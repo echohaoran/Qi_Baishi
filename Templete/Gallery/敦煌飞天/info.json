@@ -1,0 +1,12 @@
+{
+  "id": "gp12",
+  "name": "敦煌飞天",
+  "category": "gallery",
+  "cat": "重彩",
+  "desc": "石青石绿，金线勾勒。",
+  "prompt": "敦煌飞天，石青石绿，金线勾勒 —",
+  "ratio": "3:4",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(135deg, #6a8a8a 0%, #c44a44 50%, #d4a574 100%)",
+  "ink": "rgba(29,24,20,0.70)"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "gp08",
+  "name": "竹石图",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "文同笔意，竹影婆娑。",
+  "prompt": "竹石图，文同笔意，月下竹影 —",
+  "ratio": "4:5",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(45deg, #f4ecd6 0%, #7a8a5a 50%, #2d3818 100%)",
+  "ink": "rgba(29,24,20,0.80)"
+}

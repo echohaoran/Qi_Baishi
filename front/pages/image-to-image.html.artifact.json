@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "pages/image-to-image.html",
+  "entry": "pages/image-to-image.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-29T03:59:01.795Z",
+  "updatedAt": "2026-06-29T03:59:01.795Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

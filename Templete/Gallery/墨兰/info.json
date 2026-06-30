@@ -1,0 +1,12 @@
+{
+  "id": "gp21",
+  "name": "墨兰",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "郑思肖墨兰，无土之兰。",
+  "prompt": "墨兰一丛，郑思肖笔意，无土之兰 —",
+  "ratio": "1:1",
+  "strength": "0.55 - 0.75",
+  "gradient": "linear-gradient(135deg, #f4ecd6 0%, #a8a888 50%, #3a4a28 100%)",
+  "ink": "rgba(29,24,20,0.80)"
+}

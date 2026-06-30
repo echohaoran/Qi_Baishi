@@ -1,0 +1,222 @@
+{
+  "gallery": [
+    {
+      "id": "gp01",
+      "name": "飞白山水",
+      "cat": "山水",
+      "folder": "Gallery/飞白山水"
+    },
+    {
+      "id": "gp02",
+      "name": "云山图",
+      "cat": "山水",
+      "folder": "Gallery/云山图"
+    },
+    {
+      "id": "gp03",
+      "name": "溪山行旅",
+      "cat": "山水",
+      "folder": "Gallery/溪山行旅"
+    },
+    {
+      "id": "gp04",
+      "name": "富春山居",
+      "cat": "山水",
+      "folder": "Gallery/富春山居"
+    },
+    {
+      "id": "gp05",
+      "name": "工笔花鸟",
+      "cat": "花鸟",
+      "folder": "Gallery/工笔花鸟"
+    },
+    {
+      "id": "gp06",
+      "name": "墨梅",
+      "cat": "花鸟",
+      "folder": "Gallery/墨梅"
+    },
+    {
+      "id": "gp07",
+      "name": "荷花翠鸟",
+      "cat": "花鸟",
+      "folder": "Gallery/荷花翠鸟"
+    },
+    {
+      "id": "gp08",
+      "name": "竹石图",
+      "cat": "花鸟",
+      "folder": "Gallery/竹石图"
+    },
+    {
+      "id": "gp09",
+      "name": "写意人物",
+      "cat": "人物",
+      "folder": "Gallery/写意人物"
+    },
+    {
+      "id": "gp10",
+      "name": "仕女图",
+      "cat": "人物",
+      "folder": "Gallery/仕女图"
+    },
+    {
+      "id": "gp11",
+      "name": "钟馗",
+      "cat": "人物",
+      "folder": "Gallery/钟馗"
+    },
+    {
+      "id": "gp12",
+      "name": "敦煌飞天",
+      "cat": "重彩",
+      "folder": "Gallery/敦煌飞天"
+    },
+    {
+      "id": "gp13",
+      "name": "敦煌菩萨",
+      "cat": "重彩",
+      "folder": "Gallery/敦煌菩萨"
+    },
+    {
+      "id": "gp14",
+      "name": "永乐宫壁画",
+      "cat": "重彩",
+      "folder": "Gallery/永乐宫壁画"
+    },
+    {
+      "id": "gp15",
+      "name": "现代水墨",
+      "cat": "现代",
+      "folder": "Gallery/现代水墨"
+    },
+    {
+      "id": "gp16",
+      "name": "抽象水墨",
+      "cat": "现代",
+      "folder": "Gallery/抽象水墨"
+    },
+    {
+      "id": "gp17",
+      "name": "极简留白",
+      "cat": "现代",
+      "folder": "Gallery/极简留白"
+    },
+    {
+      "id": "gp18",
+      "name": "青绿山水",
+      "cat": "山水",
+      "folder": "Gallery/青绿山水"
+    },
+    {
+      "id": "gp19",
+      "name": "雪景寒林",
+      "cat": "山水",
+      "folder": "Gallery/雪景寒林"
+    },
+    {
+      "id": "gp20",
+      "name": "雨意江南",
+      "cat": "山水",
+      "folder": "Gallery/雨意江南"
+    },
+    {
+      "id": "gp21",
+      "name": "墨兰",
+      "cat": "花鸟",
+      "folder": "Gallery/墨兰"
+    },
+    {
+      "id": "gp22",
+      "name": "鹤寿图",
+      "cat": "花鸟",
+      "folder": "Gallery/鹤寿图"
+    },
+    {
+      "id": "gp23",
+      "name": "罗汉图",
+      "cat": "人物",
+      "folder": "Gallery/罗汉图"
+    },
+    {
+      "id": "gp24",
+      "name": "禅意水墨",
+      "cat": "现代",
+      "folder": "Gallery/禅意水墨"
+    }
+  ],
+  "copywriting": [
+    {
+      "id": "linqingyuan",
+      "name": "林清远风",
+      "cat": "文学",
+      "folder": "Copywriting/林清远风"
+    },
+    {
+      "id": "luxun",
+      "name": "鲁迅风",
+      "cat": "文学",
+      "folder": "Copywriting/鲁迅风"
+    },
+    {
+      "id": "zhangailing",
+      "name": "张爱玲风",
+      "cat": "文学",
+      "folder": "Copywriting/张爱玲风"
+    },
+    {
+      "id": "wangzengqi",
+      "name": "汪曾祺风",
+      "cat": "文学",
+      "folder": "Copywriting/汪曾祺风"
+    },
+    {
+      "id": "guwen",
+      "name": "古文观止",
+      "cat": "古文",
+      "folder": "Copywriting/古文观止"
+    },
+    {
+      "id": "libai",
+      "name": "李白风",
+      "cat": "古文",
+      "folder": "Copywriting/李白风"
+    },
+    {
+      "id": "business",
+      "name": "商业文案",
+      "cat": "商业",
+      "folder": "Copywriting/商业文案"
+    },
+    {
+      "id": "academic",
+      "name": "学术论文",
+      "cat": "学术",
+      "folder": "Copywriting/学术论文"
+    },
+    {
+      "id": "social",
+      "name": "社交媒体",
+      "cat": "媒体",
+      "folder": "Copywriting/社交媒体"
+    },
+    {
+      "id": "headline",
+      "name": "标题党",
+      "cat": "媒体",
+      "folder": "Copywriting/标题党"
+    },
+    {
+      "id": "brand",
+      "name": "品牌故事",
+      "cat": "商业",
+      "folder": "Copywriting/品牌故事"
+    },
+    {
+      "id": "slogan",
+      "name": "广告金句",
+      "cat": "商业",
+      "folder": "Copywriting/广告金句"
+    }
+  ]
+}

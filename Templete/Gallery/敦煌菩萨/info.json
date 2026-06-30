@@ -1,0 +1,12 @@
+{
+  "id": "gp13",
+  "name": "敦煌菩萨",
+  "category": "gallery",
+  "cat": "重彩",
+  "desc": "庄严宝相，矿物质颜料。",
+  "prompt": "敦煌菩萨，庄严宝相，矿物颜料 —",
+  "ratio": "3:4",
+  "strength": "0.55 - 0.75",
+  "gradient": "linear-gradient(45deg, #d4a574 0%, #c44a44 50%, #4a3a2a 100%)",
+  "ink": "rgba(29,24,20,0.85)"
+}

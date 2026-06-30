@@ -1,0 +1,12 @@
+{
+  "id": "gp09",
+  "name": "写意人物",
+  "category": "gallery",
+  "cat": "人物",
+  "desc": "梁楷减笔，泼墨意趣。",
+  "prompt": "写意人物，梁楷减笔，泼墨意趣 —",
+  "ratio": "3:4",
+  "strength": "0.70 - 0.90",
+  "gradient": "radial-gradient(ellipse at 30% 30%, #d4a574, #3a2a1a)",
+  "ink": "rgba(29,24,20,0.85)"
+}

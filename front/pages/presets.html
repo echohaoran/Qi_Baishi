@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>灵感墙 · 白石 Baishi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  
+  
+  
+  <link rel="stylesheet" href="../css/ink-wash.css" />
+  <link rel="stylesheet" href="../css/app-chrome.css" />
+  <link rel="stylesheet" href="../css/presets.css" />
+<script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body class="ink-wash-bg">
+  <div class="window">
+    <header class="titlebar">
+      <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
+      <div class="title"><span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 灵感墙</span></div>
+      <div class="right">
+        <div class="os-toggle"><button data-os-set="macos" class="active">macOS</button><button data-os-set="windows">Windows</button></div>
+        <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      </div>
+    </header>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.4.2</div></div></div>
+        <div class="nav-section">创作</div>
+        <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
+        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a>
+        <a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图/文</a>
+        <a href="image-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>图生图</a>
+        <div class="nav-section">资源</div>
+        <a href="presets.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6Z"/></svg>灵感墙</a>
+        <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
+        <div class="nav-section">账户</div>
+        <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
+        <div class="foot">
+          <div class="user-chip"><div class="avatar">赵</div><div class="info"><div class="name">赵明远</div><div class="plan">开源版</div></div></div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="content-header">
+          <div class="title-block">
+            <span class="crumb">资源 · 灵感墙</span>
+            <h1>灵感墙 <span class="brush" style="color: var(--accent);">古意新研</span></h1>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div class="settings-grid" data-od-id="hub">
+            <nav class="sub-nav">
+              <div class="item active" data-tab="gallery">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m3 17 5-5 4 4 3-3 6 6"/></svg>
+                画廊
+              </div>
+              <div class="item" data-tab="copywriting">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 20V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2Z"/><path d="M14 8h4M14 12h4M14 16h2"/></svg>
+                妙笔生花
+              </div>
+            </nav>
+
+            <div>
+              <!-- 画廊 -->
+              <div class="panel active" id="panel-gallery">
+                <h2 class="panel-title">翰墨丹青<span class="panel-title-count">· 25 款笔意</span></h2>
+                <div class="filter-bar">
+                  <div class="chips">
+                    <span class="tag active" data-cat="all">全部 · 25</span>
+                    <span class="tag" data-cat="山水">山水 · 8</span>
+                    <span class="tag" data-cat="人物">人物 · 5</span>
+                    <span class="tag" data-cat="重彩">重彩 · 8</span>
+                    <span class="tag" data-cat="现代">现代 · 4</span>
+                  </div>
+                  <div class="row" style="gap: var(--space-2);">
+                    <input type="text" id="search-gallery" class="input input-search" placeholder="搜索风格 · 提示词 · 标签" style="width: 240px;" />
+                    <button class="btn btn-secondary btn-sm edit-toggle" id="edit-toggle-gallery" title="进入管理模式 · 增删改预设">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      <span class="label">管理</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="grid-auto" id="preset-grid"></div>
+              </div>
+
+              <!-- 妙笔生花 · 文生文风格预设 -->
+              <div class="panel" id="panel-copywriting">
+                <h2 class="panel-title">妙笔生花<span class="panel-title-count">· 12 款文风</span></h2>
+                <p class="panel-note">本面板用于浏览与管理文生文预设风格。点击任意卡片查看完整提示词模板、字数范围与样例文本。</p>
+                <div class="filter-bar">
+                  <div class="chips">
+                    <span class="tag active" data-cat="all">全部 · 12</span>
+                    <span class="tag" data-cat="文学">文学 · 4</span>
+                    <span class="tag" data-cat="古文">古文 · 2</span>
+                    <span class="tag" data-cat="商业">商业 · 3</span>
+                    <span class="tag" data-cat="学术">学术 · 1</span>
+                    <span class="tag" data-cat="媒体">媒体 · 2</span>
+                  </div>
+                  <div class="row" style="gap: var(--space-2);">
+                    <input type="text" id="search-copywriting" class="input input-search" placeholder="搜索文风 · 提示词 · 标签" style="width: 240px;" />
+                    <select id="sort-copywriting" class="select" style="width: 120px;">
+                      <option value="newest">最新</option>
+                      <option value="hot">最热</option>
+                      <option value="rating">评分</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm edit-toggle" id="edit-toggle-copywriting" title="进入管理模式 · 增删改文风">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      <span class="label">管理</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="grid-auto" id="text-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="statusbar">
+          <span class="item">灵感墙</span>
+          <span class="spacer"></span>
+          <span class="item">白石 Baishi · 开源版</span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 详情模态 -->
+  <div class="preset-detail" id="detail">
+    <div class="panel">
+      <div class="left">
+        <div class="art" id="detail-art"></div>
+      </div>
+      <div class="right">
+        <div class="top">
+          <div>
+            <p class="eyebrow" id="detail-cat">山水</p>
+            <h2 id="detailName" style="margin-top: 6px;">飞白山水</h2>
+          </div>
+          <button class="icon-btn" id="detail-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
+          </button>
+        </div>
+        <p id="detail-desc" style="color: var(--muted); font-size: 14px; line-height: 1.65;">枯笔飞白，高山云海，留白三分。一套为大场景构图准备的笔意模板，适合海报、专辑封面与品牌主视觉。</p>
+        <div>
+          <p class="micro" style="margin-bottom: var(--space-2);">提示词</p>
+          <div class="card" style="background: var(--bg-2); padding: var(--space-4); font-size: 13px; line-height: 1.7; color: var(--fg-2);" id="detail-prompt">远山含黛，云海翻涌，笔意飞白疏朗。</div>
+        </div>
+        <div class="grid-2" style="gap: var(--space-3);">
+          <div class="card" style="padding: var(--space-4);">
+            <div class="meta">画面比例</div>
+            <div class="num" style="font-weight: 600; color: var(--fg); margin-top: 4px;">16 : 9</div>
+          </div>
+          <div class="card" style="padding: var(--space-4);">
+            <div class="meta">推荐强度</div>
+            <div class="num" style="font-weight: 600; color: var(--fg); margin-top: 4px;">0.70 - 0.85</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-block" id="favorite-preset" style="margin-top: auto;">收藏</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 文生文 · 文风详情模态 -->
+  <div class="text-detail" id="text-detail">
+    <div class="panel">
+      <div class="left">
+        <div class="text-preview" id="text-detail-sample"></div>
+      </div>
+      <div class="right">
+        <div class="top">
+          <div>
+            <p class="eyebrow" id="text-detail-cat">文学</p>
+            <h2 id="text-detail-name" style="margin-top: 6px;">EchoWang风</h2>
+          </div>
+          <button class="icon-btn" id="text-detail-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
+          </button>
+        </div>
+        <div class="editor-form-stack" style="flex:1;overflow-y:auto;">
+          <div class="editor-field">
+            <label>描述</label>
+            <textarea id="text-detail-desc" rows="2" placeholder="现代山水散文 · 留白与呼吸并重" style="font-size:14px;color:var(--fg-2);"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>提示词模板</label>
+            <textarea id="text-detail-prompt" rows="5" placeholder="完整的提示词模板" style="font-size:13px;line-height:1.6;font-family:var(--font-mono);"></textarea>
+          </div>
+          <div class="editor-form-grid">
+            <div class="editor-field">
+              <label>字数范围</label>
+              <input type="text" id="text-detail-length" placeholder="300-500 字" />
+            </div>
+            <div class="editor-field">
+              <label>风格强度</label>
+              <input type="text" id="text-detail-strength" placeholder="0.65 - 0.85" />
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>标签（回车添加）</label>
+            <div class="editor-tags-input" id="text-detail-tags-input">
+              <input type="text" id="text-detail-tag-new" placeholder="回车添加标签" />
+            </div>
+          </div>
+        </div>
+        <div class="row" style="gap: var(--space-2); margin-top: auto;">
+          <button class="btn btn-secondary btn-block" id="text-detail-cancel">取消</button>
+          <button class="btn btn-primary btn-block" id="text-detail-save">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 画廊 · 编辑模态 -->
+  <div class="preset-detail" id="editor-gallery">
+    <div class="panel">
+      <div class="left">
+        <div class="editor-upload-area" id="editor-upload-area">
+          <div class="art upload-preview" id="editor-gallery-art">
+            <div class="upload-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:36px;height:36px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>点击上传参考图</span>
+              <span class="upload-hint">支持 PNG / JPG / WebP</span>
+            </div>
+          </div>
+          <button class="btn btn-sm upload-change-btn" id="editor-upload-change" title="更换图片" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            更换图片
+          </button>
+          <input type="file" accept="image/png,image/jpeg,image/webp" id="editor-upload-input" style="display:none" />
+        </div>
+      </div>
+      <div class="right">
+        <div class="top">
+          <div>
+            <p class="eyebrow" id="editor-gallery-mode">编辑风格</p>
+            <h2 id="editor-gallery-title" style="margin-top: 6px;">编辑风格</h2>
+          </div>
+          <button class="icon-btn" id="editor-gallery-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
+          </button>
+        </div>
+        <div class="editor-form-stack">
+          <div class="editor-field">
+            <label>风格名称</label>
+            <input type="text" id="editor-gallery-name" placeholder="例：飞白山水" />
+          </div>
+          <div class="editor-form-grid">
+            <div class="editor-field">
+              <label>分类</label>
+              <div class="cat-select-wrap">
+                <select id="editor-gallery-cat">
+                  <option>山水</option>
+                  <option>花鸟</option>
+                  <option>人物</option>
+                  <option>重彩</option>
+                  <option>现代</option>
+                  <option value="__NEW__">+ 添加新分类…</option>
+                </select>
+                <input type="text" id="editor-gallery-cat-new" placeholder="输入新分类名称" style="display:none;" />
+              </div>
+            </div>
+            <div class="editor-field">
+              <label>画面比例</label>
+              <input type="text" id="editor-gallery-ratio" placeholder="16:9" />
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>描述</label>
+            <textarea id="editor-gallery-desc" rows="2" placeholder="一两句话说清这套笔意的特征与适用场景"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>提示词</label>
+            <textarea id="editor-gallery-prompt" rows="4" placeholder="完整的提示词模板，建议用「。」收尾便于模型识别"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>推荐强度</label>
+            <input type="text" id="editor-gallery-strength" placeholder="0.70 - 0.85" />
+          </div>
+        </div>
+        <div class="row" style="gap: var(--space-2); margin-top: auto;">
+          <button class="btn btn-secondary btn-block" id="editor-gallery-cancel">取消</button>
+          <button class="btn btn-primary btn-block" id="editor-gallery-save">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 妙笔生花 · 编辑模态 -->
+  <div class="text-detail" id="editor-text">
+    <div class="panel">
+      <div class="left">
+        <div class="text-preview" id="editor-text-preview"></div>
+      </div>
+      <div class="right">
+        <div class="top">
+          <div>
+            <p class="eyebrow" id="editor-text-mode">编辑文生文风格</p>
+            <h2 id="editor-text-title" style="margin-top: 6px;">编辑文风</h2>
+          </div>
+          <button class="icon-btn" id="editor-text-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
+          </button>
+        </div>
+        <div class="editor-form-stack">
+          <div class="editor-field">
+            <label>文风名称</label>
+            <input type="text" id="editor-text-name" placeholder="例：EchoWang风" />
+          </div>
+          <div class="editor-form-grid">
+            <div class="editor-field">
+              <label>分类</label>
+              <div class="cat-select-wrap">
+                <select id="editor-text-cat">
+                  <option value="文学">文学</option>
+                  <option value="古文">古文</option>
+                  <option value="商业">商业</option>
+                  <option value="学术">学术</option>
+                  <option value="媒体">媒体</option>
+                  <option value="__NEW__">+ 添加新分类…</option>
+                </select>
+                <input type="text" id="editor-text-cat-new" placeholder="输入新分类名称" style="display:none;" />
+              </div>
+            </div>
+            <div class="editor-field">
+              <label>字数范围</label>
+              <input type="text" id="editor-text-length" placeholder="300-500 字" />
+            </div>
+          </div>
+          <div class="editor-field">
+            <label>描述</label>
+            <textarea id="editor-text-desc" rows="2" placeholder="一两句话说清这套文风的特征与适用场景"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>提示词模板</label>
+            <textarea id="editor-text-prompt" rows="4" placeholder="给生成模型使用的完整指令，建议带 ①②③ 要点"></textarea>
+          </div>
+          <div class="editor-field">
+            <label>样例文本</label>
+            <textarea id="editor-text-sample" rows="4" placeholder="一两段示例，左侧预览区会实时同步"></textarea>
+          </div>
+          <div class="editor-form-grid">
+            <div class="editor-field">
+              <label>风格强度</label>
+              <input type="text" id="editor-text-strength" placeholder="0.65 - 0.85" />
+            </div>
+            <div class="editor-field">
+              <label>标签（回车添加）</label>
+              <div class="editor-tags-input" id="editor-text-tags-input">
+                <input type="text" id="editor-text-tag-new" placeholder="回车添加标签" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="gap: var(--space-2); margin-top: auto;">
+          <button class="btn btn-secondary btn-block" id="editor-text-cancel">取消</button>
+          <button class="btn btn-primary btn-block" id="editor-text-save">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-host" id="toasts"></div>
+
+  
+  <script src="../js/presets.js"></script>
+</body>
+</html>

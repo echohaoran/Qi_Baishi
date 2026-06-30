@@ -1,0 +1,12 @@
+{
+  "id": "gp22",
+  "name": "鹤寿图",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "松鹤延年，寓意吉祥。",
+  "prompt": "松鹤延年，寓意吉祥，工笔淡彩 —",
+  "ratio": "4:5",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(45deg, #e8d4b4 0%, #8a9a7a 50%, #2a2a1a 100%)",
+  "ink": "rgba(29,24,20,0.75)"
+}

@@ -1,0 +1,126 @@
+/* ===== 固定提示词：编辑模式 / 模态样式 ===== */
+    .prompt-edit-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-size: 12px; font-family: var(--font-mono);
+      cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+    }
+    .prompt-edit-toggle:hover { color: var(--fg); border-color: var(--meta); }
+    .prompt-edit-toggle.active {
+      color: var(--accent-on); background: var(--accent); border-color: var(--accent);
+    }
+    body.prompt-edit-on .prompt-edit-toggle { color: var(--accent-on); background: var(--accent); border-color: var(--accent); }
+
+    /* 编辑模式下的 chip 卡片化 */
+    .prompt-presets-grid { position: relative; }
+    body.prompt-edit-on .prompt-presets-grid .chip {
+      position: relative; padding-right: 38px;
+      border-color: var(--meta); background: rgba(255,255,255,.35);
+    }
+    .prompt-card-edit-overlay {
+      position: absolute; top: 4px; right: 4px;
+      display: flex; gap: 4px; opacity: 0;
+      transition: opacity .15s;
+    }
+    body.prompt-edit-on .prompt-chip-wrap:hover .prompt-card-edit-overlay { opacity: 1; }
+    body.prompt-edit-on .prompt-card-edit-overlay { opacity: 1; } /* 编辑模式下始终可见 */
+    .prompt-card-edit-overlay button {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--muted); cursor: pointer;
+      display: grid; place-items: center; transition: color .15s, border-color .15s;
+    }
+    .prompt-card-edit-overlay button.edit:hover { color: var(--accent); border-color: var(--accent); }
+    .prompt-card-edit-overlay button.del:hover { color: #c0392b; border-color: #c0392b; }
+
+    /* 添加占位卡 */
+    .prompt-add-card {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      border: 1.5px dashed var(--meta); background: transparent;
+      color: var(--muted); font-size: 13px; cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .prompt-add-card:hover { color: var(--accent); border-color: var(--accent); background: rgba(255,255,255,.4); }
+
+    /* 卡片内嵌二次确认 */
+    .prompt-delete-confirm {
+      position: absolute; inset: 0;
+      display: none; align-items: center; justify-content: center; gap: 6px;
+      background: rgba(255,255,255,.95); border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--fg-2);
+    }
+    .prompt-delete-confirm.show { display: flex; }
+    .prompt-delete-confirm button {
+      padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border);
+      background: var(--surface); cursor: pointer; font-size: 12px; color: var(--fg-2);
+      font-family: var(--font-mono);
+    }
+    .prompt-delete-confirm button.ok { color: #fff; background: #c0392b; border-color: #c0392b; }
+    .prompt-delete-confirm button.ok:hover { background: #a93226; }
+    .prompt-delete-confirm button.cancel:hover { color: var(--fg); }
+
+    /* 提示词编辑器模态 */
+    .prompt-editor-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(29,24,20,.32);
+      display: flex; align-items: center; justify-content: center;
+      animation: ink-fade .18s ease;
+    }
+    .prompt-editor-overlay[hidden] { display: none !important; }
+    .prompt-editor-card {
+      width: min(440px, calc(100vw - 32px));
+      background: var(--bg); color: var(--fg);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      box-shadow: 0 18px 48px rgba(0,0,0,.18);
+      display: flex; flex-direction: column;
+      animation: ink-rise .22s ease;
+    }
+    .prompt-editor-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .prompt-editor-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .prompt-editor-close:hover { color: var(--fg); border-color: var(--meta); }
+    .prompt-editor-body {
+      padding: var(--space-5);
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    .prompt-editor-field { display: flex; flex-direction: column; gap: 6px; }
+    .prompt-editor-field label {
+      font-size: 12px; color: var(--muted); letter-spacing: .04em;
+    }
+    .prompt-editor-field .input,
+    .prompt-editor-field .textarea {
+      width: 100%; font-family: var(--font-body);
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--fg); padding: 10px 12px;
+      border-radius: var(--radius-sm); font-size: 14px;
+      transition: border-color .15s;
+    }
+    .prompt-editor-field .input:focus,
+    .prompt-editor-field .textarea:focus {
+      outline: none; border-color: var(--meta);
+    }
+    .prompt-editor-field .textarea { resize: vertical; line-height: 1.6; }
+    .prompt-editor-field .field-hint { font-size: 11px; color: var(--muted); }
+    .prompt-editor-actions {
+      display: flex; justify-content: flex-end; gap: var(--space-2);
+      padding-top: var(--space-2);
+    }
+    @keyframes ink-fade { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes ink-rise {
+      from { opacity: 0; transform: translateY(8px) }
+      to { opacity: 1; transform: translateY(0) }
+    }
+
+    @media (max-width: 640px) {
+      .prompt-editor-card { width: calc(100vw - 24px); }
+    }

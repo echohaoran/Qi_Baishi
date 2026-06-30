@@ -1,0 +1,122 @@
+Agnes Batch Generation — Prompts & Metadata
+============================================================
+
+File: 01_portrait_realistic.png
+Size: 768x1024
+Prompt: Medium shot portrait of an elderly fisherman with weathered skin, deep wrinkles, intense blue eyes, wearing a worn raincoat, natural window lighting, photorealistic, ultra detailed, 8k
+URL: https://platform-outputs.agnes-ai.space/images/t2i/2b05ec3090404ef2bf068f75f35bd690.png
+
+File: 02_portrait_sketch.png
+Size: 768x1024
+Prompt: Charcoal sketch portrait of a ballerina in motion, flowing dress, dynamic pose, rough textured paper, dramatic chiaroscuro lighting, expressive strokes, high contrast
+URL: https://platform-outputs.agnes-ai.space/images/t2i/432fe65119254c01b9396db5236120aa.png
+
+File: 03_portrait_oilpainting.png
+Size: 768x1024
+Prompt: Classical oil painting portrait of a renaissance noblewoman in velvet dress, soft sfumato technique, warm golden lighting, dark background, Old Masters style, museum quality
+URL: https://platform-outputs.agnes-ai.space/images/t2i/8308fc45d4f145779dace788080d754b.png
+
+File: 04_landscape_watercolor.png
+Size: 768x1024
+Prompt: Watercolor painting of a misty bamboo forest, delicate brushstrokes, soft greens and grays, light rain, atmospheric perspective, loose painterly style, fine art paper texture
+URL: https://platform-outputs.agnes-ai.space/images/t2i/6ee9bf2e67054005a7d5e06f834bff41.png
+
+File: 05_sculpture_relief.png
+Size: 768x1024
+Prompt: Ancient Greek marble relief sculpture of Athena, Classical period style, weathered stone texture, shallow depth carving, dramatic side lighting, archaeological museum quality
+URL: https://platform-outputs.agnes-ai.space/images/t2i/36f1ba8f65dd4837b6628cdbc19e3cde.png
+
+File: 06_photo_street.png
+Size: 864x1080
+Prompt: Street photography of a bustling Tokyo night market at golden hour, lanterns glowing, steam rising from food stalls, real people, candid moment, Fujifilm color grading, grain, 35mm film
+URL: https://platform-outputs.agnes-ai.space/images/t2i/cecc918da0f44cf591b1cc04a0100896.png
+
+File: 07_sketch_architecture.png
+Size: 864x1080
+Prompt: Detailed pencil architectural drawing of Notre Dame cathedral, gothic arches, flying buttresses, cross-hatching technique, drafting paper, technical precision, vintage architectural sketch
+URL: https://platform-outputs.agnes-ai.space/images/t2i/4af98b2b855540c7aa4888bf377fb2b8.png
+
+File: 08_poster_travel.png
+Size: 864x1080
+Prompt: Vintage travel poster advertising Paris 1920s, art deco style, elegant typography, Eiffel Tower silhouetted against sunset, bold geometric shapes, limited color palette, screen print texture
+URL: https://platform-outputs.agnes-ai.space/images/t2i/de7cb5a14dff46c5a174769c92e589b3.png
+
+File: 09_inkwash_chinese.png
+Size: 864x1080
+Prompt: Traditional Chinese ink wash painting of misty mountains and pine trees, gongbi fine brushwork, ink gradations on rice paper, vertical scroll composition, seal stamp, classical Song dynasty style
+URL: https://platform-outputs.agnes-ai.space/images/t2i/7a492d4a8b0445a5b99d8205a6d881fa.png
+
+File: 10_stainedglass.png
+Size: 864x1080
+Prompt: Gothic cathedral stained glass window depicting a celestial rose, deep blues and rubies, lead came lines, morning light streaming through, kaleidoscopic pattern, intricate tracery, spiritual atmosphere
+URL: https://platform-outputs.agnes-ai.space/images/t2i/4c4a11adb5dc400884c9ae76efb10f5a.png
+
+File: 11_popart_portrait.png
+Size: 1024x1024
+Prompt: Pop art portrait of a glamorous woman, Warhol-style, bold bright colors, halftone dots, screen print effect, high contrast, iconic 1960s aesthetic, gallery wall
+URL: https://platform-outputs.agnes-ai.space/images/t2i/243ba9567a58403b89f19b8971b17648.png
+
+File: 12_mosaic_roman.png
+Size: 1024x1024
+Prompt: Ancient Roman mosaic floor depicting a lion hunt, tesserae tiles, earthy terracotta and olive tones, geometric border, weathered archaeological texture, intricate tessellation, preserved antiquity
+URL: https://platform-outputs.agnes-ai.space/images/t2i/77ad80c099164e70a3a2e88fff6685f2.png
+
+File: 14_glitch_cyberpunk.png
+Size: 1024x1024
+Prompt: Digital glitch portrait of a cyberpunk hacker, RGB chromatic aberration, pixel sorting artifacts, scan lines, data corruption visual effect, neon cyan and magenta, futuristic, vaporwave aesthetic
+URL: https://platform-outputs.agnes-ai.space/images/t2i/5bf367824aa644298f5e60ad9d6492dd.png
+
+File: 15_ukiyoe_print.png
+Size: 1024x1024
+Prompt: Ukiyo-e woodblock print of The Great Wave off Kanagawa style, stylized ocean wave with Mount Fuji in background, Hokusai homage, indigo and cream, wood grain texture, Japanese Edo period
+URL: https://platform-outputs.agnes-ai.space/images/t2i/608dab40088841d2a0c2b9e333a3d846.png
+
+File: 16_cyberpunk_city.png
+Size: 1024x576
+Prompt: Cyberpunk cityscape at night, neon-drenched rain-slicked streets, towering holographic advertisements, flying cars, blade runner aesthetic, moody atmosphere, volumetric fog, cinematic lighting
+URL: https://platform-outputs.agnes-ai.space/images/t2i/d07e2aa7602546f192a77fa88bf7aa45.png
+
+File: 17_baroque_seascape.png
+Size: 1024x576
+Prompt: Baroque landscape painting of a stormy seascape, raging waves against rocky cliffs, dramatic sky with breaking light, Turner and Ruisdael influence, impasto oil technique, dramatic chiaroscuro
+URL: https://platform-outputs.agnes-ai.space/images/t2i/cc3c8b759cd84e1f9f45f71de3cf8790.png
+
+File: 18_steampunk_airship.png
+Size: 1024x576
+Prompt: Steampunk airship fleet over Victorian London, brass and copper dirigibles, clockwork details, steam and gear aesthetic, sepia toned, intricate mechanical design, alternate history, fantasy
+URL: https://platform-outputs.agnes-ai.space/images/t2i/6095d035b8d447c49db713804784f738.png
+
+File: 19_impressionist_garden.png
+Size: 1024x576
+Prompt: Impressionist garden scene, Monet-style, water lilies in a pond, dappled sunlight through willow trees, visible brushstrokes, pastel palette, peaceful atmosphere, plein air feeling
+URL: https://platform-outputs.agnes-ai.space/images/t2i/49b13f1423ac4f52ab3cbee3f634fe84.png
+
+File: 20_graffiti_street.png
+Size: 1024x576
+Prompt: Vibrant graffiti mural on a brick wall, wild style lettering, spray paint texture, dripping paint, colorful street art, urban art movement, layers of tags and throw-ups, hip-hop culture
+URL: https://platform-outputs.agnes-ai.space/images/t2i/ccb829172f424fcd8e4dee800dbd610f.png
+
+File: 21_panorama_landscape.png
+Size: 1008x432
+Prompt: Ultra-wide cinematic landscape of Patagonia at sunrise, snow-capped Andes mountains reflecting in turquoise lake, golden hour light, anamorphic lens flare, National Geographic photography style, breathtaking panorama
+URL: https://platform-outputs.agnes-ai.space/images/t2i/cb77c20968b5461384580a3b121acb3f.png
+
+File: 22_pastel_lavender.png
+Size: 1008x432
+Prompt: Soft pastel drawing of rolling lavender fields in Provence, gentle hills under gradient sunset sky, delicate chalk texture, muted purples and warm oranges, peaceful, Cezanne-inspired, fine art
+URL: https://platform-outputs.agnes-ai.space/images/t2i/ef09c54d3648444b829af2fa24ab2ffa.png
+
+File: 23_woodblock_panorama.png
+Size: 1008x432
+Prompt: Traditional Japanese woodblock print of a long panoramic landscape, cherry blossoms along a river, Mount Fuji in distance, Hiroshige style, natural pigments on washi paper, horizontal composition
+URL: https://platform-outputs.agnes-ai.space/images/t2i/6704bb257b454fe5bf0e8f325b5d0a3f.png
+
+File: 24_artdeco_pattern.png
+Size: 1008x432
+Prompt: Art deco geometric pattern design, gold and black, symmetrical layered chevrons and sunbursts, elegant 1920s luxury style, metallic accents, architectural ornament, sophisticated wallpaper pattern
+URL: https://platform-outputs.agnes-ai.space/images/t2i/cdd38747a6b54715907a5f3170b570be.png
+
+File: 25_fresco_renaissance.png
+Size: 1008x432
+Prompt: Renaissance fresco mural depicting a celestial scene, angels and clouds, Michelangelo-inspired, vaulted ceiling perspective, cracked plaster texture, faded pigments, Sistine Chapel style, monumental scale
+URL: https://platform-outputs.agnes-ai.space/images/t2i/bf56c99466e94814a05b720d78a547aa.png

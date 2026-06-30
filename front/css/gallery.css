@@ -1,0 +1,36 @@
+.preset-detail {
+      position: fixed; inset: 0;
+      background: rgba(29, 24, 20, 0.5);
+      display: none; place-items: center;
+      z-index: 50; backdrop-filter: blur(2px);
+      animation: ink-fade 200ms var(--ease) both;
+    }
+    .preset-detail.open { display: grid; }
+    .preset-detail .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); max-width: 1080px;
+      width: calc(100% - 64px); max-height: 88vh;
+      display: grid; grid-template-columns: 1.4fr 1fr;
+      overflow: hidden; box-shadow: var(--shadow-lg);
+      animation: ink-spread 280ms var(--ease) both;
+    }
+    .preset-detail .left {
+      background: var(--bg-2); display: grid; place-items: center;
+      padding: var(--space-8); border-right: 1px solid var(--border);
+    }
+    .preset-detail .left .art {
+      width: 100%; aspect-ratio: 4 / 5;
+      border-radius: var(--radius-lg); background: var(--surface-2);
+      border: 1px solid var(--border); position: relative;
+    }
+    .preset-detail .right {
+      padding: var(--space-8); overflow-y: auto;
+      display: flex; flex-direction: column; gap: var(--space-5);
+    }
+    .preset-detail .right .top {
+      display: flex; align-items: start; justify-content: space-between;
+    }
+    @media (max-width: 920px) {
+      .preset-detail .panel { grid-template-columns: 1fr; max-height: 95vh; }
+      .preset-detail .left { border-right: 0; border-bottom: 1px solid var(--border); }
+    }

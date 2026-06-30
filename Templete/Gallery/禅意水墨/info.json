@@ -1,0 +1,12 @@
+{
+  "id": "gp24",
+  "name": "禅意水墨",
+  "category": "gallery",
+  "cat": "现代",
+  "desc": "禅意空灵，墨色克制。",
+  "prompt": "禅意水墨，墨色克制，空灵无物 —",
+  "ratio": "1:1",
+  "strength": "0.40 - 0.60",
+  "gradient": "linear-gradient(180deg, #f8f3e3 0%, #e8e0cc 50%, #c4baa4 100%)",
+  "ink": "rgba(29,24,20,0.55)"
+}

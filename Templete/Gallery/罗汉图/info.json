@@ -1,0 +1,12 @@
+{
+  "id": "gp23",
+  "name": "罗汉图",
+  "category": "gallery",
+  "cat": "人物",
+  "desc": "贯休罗汉，奇崛古怪。",
+  "prompt": "罗汉图，贯休笔意，奇崛古怪 —",
+  "ratio": "3:4",
+  "strength": "0.65 - 0.85",
+  "gradient": "radial-gradient(ellipse at 50% 30%, #c89870 0%, #4a2a1a 70%, #1a0e08 100%)",
+  "ink": "rgba(29,24,20,0.85)"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "gp05",
+  "name": "工笔花鸟",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "宋人笔意，细线淡彩。",
+  "prompt": "工笔花鸟，宋院体，细线淡彩 —",
+  "ratio": "3:4",
+  "strength": "0.50 - 0.70",
+  "gradient": "radial-gradient(ellipse at 30% 30%, #d4a574, #5a3a20)",
+  "ink": "rgba(168,50,46,0.50)"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "gp11",
+  "name": "钟馗",
+  "category": "gallery",
+  "cat": "人物",
+  "desc": "民间意趣，驱邪纳福。",
+  "prompt": "钟馗像，民间意趣，朱砂点睛 —",
+  "ratio": "3:4",
+  "strength": "0.65 - 0.85",
+  "gradient": "radial-gradient(ellipse at 50% 50%, #c44a44, #2a1a18)",
+  "ink": "rgba(168,50,46,0.60)"
+}

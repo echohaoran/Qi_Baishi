@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/packages/tauri-cli/schema.json",
+  "productName": "白石 BaiShi",
+  "version": "0.5.0",
+  "identifier": "studio.baishi.desktop",
+  "build": {
+    "frontendDist": "../front",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "",
+    "beforeDevCommand": ""
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "白石 BaiShi",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "titleBarStyle": "Visible",
+        "decorations": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src https://fonts.gstatic.com"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "msi", "nsis"],
+    "icon": [
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "GraphicsDesign",
+    "shortDescription": "水墨生图桌面应用",
+    "longDescription": "白石 BaiShi — 为创作者而生的水墨画风格桌面生图应用，支持在线API+本地推理。"
+  }
+}

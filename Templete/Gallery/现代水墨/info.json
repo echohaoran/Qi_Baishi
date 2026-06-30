@@ -1,0 +1,12 @@
+{
+  "id": "gp15",
+  "name": "现代水墨",
+  "category": "gallery",
+  "cat": "现代",
+  "desc": "吴冠中点线面。",
+  "prompt": "现代水墨，吴冠中，点线面构成 —",
+  "ratio": "4:5",
+  "strength": "0.70 - 0.90",
+  "gradient": "linear-gradient(180deg, #f8f3e3 0%, #c4a574 50%, #2a1f15 100%)",
+  "ink": "rgba(29,24,20,0.85)"
+}

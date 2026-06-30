@@ -1,0 +1,12 @@
+{
+  "id": "gp14",
+  "name": "永乐宫壁画",
+  "category": "gallery",
+  "cat": "重彩",
+  "desc": "道教壁画，沉稳厚重。",
+  "prompt": "永乐宫壁画，沉稳厚重，朱砂石青 —",
+  "ratio": "4:5",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(135deg, #c89870 0%, #8a4a3a 50%, #2a1a14 100%)",
+  "ink": "rgba(29,24,20,0.80)"
+}

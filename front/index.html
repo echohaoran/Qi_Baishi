@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>白石 Baishi · 水墨生图桌面应用 · 7 屏原型</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/ink-wash.css">
+  <link rel="stylesheet" href="css/landing.css">
+<script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body class="ink-wash-bg">
+  <header class="topnav">
+    <div class="container topnav-inner">
+      <div class="logo">
+        <span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
+        <div>
+          <div class="name">白石</div>
+          <div class="en">BAISHI · v0.4.2</div>
+        </div>
+      </div>
+      <nav>
+        <a href="pages/workspace.html">工作台</a>
+        <a href="pages/text-to-image.html">文生图/文</a>
+        <a href="pages/presets.html">灵感墙</a>
+      </nav>
+      <div class="row" style="gap: var(--space-3);">
+        <a href="pages/auth.html" class="btn btn-secondary">登录</a>
+        <a href="pages/workspace.html" class="btn btn-primary">进入原型</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="container hero" data-od-id="hero">
+      <div class="fade-in hero-text">
+        <p class="eyebrow">桌面水墨生图工具 · 7 屏原型</p>
+        <h1>以水墨，<br><span class="brush" style="color: var(--accent);">造万象</span>。</h1>
+        <p class="lead">为自媒体创作者、营销人与平面设计师而生。基于 Rust 架构，macOS 与 Windows 双端可调，笔意可设、构图可控、灵感可循。</p>
+        <div class="hero-cta">
+          <a href="pages/workspace.html" class="btn btn-primary btn-lg">进入工作台</a>
+        </div>
+        <div class="hero-meta">
+          <div class="item">
+            <span class="keyword">文生图</span>
+          </div>
+          <div class="item">
+            <span class="keyword">图生图</span>
+          </div>
+          <div class="item">
+            <span class="keyword">笔意预设</span>
+          </div>
+          <div class="item">
+            <span class="keyword">本地推理</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-fan fade-in-1" id="hero-fan" role="region" aria-label="作品预览">
+        <div class="fan-perspective">
+          <!-- 由 JS 动态渲染 5 张卡片的扇形堆叠 -->
+          <div class="fan-deck" id="fan-deck" role="list" aria-label="海报卡片"></div>
+        </div>
+        <div class="fan-label" id="fan-label" aria-live="polite">
+          <span>点击展开卡片</span>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+  <footer class="pagefoot">
+    <div class="container row-between">
+      <span>© 2026 白石 Baishi · <span class="brush" style="color: var(--accent);">以水墨 · 造万象</span></span>
+      <span class="meta">v0.4.2 · build 2026.06.29 · RUST+TAURI+HTML</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── 扇形卡牌 · 2D rotate 展开 ─────────────
+    (function () {
+      var GALLERY = [
+        { name: '写实人像', img: '../assets/posters/01_portrait_realistic.png' },
+        { name: '炭笔速写', img: '../assets/posters/02_portrait_sketch.png' },
+        { name: '古典油画', img: '../assets/posters/03_portrait_oilpainting.png' },
+        { name: '水彩竹影', img: '../assets/posters/04_landscape_watercolor.png' },
+        { name: '古希腊浮雕', img: '../assets/posters/05_sculpture_relief.png' },
+        { name: '街头摄影', img: '../assets/posters/06_photo_street.png' },
+        { name: '建筑素描', img: '../assets/posters/07_sketch_architecture.png' },
+        { name: '复古旅行海报', img: '../assets/posters/08_poster_travel.png' },
+        { name: '水墨山水', img: '../assets/posters/09_inkwash_chinese.png' },
+        { name: '哥特彩窗', img: '../assets/posters/10_stainedglass.png' },
+        { name: '波普肖像', img: '../assets/posters/11_popart_portrait.png' },
+        { name: '罗马马赛克', img: '../assets/posters/12_mosaic_roman.png' },
+        { name: '超现实达利', img: '../assets/posters/13_surrealist_dali.png' },
+        { name: '故障赛博', img: '../assets/posters/14_glitch_cyberpunk.png' },
+        { name: '浮世绘', img: '../assets/posters/15_ukiyoe_print.png' },
+        { name: '赛博都市', img: '../assets/posters/16_cyberpunk_city.png' },
+        { name: '巴洛克海景', img: '../assets/posters/17_baroque_seascape.png' },
+        { name: '蒸汽飞艇', img: '../assets/posters/18_steampunk_airship.png' },
+        { name: '印象花园', img: '../assets/posters/19_impressionist_garden.png' },
+        { name: '涂鸦街头', img: '../assets/posters/20_graffiti_street.png' },
+        { name: '巴塔哥尼亚全景', img: '../assets/posters/21_panorama_landscape.png' },
+        { name: '普罗旺斯粉彩', img: '../assets/posters/22_pastel_lavender.png' },
+        { name: '浮世绘全景', img: '../assets/posters/23_woodblock_panorama.png' },
+        { name: '装饰艺术', img: '../assets/posters/24_artdeco_pattern.png' },
+        { name: '文艺复兴湿壁画', img: '../assets/posters/25_fresco_renaissance.png' }
+      ];
+
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      var N = 8;
+      var deck = shuffle(GALLERY).slice(0, N);
+      var fanDeck = document.getElementById('fan-deck');
+      var fanLabel = document.getElementById('fan-label');
+      var isExpanded = false;
+
+      // 渲染卡片
+      deck.forEach(function (item, i) {
+        var card = document.createElement('div');
+        card.className = 'fan-card';
+        card.dataset.index = i;
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-label', item.name);
+        card.innerHTML = '<div class="fan-img" style="background-image:url(' + item.img + ')"></div><div class="fan-name">' + item.name + '</div>';
+        fanDeck.appendChild(card);
+        card.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (isExpanded) pickCard(i);
+          else expandFan();
+        });
+        card.addEventListener('mouseenter', function () {
+          if (!isExpanded) return;
+          // 保存当前 transform
+          var currentTransform = card.style.transform;
+          card.dataset.savedTransform = currentTransform;
+          card.classList.add('hover-lift');
+          // 解析 translateX 并保持水平位置，只抬升
+          var matchX = currentTransform.match(/translateX\(([\d.-]+)px\)/);
+          var matchY = currentTransform.match(/translateY\(([\d.-]+)px\)/);
+          var xOff = matchX ? parseFloat(matchX[1]) : 0;
+          var yOff = matchY ? parseFloat(matchY[1]) : 0;
+          card.style.transform = 'translateX(' + xOff + 'px) translateY(-20px) scale(1.06)';
+        });
+        card.addEventListener('mouseleave', function () {
+          if (!isExpanded) return;
+          card.classList.remove('hover-lift');
+          var saved = card.dataset.savedTransform;
+          card.style.transform = saved || card.style.transform;
+        });
+      });
+
+      // 键盘事件：Enter/Space 触发点击
+      fanDeck.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          var card = e.target.closest('.fan-card');
+          if (card) { e.preventDefault(); card.click(); }
+        }
+      });
+
+      fanDeck.addEventListener('click', function (e) {
+        if (e.target !== fanDeck) return;
+        if (isExpanded) collapseFan();
+        else expandFan();
+      });
+
+      function arrange() {
+        var cards = fanDeck.querySelectorAll('.fan-card');
+        var cardW = window.innerWidth <= 920 ? 200 : 260;
+        var overlap = window.innerWidth <= 920 ? 100 : 140;
+        var gap = cardW - overlap; // 每张卡片向左移动的距离
+        if (isExpanded) {
+          // 向左平铺展开，最多展示5张（不遮挡左侧文字）
+          var maxVisible = Math.min(N, 5);
+          cards.forEach(function (card, i) {
+            if (card.classList.contains('fan-picked')) return;
+            if (i >= maxVisible) {
+              card.style.transform = 'none';
+              card.style.opacity = '0';
+              card.style.pointerEvents = 'none';
+              card.style.zIndex = '0';
+              card.style.transitionDelay = '0ms';
+              card.style.filter = 'brightness(1)';
+              return;
+            }
+            var xOff = 60 - (i * gap); // 向右偏移 60px，避免遮挡左侧文字
+            var yOff = (i % 2 === 0 ? 3 : -3);
+            card.style.transform = 'translateX(' + xOff + 'px) translateY(' + yOff + 'px)';
+            card.style.zIndex = N - i;
+            card.style.transitionDelay = (i * 20) + 'ms';
+            card.style.opacity = '1';
+            card.style.filter = 'brightness(1)';
+            card.style.pointerEvents = 'auto';
+          });
+        } else {
+          cards.forEach(function (card, i) {
+            var offsetX = (i - (N - 1) / 2) * 2.5;
+            var offsetY = i * -0.8;
+            var rot = (i - (N - 1) / 2) * 1.5;
+            var bright = Math.max(0.55, 1 - i * 0.06);
+            card.style.transform = 'rotate(' + rot + 'deg) translateX(' + offsetX + 'px) translateY(' + offsetY + 'px)';
+            card.style.zIndex = N - i;
+            card.style.transitionDelay = (i * 15) + 'ms';
+            card.style.filter = 'brightness(' + bright + ')';
+            card.style.opacity = '' + Math.max(0.3, 1 - i * 0.09);
+            card.style.pointerEvents = 'auto';
+          });
+        }
+      }
+
+      function expandFan() {
+        isExpanded = true;
+        document.getElementById('hero-fan').classList.add('expanded');
+        document.querySelector('.hero').classList.add('fan-expanded');
+        fanLabel.querySelector('span').textContent = '悬停预览 · 点击抽图';
+        arrange();
+      }
+
+      function collapseFan() {
+        isExpanded = false;
+        document.getElementById('hero-fan').classList.remove('expanded');
+        document.querySelector('.hero').classList.remove('fan-expanded');
+        fanLabel.querySelector('span').textContent = '点击展开卡片';
+        arrange();
+      }
+
+      function pickCard(index) {
+        var cards = fanDeck.querySelectorAll('.fan-card');
+        var card = cards[index];
+        if (!card || card.classList.contains('fan-picked')) return;
+        card.classList.add('fan-picked');
+
+        // 获取卡片位置信息用来做居中飞入动画
+        var item = deck[index];
+        var imgUrl = item.img;
+
+        // 纯图片预览（无遮罩/背景/过渡）
+        var overlay = document.createElement('div');
+        overlay.className = 'fan-overlay';
+        overlay.innerHTML = '<img class="fan-overlay-img" src="' + imgUrl + '" alt="' + item.name + '">' +
+          '<div class="fan-overlay-close" aria-label="关闭预览">✕</div>';
+        document.body.appendChild(overlay);
+
+        function closeOverlay() {
+          overlay.remove();
+          card.classList.remove('fan-picked');
+          deck = shuffle(GALLERY).slice(0, N);
+          cards.forEach(function (c, i) {
+            c.querySelector('.fan-img').style.backgroundImage = 'url(' + deck[i].img + ')';
+            c.querySelector('.fan-name').textContent = deck[i].name;
+          });
+          collapseFan();
+          document.removeEventListener('keydown', overlayEsc);
+        }
+        function overlayEsc(e) {
+          if (e.key === 'Escape') closeOverlay();
+        }
+        overlay.addEventListener('click', closeOverlay);
+        document.addEventListener('keydown', overlayEsc);
+        // 防止点击图片关闭遮罩
+        overlay.querySelector('.fan-overlay-img').addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        // 聚焦关闭按钮
+        setTimeout(function () {
+          var closeBtn = overlay.querySelector('.fan-overlay-close');
+          if (closeBtn) closeBtn.focus();
+        }, 100);
+      }
+
+      // 初始：展开 → 停顿 1s → 折叠
+      setTimeout(function () {
+        expandFan();
+        setTimeout(collapseFan, 1000);
+      }, 100);
+    })();
+
+
+  </script>
+
+
+</body></html>

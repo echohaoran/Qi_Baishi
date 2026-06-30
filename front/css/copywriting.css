@@ -1,0 +1,306 @@
+.copy-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+    .copy-sidebar { display: flex; flex-direction: column; gap: var(--space-2); position: sticky; top: 0; }
+    .copy-sidebar .section-label {
+      font-family: var(--font-body); font-size: 11px; font-weight: 600;
+      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+      padding: var(--space-4) 0 var(--space-2);
+    }
+    .copy-sidebar .item {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 9px var(--space-3); border-radius: var(--radius);
+      font-size: 13px; color: var(--fg-2); cursor: pointer;
+      border: 1px solid transparent; transition: all var(--motion) var(--ease);
+    }
+    .copy-sidebar .item:hover { background: var(--surface); color: var(--fg); }
+    .copy-sidebar .item.active { background: var(--surface); color: var(--accent); border-color: var(--border); font-weight: 600; }
+    .copy-sidebar .item svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    .copy-main { display: flex; flex-direction: column; gap: var(--space-8); }
+    .copy-main > section + section { margin-top: var(--space-2); }
+
+    .copy-workspace {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .copy-workspace { grid-template-columns: 1fr; }
+    }
+
+    .copy-input-panel, .copy-output-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-2);
+    }
+    .panel-header h4 { font-size: 13px; font-weight: 600; }
+    .panel-body { padding: var(--space-5); }
+
+    .textarea-copy {
+      width: 100%; background: transparent; border: none; outline: none;
+      font-family: var(--font-body); font-size: 15px; line-height: 1.8;
+      color: var(--fg); resize: none;
+    }
+    .textarea-copy::placeholder { color: var(--muted); }
+
+    .copy-actions { display: flex; gap: var(--space-2); margin-top: var(--space-4); }
+
+    .output-text {
+      font-family: var(--font-body); font-size: 15px; line-height: 1.8;
+      color: var(--fg-2); white-space: pre-wrap; min-height: 200px;
+    }
+    .output-placeholder { color: var(--muted); text-align: center; padding: var(--space-8) 0; }
+    .output-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
+
+    .copy-templates {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .copy-templates .grid-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5);
+      padding: var(--space-5);
+    }
+    .template-card {
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; transition: background var(--motion) var(--ease);
+    }
+    .template-card:hover { background: var(--surface-2); }
+    .template-card:last-child { border-right: 0; }
+    .template-card .t-cat { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .template-card .t-name { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
+    .template-card .t-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .gen-history { display: flex; flex-direction: column; gap: var(--space-4); }
+    .history-item {
+      display: flex; align-items: start; gap: var(--space-3);
+      padding: var(--space-3); background: var(--bg-2);
+      border-radius: var(--radius); cursor: pointer;
+      border: 1px solid transparent; transition: border-color var(--motion) var(--ease);
+    }
+    .history-item:hover { border-color: var(--border); }
+    .history-item .icon-wrap {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--surface); display: grid; place-items: center; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .history-item .icon-wrap svg { width: 16px; height: 16px; }
+    .history-item .text { flex: 1; min-width: 0; }
+    .history-item .text .preview-text { font-size: 13px; color: var(--fg-2); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-item .text .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── 生成结果：可编辑态（contenteditable）─────────── */
+    .output-text[contenteditable="true"] {
+      outline: none;
+      padding: var(--space-3) var(--space-3);
+      margin: calc(var(--space-3) * -1) calc(var(--space-3) * -1);
+      border-radius: var(--radius-sm);
+      cursor: text;
+      transition: background var(--motion) var(--ease),
+                  box-shadow var(--motion) var(--ease);
+    }
+    .output-text[contenteditable="true"]:hover {
+      background: var(--bg-2);
+    }
+    .output-text[contenteditable="true"]:focus {
+      background: var(--bg-2);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+      caret-color: var(--accent);
+    }
+    .output-text[contenteditable="true"]:empty::before {
+      content: attr(data-placeholder);
+      color: var(--muted);
+      pointer-events: none;
+      font-style: italic;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .output-text[contenteditable="true"] { transition: none; }
+    }
+
+    .output-edit-flag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      border-radius: 999px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .output-edit-flag .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    .output-char-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── sr-only：屏读可达、视觉隐藏 ────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    /* ── 模板卡片 button 重置 + focus 态 ───── */
+    .template-card {
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      width: 100%;
+      display: block;
+    }
+    .template-card .t-cat,
+    .template-card .t-name,
+    .template-card .t-desc {
+      display: block;
+      text-align: left;
+    }
+    .template-card.selected {
+      background: color-mix(in srgb, var(--accent) 6%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+    .template-card:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    /* ── 历史条目 button 重置 + focus 态 ──── */
+    .history-item {
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      width: 100%;
+    }
+    .history-item:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+    .history-item:hover { border-color: var(--accent); }
+
+    /* ── 生成按钮 loading 态 ─────────────── */
+    .btn[aria-busy="true"] {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+    .btn[aria-busy="true"]::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 12px; height: 12px;
+      margin: -6px 0 0 -6px;
+      border: 1.5px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      color: var(--accent-on, var(--fg));
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── 模态（存为模板 / 二次确认） ──────── */
+    .modal-host {
+      position: fixed; inset: 0;
+      z-index: 60;
+      display: grid; place-items: center;
+    }
+    .modal-host[hidden] { display: none; }
+    .modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(2px);
+      animation: ink-fade 220ms var(--ease) both;
+    }
+    .modal-panel {
+      position: relative;
+      width: min(440px, calc(100vw - 32px));
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+      animation: ink-spread 280ms var(--ease) both;
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-head h4 { font-size: 14px; font-weight: 600; }
+    .modal-body {
+      padding: var(--space-5);
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    .modal-body .field label {
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      margin-bottom: 4px; display: block;
+    }
+    .modal-body .input,
+    .modal-body .select {
+      width: 100%; padding: 8px 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg); font-family: var(--font-body);
+      font-size: 13px; outline: none;
+      transition: border-color var(--motion) var(--ease);
+    }
+    .modal-body .input:focus,
+    .modal-body .select:focus { border-color: var(--accent); }
+    .modal-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .modal-foot {
+      display: flex; justify-content: flex-end; gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      border-top: 1px solid var(--border);
+      background: var(--bg-2);
+    }
+    .icon-btn {
+      background: none; border: 0; padding: 0;
+      width: 24px; height: 24px;
+      display: grid; place-items: center;
+      cursor: pointer; color: var(--muted);
+      font-size: 18px; line-height: 1;
+      border-radius: var(--radius-sm);
+      transition: background var(--motion) var(--ease), color var(--motion) var(--ease);
+    }
+    .icon-btn:hover {
+      background: var(--bg-2);
+      color: var(--fg);
+    }
+    .icon-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn[aria-busy="true"]::after {
+        animation: none;
+      }
+      .modal-backdrop, .modal-panel { animation: none; }
+    }

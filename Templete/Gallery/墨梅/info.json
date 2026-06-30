@@ -1,0 +1,12 @@
+{
+  "id": "gp06",
+  "name": "墨梅",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "王冕墨梅，圈花点蕊。",
+  "prompt": "墨梅一枝，圈花点蕊，月下疏影 —",
+  "ratio": "1:1",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(180deg, #f4ecd6 0%, #a8987a 50%, #2a2018 100%)",
+  "ink": "rgba(29,24,20,0.85)"
+}

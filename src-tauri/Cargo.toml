@@ -1,0 +1,48 @@
+[package]
+name = "src-tauri"
+version = "0.5.0"
+description = "白石 BaiShi - 水墨生图桌面应用后端"
+authors = ["BaiShi Studio"]
+edition = "2021"
+
+[lib]
+name = "baishi_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "baishi"
+path = "src/main.rs"
+
+[[bin]]
+name = "baishi-server"
+path = "src/server.rs"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+argon2 = "0.5"
+uuid = { version = "1", features = ["v4"] }
+rand = "0.8"
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1", features = ["full"] }
+image = "0.25"
+log = "0.4"
+env_logger = "0.11"
+password-hash = "0.5"
+base64 = "0.22"
+hex = "0.4"
+dirs-next = "2"
+
+[features]
+default = ["candle-backend"]
+candle-backend = []
+onnx-backend = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

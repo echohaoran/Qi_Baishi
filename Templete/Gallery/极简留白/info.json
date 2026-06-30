@@ -1,0 +1,12 @@
+{
+  "id": "gp17",
+  "name": "极简留白",
+  "category": "gallery",
+  "cat": "现代",
+  "desc": "极简构图，大量留白。",
+  "prompt": "极简水墨，大面积留白，仅一抹远山 —",
+  "ratio": "4:5",
+  "strength": "0.50 - 0.70",
+  "gradient": "linear-gradient(180deg, #f8f3e3 0%, #ebe2cc 60%, #d4c8a8 100%)",
+  "ink": "rgba(29,24,20,0.60)"
+}

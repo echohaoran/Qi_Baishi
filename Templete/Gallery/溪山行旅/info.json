@@ -1,0 +1,12 @@
+{
+  "id": "gp03",
+  "name": "溪山行旅",
+  "category": "gallery",
+  "cat": "山水",
+  "desc": "范宽笔意，高山仰止。",
+  "prompt": "高山仰止，溪流潺潺，范宽笔意 —",
+  "ratio": "21:9",
+  "strength": "0.70 - 0.90",
+  "gradient": "linear-gradient(45deg, #d4c8a8 0%, #8a7a5a 50%, #3a2e1c 100%)",
+  "ink": "rgba(29,24,20,0.90)"
+}

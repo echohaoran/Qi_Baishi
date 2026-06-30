@@ -1,0 +1,388 @@
+body {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    @media (max-width: 920px) {
+      body { grid-template-columns: 1fr; overflow-y: auto; }
+      .promo { display: none; }
+    }
+
+    /* ── Mobile brand strip ────────────────────────
+       当 .promo 在 <920px 被隐藏，顶部保留一条 56px 的品牌带，
+       保持登录页有品牌识别，不丢失上下文。*/
+    .mobile-strip {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-strip .seal { width: 28px; height: 28px; font-size: 14px; }
+    .mobile-strip .ms-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--fg); }
+    .mobile-strip .ms-en { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 0.16em; margin-left: 4px; }
+    @media (max-width: 920px) { .mobile-strip { display: flex; } }
+
+    /* ── Promo (left half) ────────────────────────
+       米白宣纸渐变 + 双重径向墨晕 + multiply 纹理叠加 */
+    .promo {
+      position: relative;
+      background:
+        radial-gradient(ellipse 70% 50% at 30% 30%, rgba(29, 24, 20, 0.75) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 70% 70%, rgba(29, 24, 20, 0.55) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 25% at 50% 90%, rgba(168, 50, 46, 0.45) 0%, transparent 60%),
+        linear-gradient(160deg, #f8f3e3 0%, #d4c8a8 40%, #a8987a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--space-12) var(--space-10);
+      overflow: hidden;
+    }
+    .promo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 80%, var(--fg) 0%, transparent 14%),
+        radial-gradient(ellipse at 85% 20%, var(--fg) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, var(--fg) 0%, transparent 8%);
+      opacity: 0.35;
+      mix-blend-mode: multiply;
+    }
+    .promo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0, transparent 4px, rgba(29, 24, 20, 0.018) 4px, rgba(29, 24, 20, 0.018) 5px);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .promo > * { position: relative; z-index: 1; }
+    .promo .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+      font-weight: 500;
+    }
+    .promo .tagline {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 500;
+      line-height: 1.18;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+      max-width: 16ch;
+      margin-top: var(--space-3);
+    }
+    .promo .tagline .accent { color: var(--accent); }
+    .promo .lead {
+      margin-top: var(--space-4);
+      max-width: 40ch;
+      color: var(--fg-2);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Features row (top of promo) ─────────────────── */
+    .promo .features {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      margin: 0;
+      padding: 0;
+      justify-content: flex-end;
+    }
+    .promo .features li {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+      letter-spacing: 0.02em;
+    }
+    .promo .features .dot { color: var(--meta); opacity: 0.6; font-weight: 400; }
+
+    /* Quote (bottom of promo) ─────────────────────── */
+    .promo .quote {
+      margin: 0;
+      max-width: 36ch;
+    }
+    .promo .quote blockquote {
+      margin: 0 0 var(--space-3);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fg-2);
+      line-height: 1.7;
+      letter-spacing: 0.01em;
+    }
+    .promo .quote figcaption {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .promo .quote .seal-mini {
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .promo .quote .cite {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .promo .quote .name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    .promo .quote .role {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Auth side (right half) ─────────────────── */
+    .auth-side {
+      display: grid;
+      place-items: center;
+      padding: var(--space-12) var(--space-8);
+      background: var(--surface);
+      position: relative;
+    }
+    .auth-side::before {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 1px;
+      background: var(--border);
+    }
+    @media (max-width: 920px) { .auth-side::before { display: none; } }
+    @media (max-width: 480px) { .auth-side { padding: var(--space-8) var(--space-5); } }
+
+    .auth-card { width: 100%; max-width: 380px; }
+    .auth-card h1 {
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      margin: 0 0 var(--space-2);
+    }
+    .auth-card .sub {
+      color: var(--muted);
+      margin: 0 0 var(--space-7);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .auth-card .field { margin-bottom: var(--space-5); }
+    .auth-card .field label { font-size: 13px; }
+
+    /* Field-level error state ─────────────────────── */
+    .field-err {
+      display: none;
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: var(--accent);
+      line-height: 1.5;
+    }
+    .field-err:empty { display: none; }
+    .field[data-invalid="true"] .field-err { display: block; }
+    .field[data-invalid="true"] .input,
+    .field[data-invalid="true"] .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .auth-card .auth-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: var(--space-3) 0 var(--space-6);
+      font-size: 13px;
+    }
+    .auth-card .auth-actions .link-btn { color: var(--accent); }
+    .auth-card .auth-actions .link-btn:hover { text-decoration: underline; }
+
+    .auth-card .divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin: var(--space-6) 0;
+      color: var(--meta);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .auth-card .divider span { background: var(--surface); padding: 0 var(--space-2); }
+    .auth-card .divider::before, .auth-card .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .auth-card .social { display: flex; flex-direction: column; gap: var(--space-2); }
+    .auth-card .social .btn { justify-content: center; }
+    .auth-card .switch {
+      text-align: center;
+      margin-top: var(--space-6);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .auth-card .switch .link-btn { color: var(--accent); font-weight: 500; }
+    .auth-card .switch .link-btn:hover { text-decoration: underline; }
+
+    .auth-card .input-row {
+      display: flex;
+      gap: var(--space-2);
+      align-items: stretch;
+    }
+    .auth-card .input-row .input { flex: 1; min-width: 0; }
+    .auth-card .input-row .btn { white-space: nowrap; flex-shrink: 0; }
+
+    .auth-card .input.mono {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      letter-spacing: 0.32em;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .auth-card .field-hint {
+      font-size: 12px;
+      color: var(--meta);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .auth-card #send-code-btn {
+      min-width: 124px;
+      transition: opacity var(--motion) var(--ease), background var(--motion) var(--ease);
+    }
+    .auth-card #send-code-btn.counting {
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .auth-card .input[readonly] {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      cursor: default;
+    }
+    /* 修复 .btn 的 display 覆盖了 [hidden] 的 display:none（两者特异性相同，.btn 后定义胜出） */
+    .auth-card .btn[hidden] { display: none; }
+
+    /* ── Custom remember-me checkbox ──────────────
+       替代默认浏览器 checkbox：16×16 ink-wash 描边方块，
+       勾选时填充朱砂色 + 白钩。 */
+    .remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .remember input { position: absolute; opacity: 0; pointer-events: none; }
+    .remember .box {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background: var(--bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--motion) var(--ease), border-color var(--motion) var(--ease);
+    }
+    .remember .box::after {
+      content: "";
+      width: 9px;
+      height: 5px;
+      border-left: 1.6px solid var(--bg);
+      border-bottom: 1.6px solid var(--bg);
+      transform: rotate(-45deg) translate(1px, -1px);
+      opacity: 0;
+      transition: opacity var(--motion) var(--ease);
+    }
+    .remember input:checked + .box { background: var(--accent); border-color: var(--accent); }
+    .remember input:checked + .box::after { opacity: 1; }
+    .remember input:focus-visible + .box { box-shadow: var(--focus-ring); }
+    .remember:hover .box { border-color: var(--fg); }
+
+    /* ── Password reveal toggle ─────────────────── */
+    .reveal-toggle {
+      flex-shrink: 0;
+      padding: 0 var(--space-3);
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all var(--motion) var(--ease);
+    }
+    .reveal-toggle:hover { color: var(--fg); border-color: var(--fg); }
+    .reveal-toggle[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+    .reveal-toggle:focus-visible { outline: 0; box-shadow: var(--focus-ring); }
+
+    /* ── Text-as-button (link-btn) ──────────────── */
+    .link-btn {
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .link-btn:focus-visible { outline: 0; box-shadow: var(--focus-ring); border-radius: 2px; }
+
+    /* ── Submit button loading state ──────────────
+       提交期间显示菊花，主 CTA 锁住 1.2s，避免误点；aria-busy 同步。 */
+    #submit-btn .spinner {
+      display: none;
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      margin-left: var(--space-2);
+      animation: spin 0.7s linear infinite;
+    }
+    #submit-btn[aria-busy="true"] .btn-label { opacity: 0.7; }
+    #submit-btn[aria-busy="true"] .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Corner seal ──────────────────────────────
+       移至右下角，避免与表单标题碰撞 */
+    .corner-seal {
+      position: absolute;
+      bottom: var(--space-8);
+      right: var(--space-8);
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      gap: 6px;
+      opacity: 0.55;
+    }
+    .corner-seal .seal.lg { width: 48px; height: 48px; font-size: 24px; }
+    .corner-seal .meta { font-size: 10px; color: var(--accent); letter-spacing: 0.16em; }
+
+    @media (max-width: 920px) {
+      .corner-seal { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #submit-btn .spinner { animation: none; }
+      .field[data-invalid="true"] .input { transition: none; }
+    }

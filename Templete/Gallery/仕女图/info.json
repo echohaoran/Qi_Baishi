@@ -1,0 +1,12 @@
+{
+  "id": "gp10",
+  "name": "仕女图",
+  "category": "gallery",
+  "cat": "人物",
+  "desc": "唐寅仕女，线条流畅。",
+  "prompt": "仕女图，唐寅笔意，线条流畅 —",
+  "ratio": "3:4",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(135deg, #f4d8b4 0%, #c89870 50%, #5a3a20 100%)",
+  "ink": "rgba(29,24,20,0.70)"
+}

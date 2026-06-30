@@ -1,0 +1,12 @@
+{
+  "id": "gp16",
+  "name": "抽象水墨",
+  "category": "gallery",
+  "cat": "现代",
+  "desc": "赵无极意趣。",
+  "prompt": "抽象水墨，赵无极，宇宙洪荒 —",
+  "ratio": "1:1",
+  "strength": "0.75 - 0.95",
+  "gradient": "radial-gradient(ellipse at 30% 30%, #cba66e 0%, #4a3522 70%, #1a1612 100%)",
+  "ink": "rgba(29,24,20,0.90)"
+}

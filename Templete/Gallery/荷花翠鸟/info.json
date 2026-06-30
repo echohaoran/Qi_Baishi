@@ -1,0 +1,12 @@
+{
+  "id": "gp07",
+  "name": "荷花翠鸟",
+  "category": "gallery",
+  "cat": "花鸟",
+  "desc": "没骨设色，工兼写。",
+  "prompt": "荷花翠鸟，没骨设色，工兼写 —",
+  "ratio": "3:4",
+  "strength": "0.55 - 0.75",
+  "gradient": "linear-gradient(135deg, #e8d4b4 0%, #a88064 50%, #4a2a1a 100%)",
+  "ink": "rgba(29,24,20,0.70)"
+}

@@ -1,0 +1,185 @@
+    .hist-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .hist-toolbar .input { flex: 1; min-width: 200px; max-width: 360px; }
+    .hist-toolbar .spacer { flex: 1; min-width: 0; }
+    .hist-toolbar .input-search { position: relative; flex: 1; max-width: 360px; }
+    .hist-toolbar .input-search .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .hist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-4);
+    }
+    .art-card .actions {
+      position: absolute;
+      top: var(--space-2);
+      left: var(--space-2);
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity var(--motion) var(--ease);
+    }
+    .art-card:hover .actions,
+    .art-card:focus-within .actions { opacity: 1; }
+    .art-card .actions .icon-btn {
+      width: 28px; height: 28px;
+      background: rgba(248, 243, 227, 0.85);
+      backdrop-filter: blur(4px);
+      color: var(--muted);
+    }
+    .art-card .actions .icon-btn:hover,
+    .art-card .actions .icon-btn:focus-visible { color: var(--fg); }
+    .art-card .actions .icon-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .date-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-3);
+      margin: var(--space-6) 0 var(--space-3);
+    }
+    .date-header h3 { font-size: 14px; color: var(--fg); font-weight: 500; font-family: var(--font-body); }
+    .date-header .meta { font-size: 11px; }
+    .date-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .empty-state {
+      padding: var(--space-16) var(--space-8);
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      margin: var(--space-6) 0;
+    }
+    .empty-state h3 { color: var(--fg-2); margin: 0 0 var(--space-2); font-size: 18px; font-weight: 500; }
+    .empty-state p { margin: 0 0 var(--space-4); font-size: 14px; }
+
+    /* Fav 转 button 后浏览器默认样式 reset */
+    .art-card .fav {
+      background: none;
+      border: 0;
+      padding: 0;
+      line-height: 1;
+      font: inherit;
+    }
+    .art-card .fav:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+    .art-card:hover .fav,
+    .art-card:focus-within .fav { opacity: 1; }
+
+    /* 加载中态 */
+    .btn-arrow[aria-busy="true"] {
+      position: relative;
+      color: transparent;
+      pointer-events: none;
+    }
+    .btn-arrow[aria-busy="true"]::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px;
+      border: 1.5px solid var(--muted);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 筛选时整 section 隐藏 */
+    section[data-od-id][hidden] { display: none; }
+
+    /* 工具人：仅给屏读用户 */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ─── 文生文卡（text-card variant）──────────
+       复用 .art-card 的圆角范式（border-radius: var(--radius-lg) + overflow: hidden 在 app-chrome.css line 437）
+       仅覆盖 .art-img 让其呈纸面 + 斜体文本笁 4 行限制。 */
+    .art-card.text-card .art-img {
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(180deg, #faf6ea 0%, #ede1c4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      position: relative;
+    }
+    .art-card.text-card .art-img::after {
+      /* 印章后置边缘透出纸张肌理（复用 .art-card 原有的伪元素基础上丽化） */
+      background: radial-gradient(circle at 80% 90%, rgba(168, 50, 46, 0.12) 0%, transparent 40%);
+      opacity: 0.5;
+    }
+    .art-card.text-card .text-excerpt {
+      margin: 0;
+      font-family: var(--font-serif, "Noto Serif SC", "Songti SC", serif);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--fg);
+      text-align: center;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-style: italic;
+    }
+    .art-card.text-card .text-corner-seal {
+      position: absolute;
+      bottom: var(--space-2);
+      right: var(--space-2);
+      width: 20px; height: 20px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-serif, "Noto Serif SC", serif);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 3px;
+      background: rgba(250, 246, 234, 0.85);
+      line-height: 1;
+      pointer-events: none;
+    }
+    /* 日期标题为妙笔生花 section 单独调色 */
+    section[data-od-id="copywriting"] .date-header h3 {
+      font-family: var(--font-serif, "Noto Serif SC", serif);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn-arrow[aria-busy="true"]::after { animation: none; }
+    }

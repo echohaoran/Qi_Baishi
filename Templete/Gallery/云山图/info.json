@@ -1,0 +1,12 @@
+{
+  "id": "gp02",
+  "name": "云山图",
+  "category": "gallery",
+  "cat": "山水",
+  "desc": "米氏云山，米点皴。",
+  "prompt": "云山苍茫，米点皴法，烟雨朦胧 —",
+  "ratio": "16:9",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(180deg, #e8e0cc 0%, #a4a896 50%, #5a6b58 100%)",
+  "ink": "rgba(29,24,20,0.75)"
+}

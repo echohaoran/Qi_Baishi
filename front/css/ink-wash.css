@@ -1,0 +1,621 @@
+/* ============================================================================
+   白石 (BaiShi) — Ink-Wash Design System
+   ─────────────────────────────────────────────────────────────────────────
+   Warp 活跃设计系统的结构纪律 + 水墨画的视觉语义。
+   - 8px 间距尺度、节制留白、容器宽度、动效节奏：取自 Warp §5
+   - 色彩：宣纸 + 墨 + 朱砂红（替代 Warp 的暖深色 + 暖灰）
+   - 字体：Noto Serif SC 显示体（替代 Matter Regular）
+   - 笔触、印章、水墨渐变：作为单一 decisive flourish
+
+   切勿在其他文件中重写 :root 令牌；如需派生，用 color-mix()。
+   ============================================================================ */
+
+:root {
+  /* ── 纸面 ─────────────────────────────────────────────────── */
+  --bg:           #f1ead7;   /* 宣纸 · 米黄底色，温暖非米色 */
+  --bg-2:         #ebe2cc;   /* 纸张背面 / 折叠阴影 */
+  --surface:      #f8f3e3;   /* 卡片正面 · 略微提亮 */
+  --surface-2:    #f4ecd6;   /* 卡片凹陷 · 比表面暗一档 */
+  --surface-deep: #e7dcc1;   /* 深层纸张 · 旧书页 */
+
+  /* ── 墨色（前景四阶） ──────────────────────────────────── */
+  --fg:           #1d1814;   /* 浓墨 · 标题、主文本 */
+  --fg-2:         #4a4138;   /* 中墨 · 正文 */
+  --muted:        #7a6f5f;   /* 淡墨 · 副文 */
+  --meta:         #a89a82;   /* 灰墨 · 元信息 */
+
+  /* ── 边线 ─────────────────────────────────────────────── */
+  --border:       rgba(29, 24, 20, 0.14);   /* 淡墨边线 */
+  --border-soft:  rgba(29, 24, 20, 0.08);   /* 更淡的辅助边 */
+  --border-strong:rgba(29, 24, 20, 0.32);   /* 浓墨边线 · 强调用 */
+
+  /* ── 朱砂红（唯一 accent） ──────────────────────────── */
+  --accent:       #a8322e;   /* 印泥朱砂 · 印章红 */
+  --accent-on:    #f8f3e3;   /* 朱砂底色上的纸白 */
+  --accent-soft:  rgba(168, 50, 46, 0.10);  /* 朱砂浅染 */
+  --accent-deep:  #7c1f1c;   /* 老朱砂 · 深一档 */
+
+  /* ── 语义色（节制的暖中性） ───────────────────────── */
+  --success:      #4f6b3a;   /* 苔绿 */
+  --warn:         #b58a2e;   /* 赭石 */
+  --danger:       #8a2a26;   /* 胭脂（比朱砂更暗） */
+
+  /* ── 字体 ─────────────────────────────────────────── */
+  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "SF Mono", Menlo, ui-monospace, monospace;
+  --font-brush:   "Noto Serif SC", "ZCOOL XiaoWei", "KaiTi", "STKaiti", serif; /* 笔触字 */
+
+  /* ── 字号（clamp 流动） ─────────────────────────── */
+  --fs-display:   clamp(40px, 5.2vw, 64px);
+  --fs-h1:        clamp(32px, 4vw, 48px);
+  --fs-h2:        clamp(24px, 2.6vw, 32px);
+  --fs-h3:        20px;
+  --fs-lead:      16px;
+  --fs-body:      15px;
+  --fs-meta:      13px;
+  --fs-micro:     11px;
+
+  --lh-display:   1.12;
+  --lh-body:      1.65;
+  --tracking-display: -0.02em;
+
+  /* ── 间距（8px 网格） ──────────────────────────── */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --space-12: 48px; --space-16: 64px; --space-20: 80px;
+
+  /* ── 容器与栅栏 ───────────────────────────────── */
+  --container: 1440px;       /* 桌面应用主容器 */
+  --sidebar-w: 240px;        /* 侧栏宽 */
+  --titlebar-h: 36px;        /* macOS 标题栏高 */
+  --titlebar-h-win: 32px;    /* Windows 标题栏高 */
+  --gutter: 32px;
+
+  /* ── 圆角（节制；朱砂印章为唯一例外） ─────────── */
+  --radius-sm: 4px;
+  --radius:    8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+  --radius-seal: 6px;        /* 印章方角 */
+
+  /* ── 阴影（淡墨晕染，不用黑） ───────────────── */
+  --shadow-sm: 0 1px 2px rgba(29, 24, 20, 0.06);
+  --shadow:    0 2px 8px rgba(29, 24, 20, 0.08);
+  --shadow-lg: 0 8px 24px rgba(29, 24, 20, 0.10);
+  --shadow-ink: 0 1px 0 rgba(29, 24, 20, 0.04), 0 2px 12px rgba(29, 24, 20, 0.06);
+
+  /* ── 焦点环（朱砂外晕，无蓝色） ─────────────── */
+  --focus-ring: 0 0 0 2px var(--accent-soft), 0 0 0 4px var(--accent);
+
+  /* ── 动效 ───────────────────────────────────── */
+  --motion-fast: 150ms;
+  --motion:      220ms;
+  --motion-slow: 360ms;
+  --ease:        cubic-bezier(0.2, 0, 0, 1);
+  --ease-ink:    cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── 笔触（笔画的视觉重量） ─────────────────── */
+  --brush-1: 1px;   /* 极细 · 发丝 */
+  --brush-2: 2px;   /* 中细 · 行书 */
+  --brush-3: 3px;   /* 中粗 · 楷书 */
+  --brush-4: 6px;   /* 粗 · 飞白 */
+  --brush-5: 12px;  /* 极粗 · 大字 */
+}
+
+/* ── reset ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; }
+p { text-wrap: pretty; margin: 0; }
+h1, h2, h3, h4 { text-wrap: balance; margin: 0; font-family: var(--font-display); font-weight: 500; letter-spacing: var(--tracking-display); }
+
+/* ── 字体阶 ─────────────────────────────────────── */
+.h-display, h1.display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.h1, h1 { font-size: var(--fs-h1); line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; }
+.h2, h2 { font-size: var(--fs-h2); line-height: 1.22; font-weight: 500; letter-spacing: -0.015em; }
+.h3, h3 { font-size: var(--fs-h3); line-height: 1.32; font-weight: 500; letter-spacing: -0.01em; }
+.lead  { font-size: var(--fs-lead); line-height: 1.6; color: var(--muted); }
+.meta  { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); letter-spacing: 0.02em; }
+.micro { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--meta); letter-spacing: 0.06em; text-transform: uppercase; }
+.num   { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.brush { font-family: var(--font-brush); font-weight: 500; }
+
+/* ── 排版点缀 ─────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-brush);
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.eyebrow::before {
+  content: "";
+  width: 24px;
+  height: var(--brush-2);
+  background: var(--accent);
+  display: inline-block;
+  transform: skewX(-15deg);
+  opacity: 0.85;
+}
+.brush-divider {
+  display: block;
+  width: 100%;
+  height: 8px;
+  background:
+    radial-gradient(ellipse 60% 100% at 0% 50%, var(--fg) 0%, var(--fg) 30%, transparent 70%),
+    radial-gradient(ellipse 50% 100% at 100% 50%, var(--fg) 0%, var(--fg) 25%, transparent 65%);
+  background-blend-mode: multiply;
+  opacity: 0.55;
+  filter: blur(0.4px);
+  margin: var(--space-8) 0;
+}
+.brush-divider-vert {
+  display: inline-block;
+  width: 4px;
+  height: 100%;
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, var(--fg) 0%, var(--fg) 30%, transparent 70%),
+    radial-gradient(ellipse 100% 50% at 50% 100%, var(--fg) 0%, var(--fg) 25%, transparent 65%);
+  background-blend-mode: multiply;
+  opacity: 0.5;
+  filter: blur(0.4px);
+}
+
+/* ── 印章（朱砂方印，唯一 accent 容器） ─────── */
+.seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-family: var(--font-brush);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  border-radius: var(--radius-seal);
+  border: 2px solid var(--accent-deep);
+  box-shadow: inset 0 0 0 1px var(--accent-on), 0 0 0 1px var(--accent);
+  flex-shrink: 0;
+  position: relative;
+  user-select: none;
+}
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background:
+    radial-gradient(circle at 20% 20%, transparent 0%, transparent 40%, var(--accent-on) 40.5%, var(--accent-on) 41.5%, transparent 42%),
+    radial-gradient(circle at 80% 80%, transparent 0%, transparent 25%, var(--accent-on) 25.5%, var(--accent-on) 26.5%, transparent 27%),
+    radial-gradient(circle at 70% 30%, transparent 0%, transparent 30%, rgba(248,243,227,0.5) 30.5%, rgba(248,243,227,0.5) 31.5%, transparent 32%);
+  border-radius: 3px;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.seal.sm { width: 28px; height: 28px; font-size: 15px; border-width: 1.5px; }
+.seal.lg { width: 56px; height: 56px; font-size: 30px; }
+
+/* ── 水墨背景（页面级装饰） ─────────────────── */
+.ink-wash-bg {
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+}
+.ink-wash-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(29, 24, 20, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 80%, rgba(29, 24, 20, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(29, 24, 20, 0.04) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+.ink-wash-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(29, 24, 20, 0.012) 3px, rgba(29, 24, 20, 0.012) 4px);
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* ── 墨点（散落小装饰） ──────────────────── */
+.ink-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg);
+  opacity: 0.7;
+  filter: blur(0.3px);
+  margin: 0 4px;
+}
+.ink-dot.lg { width: 12px; height: 12px; opacity: 0.5; }
+
+/* ── 容器 ───────────────────────────────────── */
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section {
+  padding-block: var(--space-12);
+}
+.section + .section { border-top: 1px solid var(--border-soft); }
+.stack { display: flex; flex-direction: column; }
+.stack > * + * { margin-top: var(--space-4); }
+.row { display: flex; align-items: center; gap: var(--space-4); }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8); align-items: start; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-8); align-items: start; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-4); }
+@media (max-width: 920px) {
+  .grid-2, .grid-3, .grid-4, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+}
+
+/* ── 按钮 ───────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
+  transition: background var(--motion) var(--ease), color var(--motion) var(--ease), border-color var(--motion) var(--ease), transform 80ms var(--ease);
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 0; box-shadow: var(--focus-ring); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-on);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--fg); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-2);
+  border-color: transparent;
+  padding-inline: var(--space-3);
+}
+.btn-ghost:hover:not(:disabled) { color: var(--accent); background: var(--accent-soft); }
+
+.btn-ink {
+  background: var(--fg);
+  color: var(--surface);
+  border-color: var(--fg);
+}
+.btn-ink:hover:not(:disabled) { background: var(--fg-2); border-color: var(--fg-2); }
+
+.btn-arrow::after { content: "→"; transition: transform var(--motion) var(--ease); margin-left: 2px; }
+.btn-arrow:hover::after { transform: translateX(3px); }
+
+.btn-lg { padding: 14px 28px; font-size: 15px; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-block { width: 100%; justify-content: center; }
+
+/* ── 卡片 / 表面 ─────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: border-color var(--motion) var(--ease), box-shadow var(--motion) var(--ease), transform var(--motion) var(--ease);
+}
+.card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-ink); }
+.card-flat { background: transparent; border: 0; padding: 0; }
+.card-rule { background: transparent; border: 0; border-top: 1px solid var(--fg); padding: var(--space-6) 0 0; border-radius: 0; }
+.card-pad-lg { padding: var(--space-8); }
+
+/* ── 标签 / 徽章 ──────────────────────────── */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-family: var(--font-body);
+  transition: all var(--motion) var(--ease);
+  cursor: pointer;
+}
+.tag:hover, .tag.active { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+
+/* ── 表单字段 ────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.input, .textarea, .select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-body);
+  transition: border-color var(--motion) var(--ease), box-shadow var(--motion) var(--ease);
+}
+.input:focus, .textarea:focus, .select:focus {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.textarea { min-height: 96px; resize: vertical; line-height: 1.6; font-family: var(--font-body); }
+.input::placeholder, .textarea::placeholder { color: var(--meta); }
+
+.input-search {
+  padding-left: 36px;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a6f5f' stroke-width='1.6'><circle cx='11' cy='11' r='7'/><path d='m20 20-3.5-3.5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 16px;
+}
+
+/* ── 滑块（朱砂轨道） ────────────────────── */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  outline: 0;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion) var(--ease);
+}
+.slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.slider::-moz-range-thumb {
+  width: 18px; height: 18px;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── 切换开关 ──────────────────────────── */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+}
+.toggle input { display: none; }
+.toggle .track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  transition: background var(--motion) var(--ease);
+}
+.toggle .knob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  background: var(--surface);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion) var(--ease);
+}
+.toggle input:checked + .track { background: var(--accent); }
+.toggle input:checked + .track + .knob { transform: translateX(16px); }
+
+/* ── 表格 ────────────────────────────── */
+.ds-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ds-table th, .ds-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+.ds-table th { color: var(--muted); font-weight: 500; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.ds-table tbody tr:hover { background: var(--surface-2); }
+.ds-table .num-col { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── 图片占位（水墨块，不用 stock URL） ─── */
+.ph-img {
+  background:
+    linear-gradient(135deg, var(--surface-2), var(--bg-2)),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 16 / 10;
+  display: grid; place-items: center;
+  color: var(--meta);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+}
+.ph-img::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 60% at 30% 40%, rgba(29, 24, 20, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 40% at 70% 70%, rgba(29, 24, 20, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.ph-img.square   { aspect-ratio: 1 / 1; }
+.ph-img.portrait { aspect-ratio: 3 / 4; }
+.ph-img.wide     { aspect-ratio: 16 / 9; }
+.ph-img.ultra    { aspect-ratio: 21 / 9; }
+.ph-img-content  { position: relative; z-index: 1; }
+
+/* ── 引用（编辑式） ─────────────────── */
+.quote {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  max-width: 28ch;
+  color: var(--fg);
+  font-weight: 500;
+}
+.quote-author { color: var(--muted); font-size: 14px; margin-top: var(--space-4); }
+.quote-mark {
+  font-family: var(--font-display);
+  font-size: 120px;
+  line-height: 0.6;
+  color: var(--accent);
+  opacity: 0.2;
+  margin-bottom: -24px;
+  font-weight: 600;
+}
+
+/* ── 分割 ─────────────────────────── */
+.rule  { border: 0; border-top: 1px solid var(--border); margin: 0; }
+.rule-strong { border: 0; border-top: 1px solid var(--fg); margin: 0; }
+
+/* ── 关键帧 ───────────────────────── */
+@keyframes ink-fade {
+  from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes ink-spread {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+@keyframes brush-stroke {
+  0%   { stroke-dashoffset: 1000; opacity: 0; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.fade-in { animation: ink-fade 600ms var(--ease-ink) both; }
+.fade-in-1 { animation: ink-fade 600ms var(--ease-ink) 80ms both; }
+.fade-in-2 { animation: ink-fade 600ms var(--ease-ink) 160ms both; }
+.fade-in-3 { animation: ink-fade 600ms var(--ease-ink) 240ms both; }
+.fade-in-4 { animation: ink-fade 600ms var(--ease-ink) 320ms both; }
+
+/* ── 状态 dot 涟漪（"引擎就绪" 活体信号） ──────────
+   复用 .dot 的 6px 基础圆，加 .pulse 修饰即激活：
+   涟漪环从 0.8× 扩张到 2.4× 同时 opacity 0.5→0，
+   2.4s 一次循环。无装饰意义，仅用于传达"系统在线"。 */
+@keyframes dot-pulse {
+  0%   { transform: scale(0.8); opacity: 0.55; }
+  70%  { transform: scale(2.4); opacity: 0;    }
+  100% { transform: scale(2.4); opacity: 0;    }
+}
+.statusbar .item .dot.pulse { position: relative; }
+.statusbar .item .dot.pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: var(--success);
+  opacity: 0;
+  animation: dot-pulse 2.4s var(--ease) infinite;
+  pointer-events: none;
+}
+
+/* ── Reduced-motion 兜底 ─────────────────
+   WCAG 2.3.3 头动前庭门槛 + 用户偏好：
+   - 取消所有 ink-fade 入场（保留可见态）
+   - 取消 dot 涟漪（保留静态点，但隐藏扩张环） */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in, .fade-in-1, .fade-in-2, .fade-in-3, .fade-in-4 { animation: none; }
+  .statusbar .item .dot.pulse::after { animation: none; opacity: 0; }
+}
+
+/* ── 选择高亮（朱砂） ───────────────── */
+::selection { background: var(--accent-soft); color: var(--accent-deep); }
+
+/* ── 滚动条（淡墨） ───────────────── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-pill); border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--meta); }
+
+/* ── 夜墨暗色主题 ────────────────────────
+   [data-theme="dark"] 激活时覆盖 :root 令牌。
+   月光冷纸 + 夜墨底色，朱砂保持。
+   视觉哲学：静夜研墨，灯下观画 */
+[data-theme="dark"] {
+  --bg:           #1a1714;   /* 夜墨底 · 暖黑 */
+  --bg-2:         #21201c;   /* 稍亮一档 */
+  --surface:      #2a2622;   /* 卡片底 · 月光微泛 */
+  --surface-2:    #32302b;   /* 凹陷面 */
+  --fg:           #f0ebe0;   /* 月白 · 暖白 */
+  --fg-2:         #c4bdb1;   /* 霜灰 */
+  --muted:        #8e867a;   /* 淡墨 · 暗处 */
+  --meta:         #6d655c;   /* 更深 */
+  --border:       rgba(240, 235, 224, 0.12);
+  --border-soft:  rgba(240, 235, 224, 0.06);
+  --border-strong:rgba(240, 235, 224, 0.25);
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.3);
+  --shadow:      0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg:   0 8px 24px rgba(0,0,0,0.5);
+  --shadow-ink:  0 1px 0 rgba(0,0,0,0.3), 0 2px 12px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .ink-wash-bg::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(168, 50, 46, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 80%, rgba(0, 0, 0, 0.2) 0%, transparent 55%);
+}
+[data-theme="dark"] .ink-wash-bg::after { opacity: 0.03; }

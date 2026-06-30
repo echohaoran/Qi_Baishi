@@ -1,0 +1,12 @@
+{
+  "id": "gp04",
+  "name": "富春山居",
+  "category": "gallery",
+  "cat": "山水",
+  "desc": "黄公望笔意，浅绛设色。",
+  "prompt": "富春江畔，浅绛设色，黄公望笔意 —",
+  "ratio": "21:9",
+  "strength": "0.65 - 0.80",
+  "gradient": "linear-gradient(135deg, #e8d8b0 0%, #c4a574 50%, #6a4a2a 100%)",
+  "ink": "rgba(29,24,20,0.70)"
+}

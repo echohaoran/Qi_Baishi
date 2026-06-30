@@ -1,0 +1,12 @@
+{
+  "id": "gp19",
+  "name": "雪景寒林",
+  "category": "gallery",
+  "cat": "山水",
+  "desc": "郭熙笔意，冬意萧瑟。",
+  "prompt": "雪景寒林，郭熙笔意，冬意萧瑟 —",
+  "ratio": "16:9",
+  "strength": "0.65 - 0.85",
+  "gradient": "linear-gradient(180deg, #f8f3e3 0%, #d4d4d4 50%, #5a5a5a 100%)",
+  "ink": "rgba(29,24,20,0.65)"
+}

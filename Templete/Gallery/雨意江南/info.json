@@ -1,0 +1,12 @@
+{
+  "id": "gp20",
+  "name": "雨意江南",
+  "category": "gallery",
+  "cat": "山水",
+  "desc": "烟雨江南，水墨氤氲。",
+  "prompt": "雨意江南，水墨氤氲，烟雨朦胧 —",
+  "ratio": "16:9",
+  "strength": "0.60 - 0.80",
+  "gradient": "linear-gradient(180deg, #e0e0d0 0%, #a4a896 50%, #4a5a48 100%)",
+  "ink": "rgba(29,24,20,0.70)"
+}

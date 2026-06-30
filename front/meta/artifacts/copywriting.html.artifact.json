@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "copywriting.html",
+  "entry": "copywriting.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-29T02:04:20.598Z",
+  "updatedAt": "2026-06-29T02:04:20.598Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
