@@ -4,6 +4,8 @@ version = "0.0.1-test"
 description = "白石 BaiShi - 水墨生图桌面应用后端 (Agnes API)"
 authors = ["BaiShi Studio"]
 edition = "2021"
+build = "build.rs"
+default-run = "baishi"
 
 [lib]
 name = "baishi_lib"
@@ -42,6 +44,9 @@ reqwest = { version = "0.12", features = ["json"] }
 axum = "0.8"
 tower-http = { version = "0.6", features = ["fs", "cors"] }
 tower = { version = "0.5", features = ["util"] }
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
 
 [profile.release]
 opt-level = 3
