@@ -7,7 +7,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: build-installers-${{ github.ref }}
@@ -193,3 +193,115 @@ jobs:
           name: BaiShi-x86_64-rpm
           path: dist/BaiShi-x86_64.rpm
           retention-days: 14
+
+  release:
+    name: Publish to GitHub Releases
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - macos-arm64-dmg
+      - macos-intel-dmg
+      - windows-x64-exe
+      - linux-x64-packages
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: false
+
+      - name: List downloaded artifacts
+        run: |
+          echo "==> Tree of artifacts/:"
+          find artifacts -type f -printf "%p (%s bytes)\n" | sort
+          echo
+          echo "==> Top-level artifact dirs:"
+          ls -1 artifacts
+
+      - name: Stage release files
+        run: |
+          set -e
+          # 把不同子目录里的产物统一到 release/ 目录，文件名为最终 release 资产名
+          mkdir -p release
+          declare -A pairs=(
+            ["BaiShi-arm64-dmg/BaiShi-arm64.dmg"]="BaiShi-arm64.dmg"
+            ["BaiShi-intel-dmg/BaiShi-intel.dmg"]="BaiShi-intel.dmg"
+            ["BaiShi-x86_64-exe/BaiShi-x86_64-setup.exe"]="BaiShi-x86_64-setup.exe"
+            ["BaiShi-x86_64-deb/BaiShi-x86_64.deb"]="BaiShi-x86_64.deb"
+            ["BaiShi-x86_64-rpm/BaiShi-x86_64.rpm"]="BaiShi-x86_64.rpm"
+          )
+          for src in "${!pairs[@]}"; do
+            dst="release/${pairs[$src]}"
+            # download-artifact 可能在顶层，也可能在 artifacts/<name>/ 下，先做模糊匹配
+            found=$(find artifacts -type f -name "$(basename "$src")" | head -n 1 || true)
+            if [ -n "$found" ] && [ -e "$found" ]; then
+              cp -f "$found" "$dst"
+              echo "  staged: $dst <- $found"
+            else
+              echo "  MISSING: artifacts/**/${src}"
+            fi
+          done
+          echo
+          echo "==> release/ contents:"
+          ls -la release
+
+          if [ -z "$(ls -A release 2>/dev/null)" ]; then
+            echo "::error::No release artifacts were downloaded. Aborting release."
+            exit 1
+          fi
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -n 1 || true)
+          if [ -z "$PREV_TAG" ]; then
+            echo "changelog<<EOF" >> "$GITHUB_OUTPUT"
+            echo "First release - ${VERSION}" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "changelog<<EOF" >> "$GITHUB_OUTPUT"
+            git log --oneline --no-decorate "${PREV_TAG}..HEAD" 2>/dev/null || echo "Initial release" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: BaiShi v${{ steps.notes.outputs.version }}
+          fail_on_unmatched_files: true
+          body: |
+            ## 白石 BaiShi v${{ steps.notes.outputs.version }}
+
+            ${{ steps.notes.outputs.changelog }}
+
+            ### Downloads
+
+            | Platform | Architecture | Format | File |
+            |----------|--------------|--------|------|
+            | macOS    | Apple Silicon (M1+) | DMG | `BaiShi-arm64.dmg` |
+            | macOS    | Intel              | DMG | `BaiShi-intel.dmg` |
+            | Windows  | x64                | NSIS Installer | `BaiShi-x86_64-setup.exe` |
+            | Linux    | x64                | DEB | `BaiShi-x86_64.deb` |
+            | Linux    | x64                | RPM | `BaiShi-x86_64.rpm` |
+
+            ### Notes
+            - macOS builds are **unsigned** - you may need to right-click -> Open to bypass Gatekeeper.
+            - Windows build is an NSIS installer.
+            - Linux DEB/RPM are provided for Debian/Ubuntu and Fedora/RHEL-based distributions respectively.
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || contains(github.ref_name, 'rc') }}
+          files: |
+            release/BaiShi-arm64.dmg
+            release/BaiShi-intel.dmg
+            release/BaiShi-x86_64-setup.exe
+            release/BaiShi-x86_64.deb
+            release/BaiShi-x86_64.rpm
