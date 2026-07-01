@@ -23,7 +23,7 @@
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
-      <div class="title"><span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 设置</span></div>
+      <div class="title"><span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 设置</span></div>
       <div class="right">
         <div class="os-toggle"><button data-os-set="macos" class="active">macOS</button><button data-os-set="windows">Windows</button></div>
         <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v6M12 22v-6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/></svg></button>
@@ -32,7 +32,7 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
@@ -279,12 +279,12 @@
               <div class="card card-pad-lg" style="margin-bottom: var(--space-5);">
                 <div class="row-between" style="margin-bottom: var(--space-3);">
                   <h3 style="font-size: 16px;">本地缓存</h3>
-                  <span class="num" style="color: var(--fg); font-weight: 600;">4.2 / 10 GB</span>
+                  <span class="num" data-storage-num style="color: var(--fg); font-weight: 600;">加载中…</span>
                 </div>
                 <div style="height: 8px; background: var(--border); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: var(--space-3);">
-                  <div style="height: 100%; width: 42%; background: linear-gradient(90deg, var(--accent), var(--accent-deep)); border-radius: var(--radius-pill);"></div>
+                  <div data-storage-bar style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-deep)); border-radius: var(--radius-pill); transition: width 0.3s ease;"></div>
                 </div>
-                <p style="font-size: 13px; color: var(--muted);">所有生成的作品会优先缓存到本地 · 离线时可访问</p>
+                <p data-storage-hint style="font-size: 13px; color: var(--muted);">所有生成的作品会优先缓存到本地 · 离线时可访问</p>
                 <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2);">
                   <button class="btn btn-secondary btn-sm">清理 30 天前</button>
                   <button class="btn btn-secondary btn-sm">仅保留收藏</button>
@@ -300,7 +300,7 @@
 
               <div class="card card-pad-lg about-hero" style="margin-bottom: var(--space-5);">
                 <div class="about-mark">
-                  <span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span>
+                  <span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>
                   <div>
                     <h3>白石 Baishi</h3>
                     <p>开源的文生图 / 图生图 / 文生文桌面创作工具，面向自媒体创作者、营销团队与设计师，聚焦中文创作流程与本地化工作台体验。</p>

@@ -21,7 +21,7 @@
   <header class="topnav">
     <div class="container topnav-inner">
       <div class="logo">
-        <span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
+        <span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>
         <div>
           <div class="name">白石</div>
           <div class="en">BAISHI · v0.0.1_test</div>
@@ -90,7 +90,7 @@
     <div class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title">
       <div class="setup-modal-header">
         <div class="brand-row">
-          <span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
+          <span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>
           <h2 id="setup-title">配置 API 服务</h2>
         </div>
         <button class="setup-modal-close" id="setup-close" aria-label="关闭">✕</button>
@@ -133,31 +133,31 @@
     // ── 扇形卡牌 · 2D rotate 展开 ─────────────
     (function () {
       var GALLERY = [
-        { name: '写实人像', img: '../assets/posters/01_portrait_realistic.png' },
-        { name: '炭笔速写', img: '../assets/posters/02_portrait_sketch.png' },
-        { name: '古典油画', img: '../assets/posters/03_portrait_oilpainting.png' },
-        { name: '水彩竹影', img: '../assets/posters/04_landscape_watercolor.png' },
-        { name: '古希腊浮雕', img: '../assets/posters/05_sculpture_relief.png' },
-        { name: '街头摄影', img: '../assets/posters/06_photo_street.png' },
-        { name: '建筑素描', img: '../assets/posters/07_sketch_architecture.png' },
-        { name: '复古旅行海报', img: '../assets/posters/08_poster_travel.png' },
-        { name: '水墨山水', img: '../assets/posters/09_inkwash_chinese.png' },
-        { name: '哥特彩窗', img: '../assets/posters/10_stainedglass.png' },
-        { name: '波普肖像', img: '../assets/posters/11_popart_portrait.png' },
-        { name: '罗马马赛克', img: '../assets/posters/12_mosaic_roman.png' },
-        { name: '超现实达利', img: '../assets/posters/13_surrealist_dali.png' },
-        { name: '故障赛博', img: '../assets/posters/14_glitch_cyberpunk.png' },
-        { name: '浮世绘', img: '../assets/posters/15_ukiyoe_print.png' },
-        { name: '赛博都市', img: '../assets/posters/16_cyberpunk_city.png' },
-        { name: '巴洛克海景', img: '../assets/posters/17_baroque_seascape.png' },
-        { name: '蒸汽飞艇', img: '../assets/posters/18_steampunk_airship.png' },
-        { name: '印象花园', img: '../assets/posters/19_impressionist_garden.png' },
-        { name: '涂鸦街头', img: '../assets/posters/20_graffiti_street.png' },
-        { name: '巴塔哥尼亚全景', img: '../assets/posters/21_panorama_landscape.png' },
-        { name: '普罗旺斯粉彩', img: '../assets/posters/22_pastel_lavender.png' },
-        { name: '浮世绘全景', img: '../assets/posters/23_woodblock_panorama.png' },
-        { name: '装饰艺术', img: '../assets/posters/24_artdeco_pattern.png' },
-        { name: '文艺复兴湿壁画', img: '../assets/posters/25_fresco_renaissance.png' }
+        { name: '写实人像', img: 'assets/posters/01_portrait_realistic.png' },
+        { name: '炭笔速写', img: 'assets/posters/02_portrait_sketch.png' },
+        { name: '古典油画', img: 'assets/posters/03_portrait_oilpainting.png' },
+        { name: '水彩竹影', img: 'assets/posters/04_landscape_watercolor.png' },
+        { name: '古希腊浮雕', img: 'assets/posters/05_sculpture_relief.png' },
+        { name: '街头摄影', img: 'assets/posters/06_photo_street.png' },
+        { name: '建筑素描', img: 'assets/posters/07_sketch_architecture.png' },
+        { name: '复古旅行海报', img: 'assets/posters/08_poster_travel.png' },
+        { name: '水墨山水', img: 'assets/posters/09_inkwash_chinese.png' },
+        { name: '哥特彩窗', img: 'assets/posters/10_stainedglass.png' },
+        { name: '波普肖像', img: 'assets/posters/11_popart_portrait.png' },
+        { name: '罗马马赛克', img: 'assets/posters/12_mosaic_roman.png' },
+        { name: '超现实达利', img: 'assets/posters/13_surrealist_dali.png' },
+        { name: '故障赛博', img: 'assets/posters/14_glitch_cyberpunk.png' },
+        { name: '浮世绘', img: 'assets/posters/15_ukiyoe_print.png' },
+        { name: '赛博都市', img: 'assets/posters/16_cyberpunk_city.png' },
+        { name: '巴洛克海景', img: 'assets/posters/17_baroque_seascape.png' },
+        { name: '蒸汽飞艇', img: 'assets/posters/18_steampunk_airship.png' },
+        { name: '印象花园', img: 'assets/posters/19_impressionist_garden.png' },
+        { name: '涂鸦街头', img: 'assets/posters/20_graffiti_street.png' },
+        { name: '巴塔哥尼亚全景', img: 'assets/posters/21_panorama_landscape.png' },
+        { name: '普罗旺斯粉彩', img: 'assets/posters/22_pastel_lavender.png' },
+        { name: '浮世绘全景', img: 'assets/posters/23_woodblock_panorama.png' },
+        { name: '装饰艺术', img: 'assets/posters/24_artdeco_pattern.png' },
+        { name: '文艺复兴湿壁画', img: 'assets/posters/25_fresco_renaissance.png' }
       ];
 
       function shuffle(arr) {

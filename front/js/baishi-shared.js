@@ -178,7 +178,7 @@
     node.dataset.toastKey = key;
     node.dataset.lastShownAt = String(now);
     node.innerHTML =
-      '<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span>' +
+      '<span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>' +
       '<span>' + escapeHtml(text) + '</span>';
 
     host.appendChild(node);

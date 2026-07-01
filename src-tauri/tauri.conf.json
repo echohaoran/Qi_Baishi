@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/packages/tauri-cli/schema.json",
   "productName": "白石 BaiShi",
-  "version": "0.0.1-test",
+  "version": "0.1.0",
   "identifier": "studio.baishi.desktop",
   "build": {
     "frontendDist": "../front",

@@ -858,6 +858,45 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+/* ════════════════════════════════════════════════
+   * 存储面板 · 真实占用查询（去掉占位符 4.2 / 10 GB）
+   * ════════════════════════════════════════════════ */
+  function formatGB(bytes) {
+    if (bytes === null || bytes === undefined || isNaN(bytes)) return '—';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+  }
+  function loadStorageInfo() {
+    var numEl   = document.querySelector('#panel-storage .num');
+    var barEl   = document.querySelector('#panel-storage [data-storage-bar]');
+    var hintEl  = document.querySelector('#panel-storage [data-storage-hint]');
+    if (!numEl || !barEl) return;
+    if (!window.BaishiApi || !window.BaishiApi.getStorageInfo) {
+      numEl.textContent = '— / — GB';
+      if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实占用）';
+      return;
+    }
+    window.BaishiApi.getStorageInfo()
+      .then(function (res) {
+        if (!res || res.success !== true || !res.data) {
+          numEl.textContent = '— / — GB';
+          if (hintEl) hintEl.textContent = '开发服务未返回数据';
+          barEl.style.width = '0%';
+          return;
+        }
+        var used = res.data.used || 0;
+        var total = res.data.total || 0;
+        numEl.textContent = formatGB(used) + ' / ' + formatGB(total) + ' GB';
+        var pct = total > 0 ? Math.min(100, Math.round(used / total * 100)) : 0;
+        barEl.style.width = pct + '%';
+        if (hintEl) hintEl.textContent = '已用 ' + pct + '% · 来自 baishi-dev /api/storage/info';
+      })
+      .catch(function (err) {
+        numEl.textContent = '— / — GB';
+        if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实占用）';
+        barEl.style.width = '0%';
+      });
+  }
+
   function bindAbout() {
     var checkBtn = document.getElementById('about-check-update');
     var releaseBtn = document.getElementById('about-open-release');
@@ -933,6 +972,7 @@ document.addEventListener('DOMContentLoaded', function () {
   bindImageApi();
   bindTextApi();
   bindStorage();
+  loadStorageInfo();
   bindAbout();
   bindSaveButton();
 });

@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   
       // ── 画廊 · 25 款真实海报预设（素材来自 ~/Downloads/posters） ─────────────────────────
-      const POSTER_DIR = '../../assets/posters/';
+      const POSTER_DIR = 'assets/posters/';
       let presets = [
         { name: '写实人像', cat: '人物', desc: '饱经风霜的老渔夫，窗光写实，8K 细节。', prompt: 'Medium shot portrait of an elderly fisherman with weathered skin, deep wrinkles, intense blue eyes, wearing a worn raincoat, natural window lighting, photorealistic, ultra detailed, 8k', ratio: '3:4', strength: '0.70 - 0.85', img: POSTER_DIR + '01_portrait_realistic.png', tags: ['写实', '人像', '窗光'] },
         { name: '炭笔速写', cat: '人物', desc: '舞者动态炭笔，明暗对比强烈。', prompt: 'Charcoal sketch portrait of a ballerina in motion, flowing dress, dynamic pose, rough textured paper, dramatic chiaroscuro lighting, expressive strokes, high contrast', ratio: '3:4', strength: '0.65 - 0.80', img: POSTER_DIR + '02_portrait_sketch.png', tags: ['炭笔', '速写', '舞者'] },
