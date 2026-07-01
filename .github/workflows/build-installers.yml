@@ -1,0 +1,195 @@
+name: build-installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-installers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-arm64-dmg:
+    name: macOS arm64 dmg
+    runs-on: macos-15
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version '^2.0.0' --locked
+
+      - name: Build arm64 dmg
+        working-directory: src-tauri
+        run: cargo tauri build --bundles dmg --target aarch64-apple-darwin --no-sign
+
+      - name: Collect artifact
+        run: |
+          mkdir -p dist
+          cp src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg dist/BaiShi-arm64.dmg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaiShi-arm64-dmg
+          path: dist/BaiShi-arm64.dmg
+          retention-days: 14
+
+  macos-intel-dmg:
+    name: macOS intel dmg
+    runs-on: macos-15-intel
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version '^2.0.0' --locked
+
+      - name: Build intel dmg
+        working-directory: src-tauri
+        run: cargo tauri build --bundles dmg --target x86_64-apple-darwin --no-sign
+
+      - name: Collect artifact
+        run: |
+          mkdir -p dist
+          cp src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg dist/BaiShi-intel.dmg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaiShi-intel-dmg
+          path: dist/BaiShi-intel.dmg
+          retention-days: 14
+
+  windows-x64-exe:
+    name: Windows x64 exe
+    runs-on: windows-2025
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version '^2.0.0' --locked
+
+      - name: Build x64 NSIS installer
+        working-directory: src-tauri
+        run: cargo tauri build --bundles nsis --target x86_64-pc-windows-msvc
+
+      - name: Collect artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          $installer = Get-ChildItem "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe" | Select-Object -First 1
+          Copy-Item $installer.FullName "dist/BaiShi-x86_64-setup.exe"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaiShi-x86_64-exe
+          path: dist/BaiShi-x86_64-setup.exe
+          retention-days: 14
+
+  linux-x64-packages:
+    name: Linux x64 deb rpm
+    runs-on: ubuntu-22.04
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            rpm \
+            xdg-utils
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version '^2.0.0' --locked
+
+      - name: Build deb and rpm
+        working-directory: src-tauri
+        run: cargo tauri build --bundles deb,rpm --target x86_64-unknown-linux-gnu
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          cp src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb dist/BaiShi-x86_64.deb
+          cp src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/rpm/*.rpm dist/BaiShi-x86_64.rpm
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaiShi-x86_64-deb
+          path: dist/BaiShi-x86_64.deb
+          retention-days: 14
+
+      - name: Upload rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaiShi-x86_64-rpm
+          path: dist/BaiShi-x86_64.rpm
+          retention-days: 14
