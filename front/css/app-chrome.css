@@ -330,29 +330,56 @@ body[data-os="windows"] .titlebar .right { margin-left: auto; }
    ───────────────────────────────────────────── */
 .toast-host {
   position: fixed;
-  bottom: 56px;
-  right: 32px;
+  right: 24px;
+  bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  z-index: 50;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 80;
   pointer-events: none;
 }
 .toast {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
+  align-items: flex-start;
+  gap: 10px;
+  width: min(320px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px;
   background: var(--fg);
   color: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 14px 28px rgba(34, 25, 21, 0.14);
+  font-size: 12px;
+  line-height: 1.5;
   pointer-events: auto;
-  animation: ink-spread var(--motion) var(--ease) both;
-  max-width: 360px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+  animation: none;
+  overflow: hidden;
 }
-.toast .seal.sm { width: 18px; height: 18px; font-size: 10px; }
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.is-leaving {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.toast .seal.sm {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.toast span:last-child {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
 .toast.success { background: var(--success); }
 .toast.error   { background: var(--danger); }
 
@@ -821,6 +848,18 @@ body[data-os="windows"] .titlebar .right { margin-left: auto; }
 [data-theme="dark"] .toast {
   background: var(--fg);
   color: var(--bg);
+}
+@media (max-width: 640px) {
+  .toast-host {
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
+    align-items: stretch;
+  }
+  .toast {
+    width: 100%;
+    max-width: none;
+  }
 }
 [data-theme="dark"] .seal {
   border-color: var(--accent-deep);

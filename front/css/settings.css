@@ -161,32 +161,6 @@
     }
     .provider-actions .meta { font-size: 12px; }
 
-    #toasts.toast-host {
-      right: 24px;
-      bottom: 28px;
-      gap: 10px;
-    }
-    #toasts .toast {
-      max-width: min(280px, calc(100vw - 40px));
-      padding: 10px 14px;
-      gap: 10px;
-      border-radius: 14px;
-      font-size: 12px;
-      line-height: 1.5;
-      box-shadow: 0 12px 28px rgba(27, 20, 16, 0.16);
-      align-items: flex-start;
-    }
-    #toasts .toast .seal.sm {
-      width: 16px;
-      height: 16px;
-      margin-top: 1px;
-      flex-shrink: 0;
-    }
-    #toasts .toast span:last-child {
-      flex: 1;
-      word-break: break-word;
-    }
-
     .about-hero {
       display: flex;
       flex-direction: column;

@@ -1,235 +1,218 @@
-# Frontend Development · 白石 BaiShi
+# 前端开发说明
 
-> 水墨生图桌面应用白石 BaiShi 的前端开发说明。
-> 项目位置：`/Users/echowang/git/Qi_Baishi/`
-> 读者：前端开发者 / Agent。
-> 用途：了解前端模块划分、目录约定、组件系统、IPC 调用方式。
+本文档说明当前 `front/` 目录的结构、共享机制、页面职责和开发约束。
 
----
+## 1. 现状概览
 
-## 1. 项目定位
+- 技术栈：HTML + CSS + 原生 JavaScript
+- 组织方式：多页面桌面应用原型
+- 页面入口：`front/index.html`
+- 功能页数量：8
+- 版本：`v0.0.1_test`
+- 主题：浅色/深色双模式，依赖 `data-theme`
 
-**白石 BaiShi** 是一款面向创作者（自媒体 / 营销 / 平面设计师）的**水墨画风格桌面生图应用**。
+前端当前不使用框架，也不是 SPA。页面之间直接通过 `<a href="*.html">` 跳转。
 
-- **纯本地部署**：应用、数据库、历史作品全部在本地
-- **可自定义生图 API**：不内置模型，生图通过用户配置的在线 API 完成
-- **视觉风格**：宣纸底 + 浓墨 / 淡墨 / 灰墨 + 朱砂红印章 + 笔触元素
+## 2. 目录结构
 
----
-
-## 2. 架构概览（前端视角）
-
-```
-┌──────────────────────────────────────┐
-│        前端 WebView / 浏览器          │
-│                                       │
-│   HTML（7 屏 + 着陆页）               │
-│     ├─ 各屏独立 .html 文件            │
-│     └─ 统一引用 CSS/JS                │
-│                                       │
-│   CSS（设计系统 + 组件库）             │
-│     ├─ ink-wash.css（令牌 + 工具类）   │
-│     ├─ app-chrome.css（桌面壳组件）    │
-│     └─ 各屏专用样式                   │
-│                                       │
-│   JavaScript（交互逻辑）              │
-│     ├─ 提示词输入 / 参数控制          │
-│     ├─ 画廊管理 / 历史筛选            │
-│     └─ invoke() → Rust 后端          │
-│                                       │
-├──────────────────────────────────────┤
-│     通信层（二选一）                   │
-│                                       │
-│   方案A: Tauri IPC（桌面打包后）       │
-│   invoke(cmd, args) → Rust Command   │
-│                                       │
-│   方案B: HTTP API（开发测试用）        │
-│   fetch('/api/...') → Rust HTTP 服务 │
-│                                       │
-├──────────────────────────────────────┤
-│         Rust 后端                     │
-│   auth → SQLite → 在线生图 API       │
-└──────────────────────────────────────┘
-```
-
-**数据流**：用户在 HTML 屏输入 → JS 收集参数 → 调用 Rust 后端 → 后端调用在线 API 生图 → 返回结果 URL
-
----
-
-## 3. 目录结构（前端部分）
-
-```
-BaiShi/
-├── front/                       前端文件总目录
-│   ├── index.html               着陆页（Header + Hero 3D扇卡 + Footer）
-│   ├── pages/                   8 个功能页面
-│   │   ├── auth.html            登录 / 注册
-│   │   ├── workspace.html       工作台（首页）
-│   │   ├── text-to-image.html   文生图
-│   │   ├── image-to-image.html  图生图
-│   │   ├── presets.html         灵感墙 Hub（画廊+妙笔生花+编辑器）
-│   │   ├── copywriting.html     妙笔生花（文案生成）
-│   │   ├── history.html         历史作品库
-│   │   └── settings.html        设置/账户（含 API 配置 + Pro付费）
-│   ├── css/
-│   │   ├── ink-wash.css         白石设计系统（令牌 + 工具类）
-│   │   ├── app-chrome.css       桌面应用窗体栏 / 侧栏 / 组件
-│   │   ├── landing.css          着陆页专用
-│   │   ├── presets.css          灵感墙专用
-│   │   ├── text-to-image.css    文生图专用
-│   │   ├── copywriting.css      妙笔生花专用
-│   │   └── history.css          历史作品库专用
-│   └── js/
-│       ├── presets.js           画廊预设 + 编辑器
-│       ├── text-to-image.js     文生图逻辑
-│       ├── image-to-image.js    图生图逻辑
-│       ├── copywriting.js       文案模板
-│       ├── history.js           历史逻辑
-│       ├── settings.js          设置逻辑
-│       └── auth.js              登录逻辑
-├── assets/                      静态资源（posters/, drawings/, logo.png）
-├── Templete/                    模板素材库
-└── docs/                        项目文档
+```text
+front/
+├── index.html
+├── css/
+│   ├── app-chrome.css
+│   ├── copywriting.css
+│   ├── history.css
+│   ├── ink-wash.css
+│   ├── landing.css
+│   ├── page-loader.css
+│   ├── presets.css
+│   ├── settings.css
+│   └── text-to-image.css
+├── js/
+│   ├── api-client.js
+│   ├── baishi-shared.js
+│   ├── copywriting.js
+│   ├── history.js
+│   ├── image-to-image.js
+│   ├── multi-image.js
+│   ├── page-loader.js
+│   ├── presets.js
+│   ├── settings.js
+│   ├── text-styles.js
+│   ├── text-to-image.js
+│   └── workspace.js
+└── pages/
+    ├── copywriting.html
+    ├── history.html
+    ├── image-to-image.html
+    ├── multi-image.html
+    ├── presets.html
+    ├── settings.html
+    ├── text-to-image.html
+    └── workspace.html
 ```
 
----
+## 3. 页面职责
 
-## 4. 前端架构（HTML + CSS + JS）
+### `index.html`
 
-### 4.1 HTML：7 屏 + 着陆页
+落地页和首次配置引导页。
 
-每个屏幕是独立的 `.html` 文件，统一引用 `ink-wash.css` + `app-chrome.css`。用户在不同 `.html` 间跳转（`<a href>`），不需要 SPA 框架。
+### `pages/workspace.html`
 
-**统一外壳**：每个屏都包含 `.window > .titlebar + .app(sidebar + .content)`，由 `app-chrome.css` 提供样式。
+工作台，总览入口、最近作品和状态信息。
 
-### 4.2 CSS 设计系统
+### `pages/copywriting.html`
 
-#### 两套共享文件
+文生文工作区。结果区分为：
 
-| 文件 | 职责 | 体积 |
-|---|---|---|
-| `ink-wash.css` | 设计令牌（`:root`）· 字体阶 · 按钮/卡片/表单 · 印章 · 笔触 · 动画 | 24 KB |
-| `app-chrome.css` | macOS/Windows 标题栏 · 侧栏 · 内容区 · 状态栏 · 模态 · Toast | 25 KB |
+- 审阅视图：Markdown 渲染后的阅读态
+- 编辑视图：原始文本可编辑态
 
-**规则**：任何屏都不要重写 `:root` 令牌。需要派生颜色用 `color-mix()`。
+### `pages/text-to-image.html`
 
-#### 核心令牌一览
+文生图主页面。当前关键行为：
 
-- **纸面**：`--bg #f1ead7` · `--surface #f8f3e3` · `--surface-2 #f4ecd6`
-- **墨阶**：`--fg #1d1814` · `--fg-2 #4a4138` · `--muted #7a6f5f` · `--meta #a89a82`
-- **朱砂**：`--accent #a8322e` · `--accent-deep #7c1f1c`
-- **字体**：Noto Serif SC（显示）· Noto Sans SC（正文）· JetBrains Mono（数字）
-- **签名元素**：`.seal` 印章 + `.eyebrow::before` 笔触斜线
+- 固定负面提示词
+- 智能润色
+- 统一尺寸结果卡片
+- 点击卡片查看原图
 
-### 4.3 JavaScript 交互层
+### `pages/image-to-image.html`
 
-当前原型阶段每个 HTML 内嵌一段 `<script>`。所有后端调用通过 `invoke()` 或 `fetch()` 完成。
+图生图页面。当前关键行为：
 
-#### 当前已实现的交互模式
+- 上传参考图
+- 可编辑提示词预设
+- 结果下载
 
-| 页面 | 交互要点 |
-|---|---|
-| 文生图 | 提示词计数 · 固定提示词片段 · 智能润色 · 参数滑块 · 生成按钮 |
-| 图生图 | 上传 · 拖拽 · 风格预设套用 · before/after 对比 |
-| 灵感墙 | 风格卡片网格 · 点击弹出详情（左侧大图 + 右侧元数据） |
-| 历史 | 日期分组 · 网格/列表切换 · 筛选标签 · 收藏 |
-| 设置 | API 密钥/端点配置 · 存储路径 · 主题切换（宣纸/夜墨） |
-| 命令面板 | `⌘K` 唤起（待补全） |
+### `pages/multi-image.html`
 
----
+多图融合作图页面。
 
-## 5. IPC 契约（前端调用）
+### `pages/presets.html`
 
-### 5.1 Command 调用清单
+灵感墙页面，同时管理：
 
-所有后端调用通过 `invoke(cmd, args)`（Tauri）或 `fetch('/api/cmd', {...})`（HTTP）完成。
+- 图像风格素材
+- 文案风格素材
 
-```typescript
-// 文生图请求
-interface GenerateRequest {
-  prompt: string;
-  negative_prompt?: string;
-  style_id?: string;
-  seed?: number;
-  steps: number;
-  cfg_scale: number;
-  aspect: string;            // "1:1" | "16:9" | "9:16" | "4:5" | "21:9"
-  reference_image?: string;  // 图生图：图片 URL
-  strength?: number;         // 0-1
-  count: number;             // 1-4
-}
+支持搜索、排序、收藏、编辑模式。
 
-// 生成结果
-interface GenerateResult {
-  job_id: string;
-  images: { id: string; url: string; seed: number }[];
-  seed_used: number;
-  took_ms: number;
-}
+### `pages/history.html`
+
+历史作品页，同时展示图片与文案：
+
+- 收藏筛选
+- 图片大图预览
+- 文案全文阅读弹层
+- 批量删除
+
+### `pages/settings.html`
+
+设置页，包含：
+
+- 图像 API 配置
+- 生文 API 配置
+- 存储与偏好
+- 关于面板
+
+## 4. 共享脚本与样式
+
+### 样式
+
+- `ink-wash.css`：全局设计令牌和基础视觉语言
+- `app-chrome.css`：应用壳、侧栏、按钮、toast、弹层等共享组件
+- `page-loader.css`：加载层样式
+
+### 脚本
+
+- `baishi-shared.js`
+  - 供应商配置
+  - 文本 API 配置
+  - 偏好读写
+  - 共享 `toast`
+- `api-client.js`
+  - 所有 HTTP API 封装
+- `page-loader.js`
+  - 页面初始化后隐藏加载层
+  - 当前不再接管页面切换动画
+
+## 5. 共享状态
+
+### localStorage 键
+
+- `baishi.api.image.providers`
+- `baishi.api.image.active`
+- `baishi.api.image.key`
+- `baishi.api.text`
+- `baishi.prefs`
+- `baishi.session`
+- `baishi.theme`
+
+### 页面公共约定
+
+- 页面里应保留 `<div class="toast-host" id="toasts"></div>`
+- 提示统一调用 `window.BaishiShared.toast(...)`
+- 页面 `<head>` 内会先写入当前主题：
+
+```html
+<script>
+  try {
+    var t = localStorage.getItem("baishi.theme") || "light";
+    document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+</script>
 ```
 
-### 5.2 可订阅事件
+## 6. API 对接方式
 
-| Event | Payload | 触发时机 |
-|---|---|---|
-| `job:progress` | `{job_id, step, total_steps}` | 生成进度（预留） |
-| `job:done` | `{job_id, image_url, seed, took_ms}` | 生成完成 |
-| `job:error` | `{job_id, message}` | 生成失败 |
-| `system:notify` | `{kind, title, body}` | 系统通知 |
+前端当前一律走 HTTP：
 
-### 5.3 前端调用示例
+- 基础地址：`http://localhost:3456`
+- 图像生成：
+  - `POST /api/generate/text`
+  - `POST /api/generate/image`
+- 文本生成：
+  - `POST /api/text/enhance`
+  - `POST /api/text/generate`
+- 设置：
+  - `GET/POST /api/settings/1`
+- 历史：
+  - `GET /api/history`
+  - `POST /api/history/favorite`
+  - `POST /api/history/delete`
 
-```javascript
-// Tauri IPC 方式（桌面打包后）
-import { invoke } from '@tauri-apps/api/core';
+## 7. 当前前端必须保持的行为
 
-const result = await invoke('generate_text_to_image', {
-  prompt: '远山含黛，江面薄雾',
-  steps: 30,
-  aspect: '1:1',
-  count: 3,
-});
-// result.images[0].url → 图片 URL
+- 右下角 toast 只保留共享实现，不再页面私有放大/缩放
+- 历史预览弹层必须跟随当前主题
+- 文生图结果卡片尺寸固定，原图在弹层中查看
+- 设置页供应商切换后显示真实官网链接
+- 设置页“关于”面板保留开源说明、项目说明和更新入口
+- 页面最外层使用统一圆角矩形外框
 
-// HTTP 方式（开发测试用）
-const res = await fetch('/api/generate/text', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ prompt: '远山含黛', steps: 30, aspect: '1:1', count: 3 }),
-});
-const result = await res.json();
+## 8. 联调与检查
+
+启动后端：
+
+```bash
+cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev
 ```
 
----
+脚本语法检查：
 
-## 6. 测试策略（前端）
+```bash
+node --check front/js/settings.js
+node --check front/js/history.js
+node --check front/js/text-to-image.js
+node --check front/js/copywriting.js
+```
 
-| 类型 | 方式 |
-|---|---|
-| 目视检查 | 各 HTML 文件在浏览器直接打开 |
-| 交互验证 | 表单录入、滑块、拖拽、弹窗流程 |
-| 响应式 | 检查 macOS/Windows 顶栏切换效果 |
-| 后端联调 | `cargo run --bin baishi-server` + 浏览器访问 |
+## 9. 常见误区
 
----
-
-## 7. 路线图（前端项目）
-
-- [x] HTML/CSS 原型（7 屏 + 着陆页 + 25 款真实海报预设 + 妙笔生花文案）
-- [x] 画廊编辑器支持图片上传、自定义分类、标签编辑
-- [x] 项目迁移到独立仓库 `front/` 目录
-- [x] 全站侧边栏统一，首页简化，设置页功能完善
-- [x] 暗色主题（夜墨）
-- [x] API 配置页（可自定义 Endpoint + Key）
-- [ ] 命令面板 `⌘K`
-- [ ] 多图生图屏
-- [ ] HTTP API 对接（开发阶段替代 Tauri IPC）
-
----
-
-## 8. 相关文档
-
-- 用户视角：[README.md](../../README.md)
-- Agent 视角：[AGENT.md](../AGENT.md)
-- 后端开发：[server.md](./server.md)
-- 开发日志：[vibecoding_log.md](../vibecoding_log.md)
+- 不要把项目描述成 SPA 或 Electron 应用
+- 不要再写“auth.html 登录页”
+- 不要再写“页面切换带过渡动画”
+- 不要在页面内再造一套 toast 系统
+- 不要把旧的本地模型叙述写回 README 或开发文档

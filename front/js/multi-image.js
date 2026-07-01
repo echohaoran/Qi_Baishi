@@ -72,13 +72,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ─── Utilities ─────────────────────────────────────────────── */
   function toast(msg, kind) {
-    kind = kind || 'success';
-    var t = document.createElement('div');
-    t.className = 'toast ' + kind;
-    t.innerHTML = '<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>' + msg + '</span>';
-    toasts.appendChild(t);
-    setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, 2400);
-    setTimeout(function () { t.remove(); }, 2800);
+    if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
+      return window.BaishiShared.toast(msg, kind);
+    }
   }
 
   function uid() { return Math.random().toString(36).slice(2, 8); }

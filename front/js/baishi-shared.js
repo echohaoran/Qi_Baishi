@@ -111,6 +111,85 @@
     try { localStorage.setItem(key, JSON.stringify(value)); return true; }
     catch (e) { return false; }
   }
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+    });
+  }
+
+  // ─── 右下角操作提示 ─────────────────────────────────
+  function toast(message, kind, options) {
+    var host = document.getElementById('toasts');
+    if (!host) return null;
+
+    kind = kind || 'success';
+    options = options || {};
+
+    var text = String(message == null ? '' : message).trim();
+    if (!text) return null;
+
+    var duration = typeof options.duration === 'number' ? options.duration : 3200;
+    var fadeDuration = typeof options.fadeDuration === 'number' ? options.fadeDuration : 220;
+    var dedupeWindow = typeof options.dedupeWindow === 'number' ? options.dedupeWindow : 900;
+    var maxVisible = typeof options.maxVisible === 'number' ? options.maxVisible : 2;
+    var key = kind + '::' + text;
+    var now = Date.now();
+
+    function armTimers(node) {
+      clearTimeout(node.__toastHideTimer);
+      clearTimeout(node.__toastRemoveTimer);
+      node.__toastHideTimer = setTimeout(function () {
+        if (!node.isConnected || node.dataset.closing === '1') return;
+        node.dataset.closing = '1';
+        node.classList.remove('is-visible');
+        node.classList.add('is-leaving');
+        node.__toastRemoveTimer = setTimeout(function () {
+          if (node.parentNode) node.parentNode.removeChild(node);
+        }, fadeDuration);
+      }, duration);
+    }
+
+    var existing = Array.prototype.find.call(host.children, function (node) {
+      return node.dataset && node.dataset.toastKey === key && node.dataset.closing !== '1';
+    });
+
+    if (existing) {
+      var lastShown = parseInt(existing.dataset.lastShownAt || '0', 10);
+      if (now - lastShown <= dedupeWindow) {
+        existing.dataset.lastShownAt = String(now);
+        existing.classList.add('is-visible');
+        existing.classList.remove('is-leaving');
+        armTimers(existing);
+        return existing;
+      }
+    }
+
+    while (host.children.length >= maxVisible) {
+      var first = host.firstElementChild;
+      if (!first) break;
+      clearTimeout(first.__toastHideTimer);
+      clearTimeout(first.__toastRemoveTimer);
+      first.remove();
+    }
+
+    var node = document.createElement('div');
+    node.className = 'toast ' + kind;
+    node.setAttribute('role', 'status');
+    node.dataset.toastKey = key;
+    node.dataset.lastShownAt = String(now);
+    node.innerHTML =
+      '<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span>' +
+      '<span>' + escapeHtml(text) + '</span>';
+
+    host.appendChild(node);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        node.classList.add('is-visible');
+      });
+    });
+    armTimers(node);
+    return node;
+  }
 
   // ─── 供应商 ──────────────────────────────────────────
   // 加载并把老字段 requestBody 自动迁移到 requestBodyT2I
@@ -318,5 +397,7 @@
     getSession: getSession,
     setSession: setSession,
     clearSession: clearSession,
+    // 右下角操作提示
+    toast: toast,
   };
 })();

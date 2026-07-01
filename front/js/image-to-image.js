@@ -11,13 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Toast
   function toast(msg, kind) {
-    kind = kind || 'success';
-    const t = document.createElement('div');
-    t.className = 'toast ' + kind;
-    t.innerHTML = `<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>${msg}</span>`;
-    document.getElementById('toasts').appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, 2400);
-    setTimeout(() => t.remove(), 2800);
+    if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
+      return window.BaishiShared.toast(msg, kind);
+    }
   }
 
   // ── 上传参考图（点击 + 拖放） ──

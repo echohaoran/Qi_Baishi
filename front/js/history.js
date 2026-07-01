@@ -3,13 +3,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 工具
   function toast(msg, kind) {
-    kind = kind || 'success';
-    var t = document.createElement('div');
-    t.className = 'toast' + (kind ? ' ' + kind : '');
-    t.innerHTML = '<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>' + msg + '</span>';
-    document.getElementById('toasts').appendChild(t);
-    setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, 2400);
-    setTimeout(function () { t.remove(); }, 2800);
+    if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
+      return window.BaishiShared.toast(msg, kind);
+    }
   }
 
   // OS 切换

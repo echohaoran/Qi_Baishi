@@ -1,31 +1,26 @@
-# Developer.md · 白石 BaiShi
+# Developer.md
 
-> 水墨生图桌面应用白石 BaiShi 的开发说明。
-> 项目位置：`/Users/echowang/git/Qi_Baishi/`
-> 读者：参与开发的工程师 / Agent。
+这是白石项目的开发索引文档。
 
----
+## 先读什么
 
-本文档已拆分为以下两部分，请根据职责分别阅读：
+- 前端开发：[`docs/DEVELOPER/front.md`](./DEVELOPER/front.md)
+- 后端开发：[`docs/DEVELOPER/server.md`](./DEVELOPER/server.md)
+- Agent 接手事实：[`docs/AGENT.md`](./AGENT.md)
+- 用户向项目说明：[`README.md`](../README.md)
 
-- **📱 前端开发** 👉 **[docs/DEVELOPER/front.md](./DEVELOPER/front.md)**  
-  HTML 结构、CSS 设计系统（宣纸底 + 朱砂红 + 墨阶）、JavaScript 交互、IPC 调用
+## 当前统一口径
 
-- **🦀 后端开发** 👉 **[docs/DEVELOPER/server.md](./DEVELOPER/server.md)**  
-  Rust 模块结构、在线 API 引擎（Agnes / 自定义）、SQLite 持久化、安全隐私
+- 项目版本：`v0.0.1_test`
+- 项目形态：本地优先桌面生图原型
+- 当前前端结构：多页面 HTML，不是 SPA
+- 当前联调方式：`baishi-dev` HTTP 服务
+- 当前数据持久化：本地 SQLite + localStorage
+- 当前功能页：工作台、文生文、文生图、图生图、多图融合、灵感墙、历史作品、设置
 
----
+## 协作原则
 
-## 关键定位（两文共享）
-
-- **白石 BaiShi** — 面向自媒体 / 营销 / 平面设计师的水墨画风格桌面生图应用
-- **纯本地部署**：应用、数据库、作品全部在本地
-- **可自定义生图 API**：不内置模型，通过用户配置的在线 API 完成生图
-- 7 个核心界面：工作台、文生图、图生图、灵感墙、历史作品、设置/账户、登录/注册
-- 视觉语言：宣纸底 + 浓墨/淡墨/灰墨 + 朱砂红印章 + 笔触元素
-
-## 相关文档
-
-- 用户视角：[README.md](../README.md)
-- Agent 视角：[AGENT.md](./AGENT.md)
-- 开发日志：[vibecoding_log.md](./vibecoding_log.md)
+- 写文档时以代码现状为准，不沿用旧方案描述
+- 改前端时优先复用共享样式、共享 toast、共享配置
+- 改后端时保持 `baishi-dev` 接口契约稳定
+- 如果 README 与 `docs/` 口径不一致，优先一起修正
