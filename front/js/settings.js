@@ -10,14 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ── 工具 ─────────────────────────────────────── */
-  function toast(msg, kind) {
+  function toast(msg, kind, options) {
     kind = kind || 'success';
+    options = options || {};
+    var duration = typeof options.duration === 'number' ? options.duration : 2400;
+    var fadeDuration = typeof options.fadeDuration === 'number' ? options.fadeDuration : 400;
     const t = document.createElement('div');
     t.className = 'toast ' + kind;
     t.innerHTML = '<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>' + msg + '</span>';
     document.getElementById('toasts').appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, 2400);
-    setTimeout(() => t.remove(), 2800);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, duration);
+    setTimeout(() => t.remove(), duration + fadeDuration);
   }
 
   /* ── Sub-nav 初始化 ───────────────────────────── */
@@ -870,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     checkBtn.addEventListener('click', () => {
       status.textContent = '已于刚刚检查更新';
-      toast('当前已是最新版本（原型阶段）', 'success');
+      toast('当前已是最新版本（原型阶段）', 'success', { duration: 4200, fadeDuration: 500 });
     });
 
     releaseBtn.addEventListener('click', () => {
