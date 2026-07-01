@@ -9,26 +9,31 @@
   
   <link rel="stylesheet" href="css/ink-wash.css">
   <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/page-loader.css">
 <script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script>try{if(localStorage.getItem("baishi.has_visited"))window.location.replace("pages/workspace.html")}catch(e){}</script>
+<script src="js/page-loader.js"></script>
 </head>
 <body class="ink-wash-bg">
+  <!-- 水墨加载动画 -->
+  <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
+  <div class="landing-shell">
   <header class="topnav">
     <div class="container topnav-inner">
       <div class="logo">
         <span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
         <div>
           <div class="name">白石</div>
-          <div class="en">BAISHI · v0.4.2</div>
+          <div class="en">BAISHI · v0.0.1_test</div>
         </div>
       </div>
       <nav>
         <a href="pages/workspace.html">工作台</a>
-        <a href="pages/text-to-image.html">文生图/文</a>
+        <a href="pages/text-to-image.html">文生图</a>
         <a href="pages/presets.html">灵感墙</a>
       </nav>
       <div class="row" style="gap: var(--space-3);">
-        <a href="pages/auth.html" class="btn btn-secondary">登录</a>
-        <a href="pages/workspace.html" class="btn btn-primary">进入原型</a>
+        <button class="btn btn-primary" id="setup-trigger-top">进入工作台</button>
       </div>
     </div>
   </header>
@@ -37,11 +42,11 @@
     <!-- HERO -->
     <section class="container hero" data-od-id="hero">
       <div class="fade-in hero-text">
-        <p class="eyebrow">桌面水墨生图工具 · 7 屏原型</p>
+        <p class="eyebrow">桌面水墨生图工具</p>
         <h1>以水墨，<br><span class="brush" style="color: var(--accent);">造万象</span>。</h1>
         <p class="lead">为自媒体创作者、营销人与平面设计师而生。基于 Rust 架构，macOS 与 Windows 双端可调，笔意可设、构图可控、灵感可循。</p>
         <div class="hero-cta">
-          <a href="pages/workspace.html" class="btn btn-primary btn-lg">进入工作台</a>
+          <button class="btn btn-primary btn-lg" id="setup-trigger-hero">进入工作台</button>
         </div>
         <div class="hero-meta">
           <div class="item">
@@ -75,9 +80,54 @@
   <footer class="pagefoot">
     <div class="container row-between">
       <span>© 2026 白石 Baishi · <span class="brush" style="color: var(--accent);">以水墨 · 造万象</span></span>
-      <span class="meta">v0.4.2 · build 2026.06.29 · RUST+TAURI+HTML</span>
+      <span class="meta">V0.0.1 Test</span>
     </div>
   </footer>
+  </div>
+
+  <!-- 首次登录引导弹窗 -->
+  <div class="setup-modal-overlay" id="setup-modal">
+    <div class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+      <div class="setup-modal-header">
+        <div class="brand-row">
+          <span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
+          <h2 id="setup-title">配置 API 服务</h2>
+        </div>
+        <button class="setup-modal-close" id="setup-close" aria-label="关闭">✕</button>
+      </div>
+      <div class="setup-modal-body">
+        <p>欢迎来到白石！在进入工作台之前，请先配置图像生成和文本生成服务的 API。您也可以先跳过，稍后在「设置」页面中配置。</p>
+
+        <!-- 步骤 1：生图 API -->
+        <div class="setup-step" id="step-image-api">
+          <div class="setup-step-num">1</div>
+          <div class="setup-step-content">
+            <h4>生图 API 配置</h4>
+            <p>配置图像生成服务，支持在线 API 或本地后端（ComfyUI / Ollama）。</p>
+            <div class="setup-step-actions">
+              <a href="pages/settings.html?tab=api" class="btn btn-primary btn-sm">去配置</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 步骤 2：生文 API -->
+        <div class="setup-step" id="step-text-api">
+          <div class="setup-step-num">2</div>
+          <div class="setup-step-content">
+            <h4>生文 API 配置</h4>
+            <p>配置文本生成服务，兼容 OpenAI / Ollama / LM Studio 等端点。</p>
+            <div class="setup-step-actions">
+              <a href="pages/settings.html?tab=text-api" class="btn btn-primary btn-sm">去配置</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="setup-skipped">
+          <button class="setup-skip-btn" type="button">暂不配置，直接进入工作台 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ── 扇形卡牌 · 2D rotate 展开 ─────────────
@@ -285,6 +335,62 @@
         expandFan();
         setTimeout(collapseFan, 1000);
       }, 100);
+    })();
+
+
+    // ── 首次登录引导弹窗 ──────────────────────
+    (function () {
+      var modal = document.getElementById('setup-modal');
+      var closeBtn = document.getElementById('setup-close');
+      var skipBtn = document.querySelector('.setup-skip-btn');
+      var triggers = document.querySelectorAll('#setup-trigger-top, #setup-trigger-hero');
+
+      function openModal() {
+        // 检查是否已经跳过配置引导
+        if (localStorage.getItem('baishi.setup_done') === 'true') {
+          window.location.href = 'pages/workspace.html';
+          return;
+        }
+        modal.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('visible');
+        document.body.style.overflow = '';
+      }
+
+      function goToWorkspace() {
+        closeModal();
+        localStorage.setItem('baishi.setup_done', 'true');
+        window.location.href = 'pages/workspace.html';
+      }
+
+      // 绑定触发按钮
+      triggers.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          openModal();
+        });
+      });
+
+      // 关闭按钮
+      closeBtn.addEventListener('click', closeModal);
+
+      // 点击遮罩关闭
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      // 跳过按钮 → 进入工作台
+      skipBtn.addEventListener('click', goToWorkspace);
+
+      // ESC 关闭
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('visible')) {
+          closeModal();
+        }
+      });
     })();
 
 

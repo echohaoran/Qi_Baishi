@@ -9,10 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/ink-wash.css" />
   <link rel="stylesheet" href="../css/app-chrome.css" />
+  <link rel="stylesheet" href="../css/page-loader.css" />
   <link rel="stylesheet" href="../css/history.css" />
 <script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="../js/page-loader.js"></script>
 </head>
 <body class="ink-wash-bg">
+  <!-- 水墨加载动画 -->
+  <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
@@ -26,11 +30,12 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.4.2</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
-        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图/文</a>
+        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
         <a href="image-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>图生图</a>
+        <a href="multi-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/><path d="M6 10v4M10 6h4M14 18h4M18 14v-4"/></svg>多图融合</a>
 
 
         <div class="nav-section">资源</div>
@@ -38,9 +43,6 @@
         <a href="history.html" class="nav-item active" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
-        <div class="foot">
-          <div class="user-chip"><div class="avatar">赵</div><div class="info"><div class="name">赵明远</div><div class="plan">开源版</div></div></div>
-        </div>
       </aside>
 
       <main class="content">
@@ -51,7 +53,7 @@
           </div>
           <div class="actions">
             <button type="button" class="btn btn-secondary" data-action="export-zip" aria-label="导出全部作品为 ZIP 包">导出 ZIP</button>
-            <button type="button" class="btn btn-secondary" data-action="batch-fav" aria-label="批量收藏当前显示的所有作品">批量收藏</button>
+            <button type="button" class="btn btn-secondary" data-action="toggle-select" id="toggle-select-btn" aria-pressed="false" aria-label="进入管理模式以批量删除作品">管理</button>
             <a href="text-to-image.html" class="btn btn-primary">＋ 新建作品</a>
           </div>
         </div>
@@ -69,6 +71,7 @@
               <option value="text-to-image">文生图</option>
               <option value="image-to-image">图生图</option>
               <option value="text-to-text">文生文</option>
+              <option value="favorites">收藏</option>
             </select>
             <label for="hist-style" class="sr-only">按风格筛选</label>
             <select id="hist-style" class="select" style="width: 130px;" aria-label="按风格筛选">
@@ -93,209 +96,34 @@
             </div>
           </div>
 
+          <div class="batch-bar" id="batch-bar" hidden role="region" aria-label="批量操作">
+            <span class="batch-label">已选 <strong id="batch-count" style="color: var(--accent);">0</strong> / <span id="batch-total" style="color: var(--accent);">0</span> 件</span>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="select-all" aria-label="全选">全选</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="select-invert" aria-label="反选">反选</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-danger btn-sm" data-action="batch-delete-confirm" aria-label="删除选中的所有作品">删除选中</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="batch-cancel" aria-label="退出多选模式">取消</button>
+          </div>
+
           <section data-od-id="today" aria-labelledby="date-today">
             <div class="date-header"><h3 id="date-today">今天 · 6 月 29 日</h3><span class="meta" data-section-count>4 件</span></div>
-            <div class="hist-grid">
-              <div class="art-card" data-cat="text-to-image" data-style="飞白" data-title="晨光山居">
-                <div class="art-img" data-art="h1" role="img" aria-label="晨光山居 · 飞白 · 1:1"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 晨光山居" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 晨光山居" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">晨光山居</div><div class="sub"><span>飞白 · 1:1</span><span class="num">14:08</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 晨光山居"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="写意" data-title="山雨欲来">
-                <div class="art-img" data-art="h2" role="img" aria-label="山雨欲来 · 写意 · 16:9"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 山雨欲来" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 山雨欲来" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">山雨欲来</div><div class="sub"><span>写意 · 16:9</span><span class="num">13:42</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 山雨欲来"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="工笔" data-title="渔翁独钓">
-                <div class="art-img" data-art="h3" role="img" aria-label="渔翁独钓 · 工笔 · 3:4"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 渔翁独钓" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 渔翁独钓" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">渔翁独钓</div><div class="sub"><span>工笔 · 3:4</span><span class="num">11:15</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 渔翁独钓"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="水墨" data-title="霜林归鸦">
-                <div class="art-img" data-art="h4" role="img" aria-label="霜林归鸦 · 水墨 · 4:5"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 霜林归鸦" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 霜林归鸦" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">霜林归鸦</div><div class="sub"><span>水墨 · 4:5</span><span class="num">10:31</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 霜林归鸦"><span aria-hidden="true">★</span></button>
-              </div>
-            </div>
+            <div class="hist-grid"></div>
           </section>
 
           <section data-od-id="yesterday" aria-labelledby="date-yesterday">
             <div class="date-header"><h3 id="date-yesterday">昨天 · 6 月 28 日</h3><span class="meta" data-section-count>4 件</span></div>
-            <div class="hist-grid">
-              <div class="art-card" data-cat="text-to-image" data-style="水墨" data-title="湖畔晨雾">
-                <div class="art-img" data-art="h5" role="img" aria-label="湖畔晨雾 · 水墨 · 16:9"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 湖畔晨雾" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 湖畔晨雾" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">湖畔晨雾</div><div class="sub"><span>水墨 · 16:9</span><span class="num">21:14</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 湖畔晨雾"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="青绿" data-title="秋山红树">
-                <div class="art-img" data-art="h6" role="img" aria-label="秋山红树 · 青绿 · 21:9"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 秋山红树" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 秋山红树" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">秋山红树</div><div class="sub"><span>青绿 · 21:9</span><span class="num">19:48</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 秋山红树"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="水墨" data-title="寒林雪霁">
-                <div class="art-img" data-art="h7" role="img" aria-label="寒林雪霁 · 水墨 · 16:9"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 寒林雪霁" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 寒林雪霁" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">寒林雪霁</div><div class="sub"><span>水墨 · 16:9</span><span class="num">17:22</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 寒林雪霁"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="浅绛" data-title="古寺夕照">
-                <div class="art-img" data-art="h8" role="img" aria-label="古寺夕照 · 浅绛 · 4:5"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 古寺夕照" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 古寺夕照" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">古寺夕照</div><div class="sub"><span>浅绛 · 4:5</span><span class="num">15:09</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 古寺夕照"><span aria-hidden="true">★</span></button>
-              </div>
-            </div>
+            <div class="hist-grid"></div>
           </section>
 
           <section data-od-id="earlier" aria-labelledby="date-earlier">
             <div class="date-header"><h3 id="date-earlier">本周 · 6 月 23 - 27 日</h3><span class="meta" data-section-count>4 件</span></div>
-            <div class="hist-grid">
-              <div class="art-card" data-cat="text-to-image" data-style="工笔" data-title="竹影">
-                <div class="art-img" data-art="h9" role="img" aria-label="竹影 · 工笔 · 3:4"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 竹影" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 竹影" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">竹影</div><div class="sub"><span>工笔 · 3:4</span><span class="num">3 天前</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 竹影"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="水墨" data-title="墨竹">
-                <div class="art-img" data-art="h10" role="img" aria-label="墨竹 · 水墨 · 4:5"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 墨竹" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 墨竹" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">墨竹</div><div class="sub"><span>水墨 · 4:5</span><span class="num">3 天前</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 墨竹"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="淡彩" data-title="茶事">
-                <div class="art-img" data-art="h11" role="img" aria-label="茶事 · 淡彩 · 4:5"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 茶事" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 茶事" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">茶事</div><div class="sub"><span>淡彩 · 4:5</span><span class="num">5 天前</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 茶事"><span aria-hidden="true">★</span></button>
-              </div>
-              <div class="art-card" data-cat="text-to-image" data-style="水墨" data-title="幽兰">
-                <div class="art-img" data-art="h12" role="img" aria-label="幽兰 · 水墨 · 1:1"></div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 幽兰" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 幽兰" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">幽兰</div><div class="sub"><span>水墨 · 1:1</span><span class="num">5 天前</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 幽兰"><span aria-hidden="true">★</span></button>
-              </div>
-            </div>
+            <div class="hist-grid"></div>
           </section>
 
           <section data-od-id="copywriting" aria-labelledby="date-copywriting">
             <div class="date-header"><h3 id="date-copywriting">妙笔生花 · 文生文作品</h3><span class="meta" data-section-count>4 件</span></div>
-            <div class="hist-grid">
-              <article class="art-card text-card" data-cat="text-to-text" data-style="brand" data-title="茶馆手记 · 山的回声">
-                <div class="art-img" role="img" aria-label="茶馆手记 · 品牌故事 · 117 字">
-                  <blockquote class="text-excerpt">「山的回声，比人更懂得沉默。初春的茶馆，炉火正旺，故人未归；我们习惯用一杯茶，丈量时间。」</blockquote>
-                  <span class="text-corner-seal" aria-hidden="true">文</span>
-                </div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 茶馆手记" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 茶馆手记" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">茶馆手记</div><div class="sub"><span>品牌故事 · 117 字</span><span class="num">14:08</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 茶馆手记"><span aria-hidden="true">★</span></button>
-              </article>
-              <article class="art-card text-card" data-cat="text-to-text" data-style="marketing" data-title="城市晨光 · 早安帖">
-                <div class="art-img" role="img" aria-label="城市晨光 · 营销文案 · 86 字">
-                  <blockquote class="text-excerpt">「城市的早晨有三种光：橙黄的路灯、白色的晨曦，和你看见第一杯热咖啡时、眼底的那一点亮。」</blockquote>
-                  <span class="text-corner-seal" aria-hidden="true">文</span>
-                </div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 城市晨光" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 城市晨光" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">城市晨光</div><div class="sub"><span>营销文案 · 86 字</span><span class="num">13:42</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 城市晨光"><span aria-hidden="true">★</span></button>
-              </article>
-              <article class="art-card text-card" data-cat="text-to-text" data-style="headline" data-title="不止是茶 · 产品上新">
-                <div class="art-img" role="img" aria-label="不止是茶 · 标题党 · 53 字">
-                  <blockquote class="text-excerpt">「你以为这只是一杯茶？不，这是你被困在写字楼第七个小时后、唯一回到自然的入口。」</blockquote>
-                  <span class="text-corner-seal" aria-hidden="true">文</span>
-                </div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 不止是茶" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 不止是茶" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">不止是茶</div><div class="sub"><span>标题党 · 53 字</span><span class="num">11:15</span></div></div>
-                <button type="button" class="fav active" aria-pressed="true" aria-label="取消收藏 不止是茶"><span aria-hidden="true">★</span></button>
-              </article>
-              <article class="art-card text-card" data-cat="text-to-text" data-style="lifestyle" data-title="泡茶的温度 · 茶事">
-                <div class="art-img" role="img" aria-label="泡茶的温度 · 生活方式 · 74 字">
-                  <blockquote class="text-excerpt">「今天分享一种泡茶的温度：80 度的水，5 秒出汤。第一口是苦，第二口回甘，第三口是山。」</blockquote>
-                  <span class="text-corner-seal" aria-hidden="true">文</span>
-                </div>
-                <div class="actions">
-                  <button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览 泡茶的温度" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="regen" aria-label="用相同参数重新生成" title="再生成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg></button>
-                  <button type="button" class="icon-btn" data-action="download" aria-label="下载 泡茶的温度" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
-                </div>
-                <div class="art-meta"><div class="title">泡茶的温度</div><div class="sub"><span>生活方式 · 74 字</span><span class="num">10:31</span></div></div>
-                <button type="button" class="fav" aria-pressed="false" aria-label="收藏 泡茶的温度"><span aria-hidden="true">★</span></button>
-              </article>
-            </div>
+            <div class="hist-grid"></div>
           </section>
-
-          <div class="empty-state" id="empty-state" role="status" aria-live="polite" hidden>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" style="color: var(--muted); margin-bottom: var(--space-3);"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6"/></svg>
-            <h3>没有匹配的作品</h3>
-            <p>尝试更换搜索词或调整筛选条件</p>
-            <button type="button" class="btn btn-ghost btn-sm" data-action="clear-filters">清除筛选</button>
-          </div>
-
           <div style="text-align: center; padding: var(--space-8) 0;">
             <button type="button" class="btn btn-ghost btn-arrow" id="load-more" aria-busy="false">加载更早作品</button>
           </div>
@@ -314,6 +142,8 @@
   <div class="toast-host" id="toasts" role="status" aria-live="polite"></div>
 
 
+  <script src="../js/baishi-shared.js"></script>
+  <script src="../js/api-client.js"></script>
   <script src="../js/history.js"></script>
 </body>
 </html>

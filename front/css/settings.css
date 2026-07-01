@@ -79,3 +79,146 @@
       font-weight: 600;
     }
     .theme-btn:hover:not(.active) { color: var(--fg); }
+
+    /* ─── 在线生图 API · 供应商/模型下拉 ─── */
+    .model-control-wrap { display: block; }
+    .model-control-wrap select,
+    .model-control-wrap input { width: 100%; }
+    #image-api-provider { font-family: var(--font-body); }
+    #image-api-model { font-family: var(--font-mono); font-size: 13px; }
+
+    .custom-fields {
+      display: none;
+      margin-top: var(--space-5);
+      padding: var(--space-4);
+      background: var(--bg-2);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+    .custom-fields.show { display: block; }
+
+    /* ─── 请求体预览（只读）── */
+    .request-preview {
+      margin-top: var(--space-5);
+    }
+    .request-preview .rp-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .request-preview .rp-tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: var(--space-3);
+    }
+    .request-preview .rp-tab {
+      padding: 5px 14px;
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 6px);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+    .request-preview .rp-tab:hover {
+      color: var(--fg-2);
+      background: var(--surface);
+    }
+    .request-preview .rp-tab.active {
+      color: var(--fg);
+      background: var(--surface);
+      border-color: var(--accent, #c0533a);
+    }
+    .request-preview .rp-body {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 0;
+    }
+    .request-preview .rp-body::-webkit-scrollbar { width: 6px; height: 6px; }
+    .request-preview .rp-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .provider-actions {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      margin-top: var(--space-5);
+    }
+    .provider-actions .meta { font-size: 12px; }
+
+    .about-hero {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .about-mark {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
+    .about-mark .seal {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+    .about-mark h3 {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .about-mark p,
+    .about-copy p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--fg-2);
+    }
+    .about-copy {
+      display: grid;
+      gap: var(--space-3);
+    }
+    .about-meta,
+    .about-links,
+    .about-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .about-update-head {
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    @media (max-width: 920px) {
+      .about-mark,
+      .about-update-head {
+        flex-direction: column;
+      }
+    }

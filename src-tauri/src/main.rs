@@ -1,37 +1,35 @@
-/// 白石 BaiShi 桌面应用 Tauri 入口
-///
-/// Tauri Builder 初始化，注册所有 Command 和状态管理
-/// 此文件仅在 Tauri 构建上下文中编译
-
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
 
+/// 白石 BaiShi 桌面应用 Tauri 入口
+///
+/// 使用 Agnes Image 2.1 Flash API 进行图像生成
+
 use std::path::PathBuf;
 
 use baishi_lib::commands::{AppState, self};
-use baishi_lib::inference::MockEngine;
+use baishi_lib::inference::AgnesEngine;
 use baishi_lib::storage::Storage;
-use baishi_lib::models::ModelRegistry;
 
 fn main() {
     env_logger::init();
 
-    // 确定数据目录
     let data_dir = get_data_dir();
     log::info!("数据目录: {:?}", data_dir);
 
-    // 初始化存储
+    // 初始化存储（SQLite）
     let storage = Storage::open(data_dir.clone())
         .expect("无法初始化数据库");
 
-    // 初始化推理引擎（原型阶段使用 Mock）
-    let engine = MockEngine::new();
+    // 读取 API Key
+    let api_key = std::env::var("BAISHI_API_KEY")
+        .unwrap_or_else(|_| "sk-ZpxAQINPD8XUWRkWdSzugoT2a3Q3Cj48CHTtEVJaodPgUxkF".to_string());
+    log::info!("使用 Agnes API (密钥前缀: {}...)", &api_key[..12]);
 
-    // 注册内置预设
-    let mut registry = ModelRegistry::new(data_dir);
-    registry.register_builtins();
+    // 初始化 Agnes 引擎
+    let engine = AgnesEngine::new(api_key);
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -60,7 +58,6 @@ fn main() {
         .expect("启动白石 BaiShi 失败");
 }
 
-/// 获取用户数据目录
 fn get_data_dir() -> PathBuf {
     #[cfg(target_os = "macos")]
     {

@@ -1,0 +1,176 @@
+/* ── 页面跳转加载动画 · 水墨风 ─────────────────────────────────────
+ *  白石 Baishi — 墨滴晕染 + 纸面淡出
+ *  用法：<link rel="stylesheet" href="css/page-loader.css">
+ *        <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
+ *        <script src="js/page-loader.js"></script>
+ * ────────────────────────────────────────────────────────────────── */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--paper, #f6f0de) 66%, transparent) 0%, transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--paper, #f6f0de) 94%, transparent) 0%, color-mix(in srgb, var(--bg, #f1ead7) 92%, white 8%) 100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  backdrop-filter: blur(0px);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 420ms,
+    backdrop-filter 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-loader.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s,
+    backdrop-filter 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-loader.is-transitioning {
+  backdrop-filter: blur(14px);
+}
+
+.page-loader.is-handoff {
+  backdrop-filter: blur(8px);
+}
+
+.page-loader.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.page-loader.is-idle {
+  display: none;
+}
+
+/* ── 墨滴 ──────────────────────────────────────────── */
+.loader-ink {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg, #1d1814);
+  opacity: 0;
+  transform: scale(0.72);
+  filter: blur(0px);
+  transition:
+    opacity 260ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-loader.is-visible .loader-ink {
+  opacity: 1;
+  transform: scale(1);
+  animation: ink-bloom 1.32s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+.page-loader.is-transitioning .loader-ink {
+  filter: blur(1.2px);
+}
+
+.page-loader.is-handoff .loader-ink,
+.page-loader.is-handoff .loader-ink::before,
+.page-loader.is-handoff .loader-ink::after {
+  animation: none;
+}
+
+.page-loader.is-handoff .loader-ink {
+  opacity: 0;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+.page-loader.is-handoff .loader-ink::before,
+.page-loader.is-handoff .loader-ink::after {
+  opacity: 0;
+}
+
+/* ── 晕染（墨滴向外扩散） ────────────────────────── */
+.loader-ink::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg, #1d1814);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+}
+
+.page-loader.is-visible .loader-ink::before {
+  animation: ink-spread 1.32s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+/* ── 墨韵（最外圈淡影） ────────────────────────── */
+.loader-ink::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg, #1d1814);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+}
+
+.page-loader.is-visible .loader-ink::after {
+  animation: ink-outer 1.32s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+/* ── 动画关键帧 ────────────────────────────────────── */
+@keyframes ink-bloom {
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(2.5); opacity: 0.9; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+
+@keyframes ink-spread {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+  40%  { transform: translate(-50%, -50%) scale(5); opacity: 0.15; }
+  100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+}
+
+@keyframes ink-outer {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.12; }
+  40%  { transform: translate(-50%, -50%) scale(8); opacity: 0.06; }
+  100% { transform: translate(-50%, -50%) scale(14); opacity: 0; }
+}
+
+/* ── 纸面纹理叠加 ────────────────────────────────── */
+.page-loader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.08) 0%, transparent 30%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(29, 24, 20, 0.012) 3px, rgba(29, 24, 20, 0.012) 4px);
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+/* ── 减弱动效偏好 ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .loader-ink,
+  .loader-ink::before,
+  .loader-ink::after {
+    animation-duration: 0.01ms !important;
+  }
+  .page-loader {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -7,7 +7,7 @@
 
 ## 0. 一句话项目快照
 
-**白石 BaiShi** 是一款面向自媒体创作者 / 营销人 / 平面设计师的**水墨画风格桌面生图应用**，macOS + Windows 双壳，**Rust + Tauri 架构**，支持在线API+本地推理（SDXL-BaiShi-v2），当前阶段：**HTML/CSS 原型（7 屏 + 着陆页，25 款真实海报预设，完整的灵感墙编辑器）**。项目已迁至 `/Users/echowang/git/Qi_Baishi/`，前端文件归入 `front/` 目录。
+**白石 BaiShi** 是一款面向自媒体创作者 / 营销人 / 平面设计师的**水墨画风格桌面生图应用**，**纯本地部署**，**可自定义在线生图 API**（如 Agnes Image 2.1 Flash），不内置任何本地模型。当前阶段：**前端 HTML/CSS 原型 + Rust 后端（SQLite + 在线 API 引擎）**。项目位于 `/Users/echowang/git/Qi_Baishi/`，前端文件归入 `front/` 目录，后端代码在 `src-tauri/`。
 
 ---
 
@@ -16,10 +16,12 @@
 | 字段 | 值 |
 |---|---|
 | 项目名 | 白石 · BaiShi |
-| 项目类型 | 桌面应用原型（macOS + Windows） |
-| 技术栈 | HTML + CSS + JavaScript + Rust + Tauri |
+| 项目类型 | 桌面应用（纯本地部署） |
+| 技术栈 | 前端：HTML + CSS + JavaScript ｜ 后端：Rust (SQLite + reqwest) |
+| 通信方式 | Tauri IPC（桌面打包后）或 HTTP API（开发测试用） |
 | 设计系统 | 白石（in-house）· 水墨画 + Warp 8px 网格纪律 |
-| 当前阶段 | HTML/CSS 原型（8 屏 + 着陆页） |
+| 生图引擎 | 可自定义在线 API（兼容 OpenAI 格式） |
+| 当前阶段 | 前后端分离开发：前端 9 屏原型 + Rust 后端（SQLite + API 引擎） |
 | 目标用户 | 自媒体创作者 / 营销 / 平面设计师 |
 | 视觉风格 | 宣纸底 + 浓淡墨 + 朱砂红印章 + 笔触元素 |
 | 主力字体 | Noto Serif SC（显示）+ Noto Sans SC（正文）+ JetBrains Mono（数字）+ Noto Serif SC（笔触字） |
@@ -191,10 +193,12 @@
 6. **登录方式**：邮箱 + 密码（不是手机号、不是 OAuth 唯一）。GitHub / Apple ID 作为可选社交登录。
 7. **配色约束**：暖中性（宣纸 / 墨）+ 朱砂。**禁止**冷色（蓝/紫/绿）作为主色或品牌色。
 8. **字体**：Noto Serif SC（显示 + 笔触）+ Noto Sans SC（正文）+ JetBrains Mono（数字）。**禁止** Inter / Roboto / Arial 作为显示体。
-9. **算力模型**：Free 500 / PRO 5,000 / PRO+ 20,000 算力 · 单次按 `steps × 像素 / 1000` 消耗。
+9. **算力模型**：Free 500 / PRO 5,000 / PRO+ 20,000 算力 · 单次 1 算力（在线 API 按张计费）。
 10. **历史作品是用户私有财产**：仅存本地，**不上传云端**。
 11. **i18n**：UI 文案简体中文为主，技术名词允许英文。
 12. **不填的表单默认值**：所有数值参数都有合理默认（如 `steps=30`, `cfg=7.5`, `seed=随机`）。
+13. **生图 API 可自定义**：用户可在设置页自行填写 Endpoint 与 API Key，不绑定任何特定服务商。
+14. **不内置本地模型**：不包含任何模型权重文件，不依赖 candle / ONNX / GPU。
 
 ---
 
@@ -285,44 +289,41 @@
 
 - [x] **设计系统**（`ink-wash.css`）：令牌、字体、按钮、表单、卡片、印章、笔触、动画
 - [x] **应用窗体**（`app-chrome.css`）：macOS/Windows 切换、侧栏、状态栏、模态、Toast、对比滑块
-- [x] **落地页**（`index.html`）：品牌着陆 + Hero 层叠卡片轮播（从画廊随机抽图）
+- [x] **落地页**（`index.html`）：品牌着陆 + Hero 3D 扇形抽卡（8 张海报）
 - [x] **登录注册**（`pages/auth.html`）：左右分屏 · 邮箱+密码 · 社交登录
 - [x] **工作台**（`pages/workspace.html`）：快速入口 · 最近作品 · 风格趋势 · 算力统计
 - [x] **文生图**（`text-to-image.html`）：提示词 · 固定提示词 · 润色 · 参数 · 生成进度 · 4 候选图
 - [x] **图生图**（`image-to-image.html`）：上传参考图 · 重绘强度 · before/after 对比
-- [x] **灵感墙 Hub**（`pages/presets.html`）：画廊（25 款预设）+ 妙笔生花（6 类文案）双面板 · 管理模式
-- [x] **妙笔生花**（`pages/copywriting.html`）：6 类文案模板 · 双栏工作区 · 管理增删改
+- [x] **灵感墙 Hub**（`pages/presets.html`）：画廊（25 款预设）+ 妙笔生花（12 类文案）双面板 · 管理模式
+- [x] **妙笔生花**（`pages/copywriting.html`）：12 类文案模板 · 双栏工作区 · 管理增删改
 - [x] **历史作品库**（`pages/history.html`）：日期分组 · 网格/列表 · 筛选 · 收藏 · 批量操作
-- [x] **设置/账户**（`pages/settings.html`）：账户信息 · 在线/本地 API 两栏配置 · 存储 · 快捷键
-- [x] **真实海报素材接入**：25 张海报从 `/Users/echowang/Downloads/posters/` 导入 `assets/posters/`，presets.js 按实际图片渲染
-- [x] **画廊详情自适应布局**：横图（宽>高）左图右信息，竖图（高>宽）上图下信息，图片含圆角
-- [x] **Hero 层叠卡片轮播**：首页右区三张层叠切换，从 25 张海报随机抽 10 张，4.2 秒自动切换
-- [x] **侧栏入口重命名**：「文生图」→「文生图/文」覆盖图生成与文案生成
-- [x] **项目文档化**：AGENT.md + Developer.md + README.md 三份文档完整
+- [x] **设置/账户**（`pages/settings.html`）：账户信息 · API 配置（Endpoint + Key）· 存储 · 快捷键 · 主题切换 · Pro 付费
+- [x] **暗色主题**（夜墨）：深墨底 + 冷月白 · 所有页面适配
+- [x] **多图融合屏**（`pages/multi-image.html`）：上传 2-6 张参考图 · 拖拽排序 · 融合模式选择
+- [x] **Rust 后端 SQLite 持久化**：6 张表（users/sessions/artworks/presets/settings/generation_log）· 自动迁移
+- [x] **Rust 后端鉴权模块**：Argon2id 密码哈希 · 256-bit session token
+- [x] **在线 API 引擎**：Agnes Image 2.1 Flash 集成 · 可自定义 Endpoint 和 Key
+- [x] **IPC Command 骨架**：13 个 Command（auth/generate/history/presets/settings/storage）
 
 ### 8.2 待办（按优先级） 🔜
 
-- [ ] **本地推理引擎模拟**：接入本地生成推理 Mock（替代填充渐变图）
-- [ ] **多图生图屏**：文生图的扩展，支持参考多张图融合
-- [ ] **Rust 推理引擎**：candle 后端实现 GenerateRequest / Job 队列
-- [ ] **Tauri 工程化**：src-tauri 目录、tauri.conf.json、IPC 接入
-- [ ] **SQLite 持久化**：用户表、作品表、预设表、设置表
+- [ ] **HTTP API 服务器**：创建开发用的 HTTP 服务器，供前端直接联调
+- [ ] **生成队列与并发控制**：当前为同步阻塞请求
+- [ ] **API 密钥加密存储**：当前明文存储在 SQLite
+- [ ] **Tauri 工程化**：src-tauri 目录已有 · 需 build.rs + 前端构建集成
 - [ ] **macOS / Windows 打包**：.dmg / .msi + 代码签名 + 自动更新
 - [ ] **命令面板 ⌘K**：所有屏共享的快捷命令入口
-- [ ] **暗色主题**（夜墨）：深墨底 + 冷月白
-- [ ] **生成结果大图预览**：点击候选图后弹出全屏大图查看器
-- [ ] **历史作品的元数据查看**：点击历史作品显示完整 prompt / 参数
+- [ ] **多图生图屏**：文生图的扩展，支持参考多张图融合
 - [ ] **键盘快捷键完整覆盖**：当前文档列出但未全部实现
 
 ### 8.3 已知妥协 ⚠️
 
-- **原型阶段无真实推理**：文生图屏的生成结果是模拟的（CSS 渐变 + 文案），不是真实 AI 出图
-- **原型阶段无真实持久化**：登录、收藏、历史、预设管理修改都只在内存，重启即清
+- **原型阶段无持久化**：登录、收藏、历史修改只存内存，SQLite 虽已实现但前后端尚未对接
 - **`os-toggle` 是演示用**：预览 macOS / Windows 两种风格，正式 Tauri 化后由原生窗体栏取代
-- **文生图/图生图 HTML 在根目录**：`text-to-image.html` 和 `image-to-image.html` 尚未迁移到 `pages/`，与其他屏路径不一致
-- **画廊标签不可编辑**：当前 25 款预设的 tags 是硬编码在 `js/presets.js` 中的数组，管理模式不支持标签编辑
+- **生成队列为同步阻塞**：当前调用在线 API 为同步等待，影响 UI 响应
+- **API 密钥明文存储**：需加密后再写入 SQLite
 - **多图生图未独立成屏**：用户简报提到过，但当前未实现
-- **`index.html` 较紧凑（~570 行）**：已比原版精简，但仍包含较多内容
+- **`index.html` 较紧凑**：已比原版精简，但仍包含较多内容
 
 ---
 
@@ -348,9 +349,8 @@
 
 > 每次更新追加到下方，不要修改历史条目。
 
-| 日期 | 概要 |
-|---|---|
 | 2026-06-29 | 初版建立。覆盖 7 屏原型、设计系统、文件地图、用户偏好、编码规范、当前完成度与待办。同步建立 Developer.md（架构）与 README.md（用户手册）。 |
-| 2026-06-29 | 全量任务盘点与核验：8 HTML + 2 CSS + 3 MD 全部落盘；7 屏视觉签名（`.seal` 印章 + `.eyebrow` 笔触小标）每屏均出；HTML 结构合法（doctype / html / body 平衡）；CSS 令牌未重声明；架构与设计系统一致性已校验。 |
-| 2026-06-29 | 增量更新：文件地图修正（`pages/`、`css/`、`js/` 目录结构，`docs/` 路径）；8.1 完成度更新（25 张真实海报接入、画廊自适应详情、Hero 层叠轮播、侧栏入口重命名、妙笔生花文案页、设置两栏 API）；§0 阶段更新为 8 屏；8.2 待办移除已完成任务；8.3 已知妥协新增标签编辑、文件路径不一致。同步更新 Developer.md 目录结构/路线图，README.md 版本历史。 |
-| 2026-06-30 | 项目完整迁移至 `/Users/echowang/git/Qi_Baishi/`，前端文件全数归入 `front/` 目录，所有相对路径验证正确。`front/index.html` 简化至仅 Header + Hero + Footer。Hero 卡牌交互从横向轮播 → 3D 扇卡最终方案。画廊预设标签修复（补充第 25 项缺失 tags），图文详情标签动态填充。画廊编辑器支持图片上传和自定义分类。文风详情模态改为可编辑表单。全站侧边栏 7 页统一图标与标签。图生图页面重写补齐功能。设置页云端同步改为 Pro 付费支持。新建 `docs/vibecoding_log.md` 开发过程日志。 |
+| 2026-06-29 | 全量任务盘点与核验。 |
+| 2026-06-29 | 增量更新：文件地图修正、完成度更新。 |
+| 2026-06-30 | 项目完整迁移至 `/Users/echowang/git/Qi_Baishi/`，前端文件归入 `front/`。Hero 3D 扇卡、画廊编辑器、暗色主题、多图融合、品牌人设更新。 |
+| 2026-06-30 | **后端重构**：移除所有本地模型依赖（SDXL-BaiShi-v2/candle/ONNX），接入 Agnes Image 2.1 Flash API，SQLite 持久化，Argon2id 鉴权。**文档更新**：README.md、AGENT.md、front.md、server.md 全部更新为纯本地部署 + 可自定义在线 API 架构。 |

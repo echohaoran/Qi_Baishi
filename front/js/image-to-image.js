@@ -1,4 +1,5 @@
-// image-to-image.js — 图生图引擎
+// image-to-image.js — 图生图（笔意化境）
+// 上传 / 拖放 真实存储，智能润色 / 生成 全部接通后端
 document.addEventListener('DOMContentLoaded', function () {
   // OS 切换
   document.querySelectorAll('[data-os-set]').forEach(btn => {
@@ -9,33 +10,110 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Toast
-  function toast(msg, kind = 'success') {
+  function toast(msg, kind) {
+    kind = kind || 'success';
     const t = document.createElement('div');
-    t.className = `toast ${kind}`;
+    t.className = 'toast ' + kind;
     t.innerHTML = `<span class="seal sm" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><span>${msg}</span>`;
     document.getElementById('toasts').appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; }, 2400);
     setTimeout(() => t.remove(), 2800);
   }
 
-  // 上传
+  // ── 上传参考图（点击 + 拖放） ──
   const dropzone = document.getElementById('dropzone');
   const preview = document.getElementById('preview');
-  dropzone.addEventListener('click', () => {
-    dropzone.style.display = 'none';
-    preview.style.display = 'block';
-    toast('参考图已加载');
-  });
+  const previewImg = document.getElementById('preview-img');
+  const previewName = document.getElementById('preview-name');
+  const previewMeta = document.getElementById('preview-meta');
+  let refImageDataUrl = null;
+  let refImageName = '';
+
+  // 压缩到最长边 1280px / JPEG 0.9 质量, 避免 2MB axum body limit
+  function compressImage(dataUrl, maxSide, quality, cb) {
+    var img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      if (w <= maxSide && h <= maxSide && dataUrl.length < 1500 * 1024) { cb(dataUrl); return; }
+      var scale = Math.min(1, maxSide / Math.max(w, h));
+      var cw = Math.round(w * scale), ch = Math.round(h * scale);
+      var canvas = document.createElement('canvas');
+      canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, cw, ch);
+      // 优先 JPEG (小), 仅在原图带 alpha 通道时退回 PNG
+      var isPng = dataUrl.indexOf('data:image/png') === 0;
+      var out = isPng && hasAlpha(img, w, h)
+        ? canvas.toDataURL('image/png')
+        : canvas.toDataURL('image/jpeg', quality);
+      cb(out);
+    };
+    img.onerror = function () { cb(dataUrl); };
+    img.src = dataUrl;
+  }
+  function hasAlpha(img, w, h) {
+    try {
+      var c = document.createElement('canvas');
+      c.width = 1; c.height = 1;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, 1, 1);
+      var d = ctx.getImageData(0, 0, 1, 1).data;
+      return d[3] < 255;
+    } catch (e) { return false; }
+  }
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      toast('请选择图片文件（PNG / JPG / WebP）', 'error');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      toast('图片过大 · 请选择小于 20MB 的文件', 'error');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var raw = e.target.result;
+      // 压缩到 ≤1280px / JPEG 0.9, 目标 ≤1.5MB dataURL
+      compressImage(raw, 1280, 0.9, function (compressed) {
+        refImageDataUrl = compressed;
+        refImageName = file.name;
+        previewImg.src = compressed;
+        if (previewName) previewName.textContent = file.name;
+        var sizeMB = (compressed.length * 0.75 / (1024 * 1024)).toFixed(2);
+        if (previewMeta) previewMeta.textContent =
+          '已压缩至 ≤1280px · 约 ' + sizeMB + ' MB' + (compressed !== raw ? '（已优化）' : '');
+        dropzone.style.display = 'none';
+        preview.style.display = 'block';
+        var origMB = (file.size / (1024 * 1024)).toFixed(1);
+        if (compressed !== raw) toast('参考图已加载 · ' + origMB + ' MB → ' + sizeMB + ' MB');
+        else toast('参考图已加载');
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function pickFile() {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/jpeg,image/webp';
+    input.addEventListener('change', function () {
+      if (input.files && input.files[0]) handleFile(input.files[0]);
+    });
+    input.click();
+  }
+
+  dropzone.addEventListener('click', pickFile);
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
   dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
   dropzone.addEventListener('drop', e => {
     e.preventDefault();
     dropzone.classList.remove('drag-over');
-    dropzone.style.display = 'none';
-    preview.style.display = 'block';
-    toast('参考图已加载');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   document.getElementById('remove-img').addEventListener('click', () => {
+    refImageDataUrl = null;
+    refImageName = '';
     preview.style.display = 'none';
     dropzone.style.display = 'block';
   });
@@ -50,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const strengthVal = document.getElementById('strength-val');
   strengthSlider.addEventListener('input', () => { strengthVal.textContent = parseFloat(strengthSlider.value).toFixed(2); });
 
-  // 比例 / 数量选择
+  // 比例 / 数量
   function bindOptions(group, valEl, prefix, getValue) {
     const opts = group.querySelectorAll('.opt');
     opts.forEach(o => o.addEventListener('click', () => {
@@ -60,11 +138,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }));
   }
   bindOptions(document.getElementById('ratio-opts'), document.getElementById('ratio-val'), null, function(o) {
-    return o.dataset.v === 'orig' ? '原图' : o.dataset.v;
+    return o.dataset.v;
   });
   bindOptions(document.getElementById('batch-opts'), document.getElementById('batch-val'), '');
 
-  // 种子骰
+  // 种子
   const seedInput = document.getElementById('seed-input');
   const seedVal = document.getElementById('seed-val');
   seedInput.addEventListener('input', () => { seedVal.textContent = seedInput.value || '-1 (随机)'; });
@@ -74,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
     seedVal.textContent = n;
   });
 
-  // 固定提示词：可编辑 + 编辑器模态
+  // ── 固定提示词（同 text-to-image） ──
   var promptPresets = [
     { id: 'pp01', name: '飞白山水',     prompt: '将输入图像转换为飞白水墨风格：远山以焦墨枯笔写意写出，近处古松苍劲虬曲，云海翻涌于山腰。以飞白法表现山石肌理，留白处见宣纸本色，干湿浓淡相生相发。整体气势雄浑而静谧，意境悠远深邃，保持原图构图主体位置，细节转化为飞白山水笔法。' },
     { id: 'pp02', name: '工笔花鸟',     prompt: '将输入图像转为宋代院体工笔花鸟风格：画面主体精细勾勒，线条细劲圆润。色彩以中国传统矿物颜料晕染，层次丰富。背景大面积留白，花瓣层叠渲染，叶脉勾勒分明。设色清雅明丽，格调工致婉约，保留原图构图与主体形态，以工笔技法重新描绘每个细节，传达静观自然之神韵。' },
@@ -88,17 +166,16 @@ document.addEventListener('DOMContentLoaded', function () {
   var promptEditMode = false;
   var editingPromptId = null;
   var pendingDeletePromptId = null;
-
   var promptGrid = document.getElementById('prompt-presets-grid');
-  var editToggle   = document.getElementById('prompt-edit-toggle');
+  var editToggle = document.getElementById('prompt-edit-toggle');
   var editToggleLb = document.getElementById('prompt-edit-toggle-label');
-  var editor       = document.getElementById('prompt-editor');
-  var editorTitle  = document.getElementById('prompt-editor-title');
-  var editorName   = document.getElementById('prompt-editor-name');
-  var editorText   = document.getElementById('prompt-editor-text');
-  var editorSave   = document.getElementById('prompt-editor-save');
+  var editor = document.getElementById('prompt-editor');
+  var editorTitle = document.getElementById('prompt-editor-title');
+  var editorName = document.getElementById('prompt-editor-name');
+  var editorText = document.getElementById('prompt-editor-text');
+  var editorSave = document.getElementById('prompt-editor-save');
   var editorCancel = document.getElementById('prompt-editor-cancel');
-  var editorClose  = document.getElementById('prompt-editor-close');
+  var editorClose = document.getElementById('prompt-editor-close');
 
   function renderPromptPresets() {
     promptGrid.innerHTML = '';
@@ -115,13 +192,11 @@ document.addEventListener('DOMContentLoaded', function () {
       wrap.style.position = 'relative';
       wrap.style.display = 'inline-flex';
       wrap.dataset.promptId = p.id;
-
       var chip = document.createElement('span');
       chip.className = 'chip';
       chip.dataset.prompt = p.prompt;
-      if (idx === 0 && !promptEditMode) chip.classList.add('active');
+      // 默认不选中任何固定提示词 (用户要求)
       chip.textContent = '+ ' + p.name;
-
       if (!promptEditMode) {
         chip.addEventListener('click', function() {
           var cur = prompt.value.trim();
@@ -135,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function () {
         chip.style.cursor = 'pointer';
         chip.addEventListener('click', function() { openPromptEditor(p.id); });
       }
-
       if (promptEditMode) {
         var overlay = document.createElement('span');
         overlay.className = 'prompt-card-edit-overlay';
@@ -150,13 +224,11 @@ document.addEventListener('DOMContentLoaded', function () {
         ].join('');
         overlay.querySelector('.edit').addEventListener('click', function(e) { e.stopPropagation(); openPromptEditor(p.id); });
         overlay.querySelector('.del').addEventListener('click', function(e) { e.stopPropagation(); showPromptDeleteConfirm(p.id, wrap); });
-
         var confirmEl = document.createElement('span');
         confirmEl.className = 'prompt-delete-confirm';
         confirmEl.innerHTML = '<span>删除？</span><button class="ok" type="button">确定</button><button class="cancel" type="button">取消</button>';
         confirmEl.querySelector('.ok').addEventListener('click', function(e) { e.stopPropagation(); executePromptDelete(p.id); });
         confirmEl.querySelector('.cancel').addEventListener('click', function(e) { e.stopPropagation(); confirmEl.classList.remove('show'); pendingDeletePromptId = null; });
-
         wrap.appendChild(chip);
         wrap.appendChild(overlay);
         wrap.appendChild(confirmEl);
@@ -166,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function () {
       promptGrid.appendChild(wrap);
     });
   }
-
   function showPromptDeleteConfirm(id, wrapEl) {
     var all = promptGrid.querySelectorAll('.prompt-delete-confirm.show');
     all.forEach(function(el) { el.classList.remove('show'); });
@@ -174,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var cf = wrapEl.querySelector('.prompt-delete-confirm');
     if (cf) cf.classList.add('show');
   }
-
   function executePromptDelete(id) {
     var idx = promptPresets.findIndex(function(x) { return x.id === id; });
     if (idx >= 0) {
@@ -184,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     pendingDeletePromptId = null;
   }
-
   function openPromptEditor(id) {
     editingPromptId = id;
     if (id) {
@@ -201,12 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
     editor.hidden = false;
     setTimeout(function() { editorName.focus(); }, 30);
   }
-
-  function closePromptEditor() {
-    editor.hidden = true;
-    editingPromptId = null;
-  }
-
+  function closePromptEditor() { editor.hidden = true; editingPromptId = null; }
   function savePromptPreset() {
     var name = editorName.value.trim();
     var txt  = editorText.value.trim();
@@ -222,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function () {
     closePromptEditor();
     renderPromptPresets();
   }
-
   editToggle.addEventListener('click', function() {
     promptEditMode = !promptEditMode;
     editToggle.classList.toggle('active', promptEditMode);
@@ -232,81 +295,217 @@ document.addEventListener('DOMContentLoaded', function () {
     promptGrid.querySelectorAll('.prompt-delete-confirm.show').forEach(function(el) { el.classList.remove('show'); });
     renderPromptPresets();
   });
-
   editorSave.addEventListener('click', savePromptPreset);
   editorCancel.addEventListener('click', closePromptEditor);
   editorClose.addEventListener('click', closePromptEditor);
   editor.addEventListener('click', function(e) { if (e.target === editor) closePromptEditor(); });
-
-  // 首次渲染固定提示词
   renderPromptPresets();
 
-  // 智能润色
-  document.getElementById('enhance-btn').addEventListener('click', function() {
-    if (!prompt.value.trim()) { toast('请先输入提示词', 'error'); return; }
-    var enhanced = prompt.value + '，飞白与皴法交融，留白三分，笔意疏朗';
-    prompt.value = enhanced;
-    charCount.textContent = prompt.value.length;
-    toast('已润色 · 增加飞白与留白');
+  // ── 智能润色 ──
+  var enhanceBtn = document.getElementById('enhance-btn');
+  var enhancing = false;
+  enhanceBtn.addEventListener('click', async function () {
+    if (enhancing) return;
+    var val = prompt.value.trim();
+    if (!val) { toast('请先输入提示词', 'error'); return; }
+    enhancing = true;
+    var orig = enhanceBtn.innerHTML;
+    enhanceBtn.innerHTML = '<span>润色中…</span>';
+    enhanceBtn.disabled = true;
+    var r = await window.BaiShiAPI.enhancePrompt(val);
+    enhancing = false;
+    enhanceBtn.innerHTML = orig;
+    enhanceBtn.disabled = false;
+    if (r && r.success && r.data && r.data.enhanced) {
+      prompt.value = r.data.enhanced;
+      charCount.textContent = prompt.value.length;
+      toast('已润色 · LLM 改写完成');
+    } else {
+      toast('润色失败：' + (r && r.error ? r.error : '未知'), 'error');
+    }
   });
 
   // 清空
-  document.getElementById('clear-btn').addEventListener('click', function() {
+  document.getElementById('clear-btn').addEventListener('click', function () {
     prompt.value = '';
     charCount.textContent = 0;
+    refImageDataUrl = null;
+    refImageName = '';
     preview.style.display = 'none';
     dropzone.style.display = 'block';
     document.getElementById('result-empty').style.display = 'grid';
     document.getElementById('result-grid').style.display = 'none';
-    strengthSlider.value = 0.65;
-    strengthVal.textContent = '0.65';
-    seedInput.value = '-1';
-    seedVal.textContent = '-1 (随机)';
+    var lc = document.getElementById('loading-canvas');
+    if (lc) lc.hidden = true;
+    // 重置为默认值: 化境 0.8 / 比例 1:1 / 1 张 / 种子 0 / 高精度 ON
+    strengthSlider.value = 0.8;
+    strengthVal.textContent = '0.80';
+    document.querySelectorAll('#ratio-opts .opt').forEach(function(o) {
+      o.classList.toggle('active', o.dataset.v === '1:1');
+    });
+    document.getElementById('ratio-val').textContent = '1 : 1';
+    document.querySelectorAll('#batch-opts .opt').forEach(function(o) {
+      o.classList.toggle('active', o.dataset.v === '1');
+    });
+    document.getElementById('batch-val').textContent = '1 张';
+    seedInput.value = '0';
+    seedVal.textContent = '0';
+    var hpReset = document.getElementById('high-precision');
+    if (hpReset) hpReset.checked = true;
+    var negReset = document.getElementById('negative-prompt');
+    if (negReset) negReset.value = '';
     toast('已清空所有参数');
   });
 
-  // 生图
+  // 右侧预览区：墨笔加载动画的显示/隐藏
+  function showLoading() {
+    var empty = document.getElementById('result-empty');
+    var grid = document.getElementById('result-grid');
+    var lc = document.getElementById('loading-canvas');
+    var step = document.getElementById('loading-step');
+    if (empty) empty.style.display = 'none';
+    if (grid) grid.style.display = 'none';
+    if (lc) lc.hidden = false;
+    if (step) step.textContent = '正在连接后端';
+  }
+  function hideLoading() {
+    var lc = document.getElementById('loading-canvas');
+    if (lc) lc.hidden = true;
+  }
+  function setLoadingStep(t) {
+    var step = document.getElementById('loading-step');
+    if (step) step.textContent = t;
+  }
+
+  // ── 生成（图生图） ──
   var genBtn = document.getElementById('generate-btn');
   var generating = false;
-  genBtn.addEventListener('click', function() {
+  genBtn.addEventListener('click', async function () {
     if (generating) return;
-    if (preview.style.display === 'none') { toast('请先上传参考图', 'error'); return; }
+    if (!refImageDataUrl) { toast('请先上传参考图', 'error'); return; }
     if (!prompt.value.trim()) { toast('请先输入提示词', 'error'); return; }
     generating = true;
-    var orig = genBtn.innerHTML;
-    genBtn.innerHTML = '<span>正在化境…</span>';
+    var origHtml = genBtn.innerHTML;
+    genBtn.innerHTML = '<span>化境中…</span>';
     genBtn.disabled = true;
-    document.getElementById('result-empty').style.display = 'none';
-    document.getElementById('result-grid').style.display = 'grid';
-    setTimeout(function() {
-      genBtn.innerHTML = orig;
-      genBtn.disabled = false;
-      generating = false;
-      toast('化境完成 · 4 张作品已就位');
-    }, 1800);
-  });
+    showLoading();
+    setLoadingStep('正在连接后端…');
 
-  // 作品图注入
-  var arts = {
-    i1: 'radial-gradient(ellipse at 30% 30%, #d4a574, #4a3522)',
-    i2: 'radial-gradient(ellipse at 70% 70%, #a4a896, #2d3818)',
-    i3: 'linear-gradient(135deg, #cba66e, #5a3a20)',
-    i4: 'radial-gradient(circle at 50% 50%, #b4a07e, #2a1f15)'
-  };
-  document.querySelectorAll('[data-art]').forEach(function(el) {
-    var k = el.dataset.art;
-    if (arts[k]) {
-      el.style.background = arts[k];
-      el.style.position = 'relative';
+    var ratioActive = document.querySelector('#ratio-opts .opt.active');
+    var ratio = ratioActive ? ratioActive.dataset.v : '1:1';
+    var batchActive = document.querySelector('#batch-opts .opt.active');
+    var count = batchActive ? parseInt(batchActive.dataset.v, 10) || 1 : 1;
+    var seed = parseInt(seedInput.value, 10);
+    var strength = parseFloat(strengthSlider.value) || 0.8;
+    // 负面提示词
+    var negEl = document.getElementById('negative-prompt');
+    var negativePrompt = negEl ? negEl.value.trim() : '';
+    // 高精度模式
+    var hpEl = document.getElementById('high-precision');
+    var highPrecision = hpEl ? hpEl.checked : true;
+    var steps = highPrecision ? 50 : 30;
+
+    setLoadingStep('发送化境请求…');
+    var r = await window.BaiShiAPI.imageToImage({
+      prompt: prompt.value.trim(),
+      reference_image: refImageDataUrl,
+      strength: strength,
+      style_id: 'image-to-image',
+      seed: seed > 0 ? seed : null,
+      steps: steps,
+      cfg_scale: strength,
+      aspect: ratio,
+      count: count,
+      negative_prompt: negativePrompt,
+      high_precision: highPrecision,
+    });
+
+    generating = false;
+    genBtn.innerHTML = origHtml;
+    genBtn.disabled = false;
+    hideLoading();
+
+    if (r && r.success) {
+      renderResults(r.data.images || [], ratio, '生成');
+      toast('生成完成 · ' + (r.data.images || []).length + ' 张 · ' + (r.data.took_ms / 1000).toFixed(1) + 's');
+    } else {
+      document.getElementById('result-empty').style.display = 'grid';
+      toast('生成失败：' + (r && r.error ? r.error : '未知'), 'error');
     }
   });
 
+  function renderResults(images, ratio, label) {
+    var grid = document.getElementById('result-grid');
+    grid.innerHTML = '';
+    grid.style.display = 'grid';
+    // 画面比例 → CSS aspect-ratio 字符串 (e.g. '16:9' → '16 / 9')
+    var cssRatio = (ratio || '1:1').replace(':', ' / ');
+    images.forEach(function (img, i) {
+      var url = img.url || img.b64_json || '';
+      var div = document.createElement('div');
+      div.className = 'art-card';
+      div.innerHTML =
+        '<div class="art-img" style="background-image:url(\'' + url + '\');background-size:cover;background-position:center;cursor:pointer;aspect-ratio:' + cssRatio + ';"></div>' +
+        '<div class="art-meta"><div class="title">' + label + ' #' + (i + 1) + '</div>' +
+        '<div class="sub"><span>' + ratio + ' · BaiShi</span><span class="num">' +
+        '<button class="dl-btn" data-url="' + url + '" data-title="' + label + '_' + (i + 1) + '" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;">下载</button>' +
+        '</span></div></div>';
+      div.querySelector('.art-img').addEventListener('click', (function (u) {
+        return function () {
+          var modal = document.createElement('div');
+          modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:grid;place-items:center;cursor:pointer';
+          var big = document.createElement('img');
+          big.src = u;
+          big.style.cssText = 'max-width:90vw;max-height:85vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4)';
+          modal.appendChild(big);
+          modal.onclick = function () { modal.remove(); };
+          document.body.appendChild(modal);
+        };
+      })(url));
+      div.querySelector('.dl-btn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        downloadImage(this.dataset.url, this.dataset.title);
+      });
+      grid.appendChild(div);
+    });
+  }
+
+  function downloadImage(url, title) {
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = (title || 'image') + '.png';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 100);
+    toast('已下载 · ' + title);
+  }
+
+  // 对比滑块
+  var compare = document.getElementById('compare');
+  var divider = document.getElementById('divider');
+  if (compare && divider) {
+    var dragging = false;
+    function setPos(pct) {
+      pct = Math.max(0, Math.min(100, pct));
+      divider.style.left = pct + '%';
+      var after = compare.querySelector('.after');
+      if (after) after.style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+    }
+    compare.addEventListener('mousedown', function (e) { dragging = true; setPos(((e.clientX - compare.getBoundingClientRect().left) / compare.offsetWidth) * 100); });
+    document.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      setPos(((e.clientX - compare.getBoundingClientRect().left) / compare.offsetWidth) * 100);
+    });
+    document.addEventListener('mouseup', function () { dragging = false; });
+    setPos(50);
+  }
+
   // ⌘ + ⏎
-  document.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function (e) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
       genBtn.click();
     }
   });
-
 });

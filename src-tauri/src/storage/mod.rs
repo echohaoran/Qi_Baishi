@@ -30,6 +30,7 @@ impl Storage {
             data_dir,
         };
         storage.migrate()?;
+        storage.ensure_default_user()?;
         Ok(storage)
     }
 
@@ -39,6 +40,7 @@ impl Storage {
         conn.execute_batch("
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL DEFAULT '',
                 email TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 created_at INTEGER NOT NULL,
@@ -82,6 +84,22 @@ impl Storage {
                 theme TEXT DEFAULT 'ink',
                 shortcuts TEXT
             );
+        ")?;
+
+        // 幂等迁移:为 settings 表追加 text_api_model 列(仅当不存在时)
+        let has_text_api_model: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM pragma_table_info('settings') WHERE name='text_api_model'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        if has_text_api_model == 0 {
+            // 使用单独 execute 以避免 execute_batch 整批失败
+            let _ = conn.execute("ALTER TABLE settings ADD COLUMN text_api_model TEXT", []);
+        }
+
+        conn.execute_batch("
             CREATE TABLE IF NOT EXISTS generation_log (
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER NOT NULL,
@@ -90,17 +108,40 @@ impl Storage {
                 created_at INTEGER NOT NULL
             );
         ")?;
+
+        Ok(())
+    }
+
+    /// 开发模式默认用户 · 单用户场景下避免 FK 约束失败
+    /// 必须在 migrate() 返回后调用（不能在里面调，否则 Mutex 重入死锁）
+    pub fn ensure_default_user(&self) -> SqlResult<()> {
+        let conn = self.conn.lock().unwrap();
+        let exists: bool = conn
+            .query_row(
+                "SELECT EXISTS(SELECT 1 FROM users WHERE id = 1)",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(false);
+        if !exists {
+            let now = Utc::now().timestamp();
+            // dev 用户 · password_hash 字段占位（dev 模式不验证密码）
+            conn.execute(
+                "INSERT INTO users (id, name, email, password_hash, created_at, plan) VALUES (1, 'dev', 'dev@baishi.local', 'dev-no-auth', ?1, 'free')",
+                params![now],
+            )?;
+        }
         Ok(())
     }
 
     // ─── 用户 CRUD ─────────────────────────────────────
 
-    pub fn create_user(&self, email: &str, password_hash: &str) -> SqlResult<i64> {
+    pub fn create_user(&self, name: &str, email: &str, password_hash: &str) -> SqlResult<i64> {
         let conn = self.conn.lock().unwrap();
         let now = Utc::now().timestamp();
         conn.execute(
-            "INSERT INTO users (email, password_hash, created_at, plan) VALUES (?1, ?2, ?3, 'free')",
-            params![email, password_hash, now],
+            "INSERT INTO users (name, email, password_hash, created_at, plan) VALUES (?1, ?2, ?3, ?4, 'free')",
+            params![name, email, password_hash, now],
         )?;
         let user_id = conn.last_insert_rowid();
 
@@ -112,10 +153,10 @@ impl Storage {
         Ok(user_id)
     }
 
-    pub fn get_user_by_email(&self, email: &str) -> SqlResult<Option<(i64, String, String, i64, String)>> {
+    pub fn get_user_by_email(&self, email: &str) -> SqlResult<Option<(i64, String, String, String, i64, String)>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, email, password_hash, created_at, plan FROM users WHERE email = ?1"
+            "SELECT id, name, email, password_hash, created_at, plan FROM users WHERE email = ?1"
         )?;
         let mut rows = stmt.query(params![email])?;
         match rows.next()? {
@@ -125,6 +166,27 @@ impl Storage {
                 row.get(2)?,
                 row.get(3)?,
                 row.get(4)?,
+                row.get(5)?,
+            ))),
+            None => Ok(None),
+        }
+    }
+
+    /// 按用户名查找用户
+    pub fn get_user_by_name(&self, name: &str) -> SqlResult<Option<(i64, String, String, String, i64, String)>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(
+            "SELECT id, name, email, password_hash, created_at, plan FROM users WHERE name = ?1"
+        )?;
+        let mut rows = stmt.query(params![name])?;
+        match rows.next()? {
+            Some(row) => Ok(Some((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
             ))),
             None => Ok(None),
         }
@@ -133,15 +195,16 @@ impl Storage {
     pub fn get_user_by_id(&self, user_id: i64) -> SqlResult<Option<UserInfo>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, email, created_at, plan FROM users WHERE id = ?1"
+            "SELECT id, name, email, created_at, plan FROM users WHERE id = ?1"
         )?;
         let mut rows = stmt.query(params![user_id])?;
         match rows.next()? {
             Some(row) => Ok(Some(UserInfo {
                 id: row.get(0)?,
-                email: row.get(1)?,
-                created_at: row.get(2)?,
-                plan: match row.get::<_, String>(3)?.as_str() {
+                name: row.get(1)?,
+                email: row.get(2)?,
+                created_at: row.get(3)?,
+                plan: match row.get::<_, String>(4)?.as_str() {
                     "pro" => PlanTier::Pro,
                     "pro_plus" => PlanTier::ProPlus,
                     _ => PlanTier::Free,
@@ -262,6 +325,27 @@ impl Storage {
         Ok(())
     }
 
+    /// 批量删除: 用单条 SQL 的 IN (...) 子句, O(1) 事务开销
+    /// 空 ids 数组安全返回 Ok
+    pub fn delete_artworks_batch(&self, ids: &[i64]) -> SqlResult<usize> {
+        if ids.is_empty() {
+            return Ok(0);
+        }
+        let conn = self.conn.lock().unwrap();
+        // 动态拼 "?,?,?,?" 占位符, 避免 SQL 注入
+        let placeholders = std::iter::repeat("?")
+            .take(ids.len())
+            .collect::<Vec<_>>()
+            .join(",");
+        let sql = format!("DELETE FROM artworks WHERE id IN ({})", placeholders);
+        let mut params_vec: Vec<&dyn rusqlite::ToSql> = Vec::with_capacity(ids.len());
+        for id in ids {
+            params_vec.push(id);
+        }
+        let n = conn.execute(&sql, params_vec.as_slice())?;
+        Ok(n)
+    }
+
     pub fn get_artwork(&self, artwork_id: i64) -> SqlResult<Option<Artwork>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -346,7 +430,7 @@ impl Storage {
     pub fn get_settings(&self, user_id: i64) -> SqlResult<UserSettings> {
         let conn = self.conn.lock().unwrap();
         let result = conn.query_row(
-            "SELECT api_key, api_endpoint, storage_path, theme, shortcuts FROM settings WHERE user_id = ?1",
+            "SELECT api_key, api_endpoint, storage_path, theme, shortcuts, text_api_model FROM settings WHERE user_id = ?1",
             params![user_id],
             |row| {
                 Ok(UserSettings {
@@ -355,6 +439,7 @@ impl Storage {
                     storage_path: row.get(2)?,
                     theme: row.get(3)?,
                     shortcuts: row.get(4)?,
+                    text_api_model: row.get(5)?,
                 })
             }
         );
@@ -369,6 +454,7 @@ impl Storage {
                     storage_path: None,
                     theme: "ink".into(),
                     shortcuts: None,
+                    text_api_model: None,
                 })
             }
             Err(e) => Err(e),
@@ -378,8 +464,8 @@ impl Storage {
     pub fn update_settings(&self, user_id: i64, settings: &UserSettings) -> SqlResult<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute(
-            "UPDATE settings SET api_key = ?1, api_endpoint = ?2, storage_path = ?3, theme = ?4, shortcuts = ?5 WHERE user_id = ?6",
-            params![settings.api_key, settings.api_endpoint, settings.storage_path, settings.theme, settings.shortcuts, user_id],
+            "UPDATE settings SET api_key = ?1, api_endpoint = ?2, storage_path = ?3, theme = ?4, shortcuts = ?5, text_api_model = ?6 WHERE user_id = ?7",
+            params![settings.api_key, settings.api_endpoint, settings.storage_path, settings.theme, settings.shortcuts, settings.text_api_model, user_id],
         )?;
         Ok(())
     }
@@ -411,6 +497,9 @@ impl Storage {
         )?;
         Ok(total as u32)
     }
+
+    // ─── 密码重置 ─────────────────────────────────────
+
 
     // ─── 存储用量 ───────────────────────────────────────
 

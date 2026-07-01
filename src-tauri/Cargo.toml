@@ -1,7 +1,7 @@
 [package]
 name = "src-tauri"
-version = "0.5.0"
-description = "白石 BaiShi - 水墨生图桌面应用后端"
+version = "0.0.1-test"
+description = "白石 BaiShi - 水墨生图桌面应用后端 (Agnes API)"
 authors = ["BaiShi Studio"]
 edition = "2021"
 
@@ -17,6 +17,10 @@ path = "src/main.rs"
 name = "baishi-server"
 path = "src/server.rs"
 
+[[bin]]
+name = "baishi-dev"
+path = "src/server_http.rs"
+
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-shell = "2"
@@ -28,18 +32,16 @@ uuid = { version = "1", features = ["v4"] }
 rand = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "1", features = ["full"] }
-image = "0.25"
 log = "0.4"
 env_logger = "0.11"
 password-hash = "0.5"
 base64 = "0.22"
 hex = "0.4"
 dirs-next = "2"
-
-[features]
-default = ["candle-backend"]
-candle-backend = []
-onnx-backend = []
+reqwest = { version = "0.12", features = ["json"] }
+axum = "0.8"
+tower-http = { version = "0.6", features = ["fs", "cors"] }
+tower = { version = "0.5", features = ["util"] }
 
 [profile.release]
 opt-level = 3

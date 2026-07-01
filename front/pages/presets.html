@@ -12,10 +12,14 @@
   
   <link rel="stylesheet" href="../css/ink-wash.css" />
   <link rel="stylesheet" href="../css/app-chrome.css" />
+  <link rel="stylesheet" href="../css/page-loader.css" />
   <link rel="stylesheet" href="../css/presets.css" />
 <script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="../js/page-loader.js"></script>
 </head>
 <body class="ink-wash-bg">
+  <!-- 水墨加载动画 -->
+  <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
@@ -28,20 +32,18 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.4.2</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a>
-        <a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图/文</a>
+        <a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
         <a href="image-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>图生图</a>
+        <a href="multi-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/><path d="M6 10v4M10 6h4M14 18h4M18 14v-4"/></svg>多图融合</a>
         <div class="nav-section">资源</div>
         <a href="presets.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6Z"/></svg>灵感墙</a>
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
-        <div class="foot">
-          <div class="user-chip"><div class="avatar">赵</div><div class="info"><div class="name">赵明远</div><div class="plan">开源版</div></div></div>
-        </div>
       </aside>
 
       <main class="content">
@@ -175,7 +177,7 @@
         <div class="top">
           <div>
             <p class="eyebrow" id="text-detail-cat">文学</p>
-            <h2 id="text-detail-name" style="margin-top: 6px;">EchoWang风</h2>
+            <h2 id="text-detail-name" style="margin-top: 6px;">鲁迅风</h2>
           </div>
           <button class="icon-btn" id="text-detail-close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
@@ -308,7 +310,7 @@
         <div class="editor-form-stack">
           <div class="editor-field">
             <label>文风名称</label>
-            <input type="text" id="editor-text-name" placeholder="例：EchoWang风" />
+            <input type="text" id="editor-text-name" placeholder="例：鲁迅风" />
           </div>
           <div class="editor-form-grid">
             <div class="editor-field">
@@ -364,8 +366,9 @@
   </div>
 
   <div class="toast-host" id="toasts"></div>
-
-  
+  <script src="../js/baishi-shared.js"></script>
+  <script src="../js/api-client.js"></script>
+  <script src="../js/text-styles.js"></script>
   <script src="../js/presets.js"></script>
 </body>
 </html>

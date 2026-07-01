@@ -9,9 +9,13 @@
   <script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <link rel="stylesheet" href="../css/ink-wash.css" />
   <link rel="stylesheet" href="../css/app-chrome.css" />
+  <link rel="stylesheet" href="../css/page-loader.css" />
   <link rel="stylesheet" href="../css/text-to-image.css" />
+<script src="../js/page-loader.js"></script>
 </head>
 <body class="ink-wash-bg">
+  <!-- 水墨加载动画 -->
+  <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
@@ -29,10 +33,10 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.4.2</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
-        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"></path></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图/文</a>
+        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"></path></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
         <a href="image-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>图生图</a>
         <a href="multi-image.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/><path d="M6 10v4M10 6h4M14 18h4M18 14v-4"/></svg>多图融合</a>
         <div class="nav-section">资源</div>
@@ -40,9 +44,6 @@
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
-        <div class="foot">
-          <div class="user-chip"><div class="avatar">赵</div><div class="info"><div class="name">赵明远</div><div class="plan">开源版</div></div></div>
-        </div>
       </aside>
 
       <main class="content">
@@ -53,9 +54,8 @@
           </div>
           <div class="actions">
             <button class="btn btn-secondary" id="clear-btn">清空</button>
-            <button class="btn btn-secondary">保存为预设</button>
             <button class="btn btn-primary btn-lg" id="generate-btn">
-              <span>融合</span>
+              <span>生成</span>
             </button>
           </div>
         </div>
@@ -105,7 +105,7 @@
 
                 <details style="margin-top: var(--space-4);">
                   <summary style="cursor: pointer; font-size: 13px; color: var(--muted); user-select: none;">＋ 负面提示词</summary>
-                  <textarea class="textarea" rows="2" placeholder="不希望在融合结果中出现的元素 —" style="margin-top: var(--space-2); font-size: 13px;"></textarea>
+                  <textarea class="textarea" id="negative-prompt" rows="2" placeholder="不希望在融合结果中出现的元素 —" data-test="negative-prompt" style="margin-top: var(--space-2); font-size: 13px;"></textarea>
                 </details>
               </section>
 
@@ -143,9 +143,9 @@
                 <div class="param-group">
                   <div class="label-row">
                     <span>出图数量</span>
-                    <span class="value" id="batch-val">3 张</span>
+                    <span class="value" id="batch-val">1 张</span>
                   </div>
-                  <input type="range" min="1" max="5" step="1" value="3" class="slider" id="batch-slider">
+                  <input type="range" min="1" max="5" step="1" value="1" class="slider" id="batch-slider">
                   <div class="row" style="justify-content: space-between; margin-top: 4px;">
                     <span class="meta">1</span>
                     <span class="meta">2</span>
@@ -158,10 +158,10 @@
                 <div class="param-group">
                   <div class="label-row">
                     <span>随机种子</span>
-                    <span class="value" id="seed-val">-1 (随机)</span>
+                    <span class="value" id="seed-val">0</span>
                   </div>
                   <div class="row" style="gap: var(--space-2);">
-                    <input type="text" class="input" id="seed-input" value="-1" style="font-family: var(--font-mono); flex: 1;">
+                    <input type="text" class="input" id="seed-input" value="0" style="font-family: var(--font-mono); flex: 1;">
                     <button class="btn btn-secondary btn-sm" id="seed-dice" type="button">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1"></circle><circle cx="15" cy="9" r="1"></circle><circle cx="9" cy="15" r="1"></circle><circle cx="15" cy="15" r="1"></circle></svg>
                       摇骰
@@ -172,7 +172,7 @@
                 <div class="param-group">
                   <div class="label-row"><span>高精度模式</span><span class="value">+30% 质量</span></div>
                   <label class="toggle">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="high-precision" data-test="high-precision" checked="">
                     <span class="track"></span><span class="knob"></span>
                   </label>
                 </div>
@@ -193,20 +193,18 @@
                 </div>
               </div>
 
-              <!-- 融合进度 -->
-              <div id="progress-area" style="display: none; margin-top: var(--space-5);">
-                <div class="card" style="padding: var(--space-5);">
-                  <div class="row-between" style="margin-bottom: var(--space-3);">
-                    <span style="font-size: 13px; font-weight: 500;">融合进度</span>
-                    <span class="meta" id="progress-status">初始化中…</span>
-                  </div>
-                  <div style="height: 6px; background: var(--border); border-radius: var(--radius-pill); overflow: hidden;">
-                    <div id="progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-deep)); border-radius: var(--radius-pill); transition: width 300ms var(--ease);"></div>
-                  </div>
-                  <div class="row" style="margin-top: var(--space-2); gap: var(--space-2); flex-wrap: wrap;">
-                    <span class="meta" id="progress-step">准备融合特征…</span>
-                  </div>
+              <!-- 墨笔加载动画 -->
+              <div id="loading-canvas" class="loading-canvas" hidden>
+                <div class="ink-stage">
+                  <div class="ink-ripple ink-r1"></div>
+                  <div class="ink-ripple ink-r2"></div>
+                  <div class="ink-ripple ink-r3"></div>
+                  <div class="ink-drop"></div>
                 </div>
+                <p class="loading-status" id="loading-status">融合中…</p>
+                <p class="loading-hint" id="loading-hint">多象合一 · 笔意汇融</p>
+                <div class="brush-bar"><div class="brush-fill" id="brush-fill"></div></div>
+                <span class="loading-step" id="loading-step">正在连接后端</span>
               </div>
 
               <div id="result-grid" class="grid-2" style="margin-top: var(--space-5); display: none;">
@@ -232,7 +230,7 @@
 
   <div class="modal-overlay" id="preview-modal" style="display: none;">
     <div class="modal" style="max-width: 720px; text-align: center;">
-      <div style="aspect-ratio: 1 / 1; max-height: 60vh; background: var(--surface-2); border-radius: var(--radius-lg); margin-bottom: var(--space-4); display: grid; place-items: center; overflow: hidden;">
+      <div id="preview-frame" style="aspect-ratio: 1 / 1; max-height: 70vh; background: var(--surface-2); border-radius: var(--radius-lg); margin-bottom: var(--space-4); display: grid; place-items: center; overflow: hidden;">
         <img id="preview-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;">
         <span class="meta" id="preview-placeholder" style="font-size: 13px;">大图预览</span>
       </div>
@@ -245,5 +243,7 @@
     </div>
   </div>
 
+  <script src="../js/baishi-shared.js"></script>
+  <script src="../js/api-client.js"></script>
   <script src="../js/multi-image.js"></script>
 </body></html>

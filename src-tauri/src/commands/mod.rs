@@ -1,12 +1,12 @@
 /// Tauri Command 处理器 — IPC 入口
 ///
 /// 遵循 server.md §4 IPC 契约
-/// 所有 Command 由 Tauri Builder 注册，前端通过 invoke() 调用
+/// 前端通过 invoke() 调用
 
 use tauri::{command, State};
 
 use crate::auth;
-use crate::inference::{self, InferenceEngine, MockEngine, compute_cost, check_quota};
+use crate::inference::InferenceEngine;
 use crate::storage::Storage;
 use crate::types::*;
 
@@ -17,7 +17,6 @@ pub struct AppState {
 }
 
 impl AppState {
-    /// 根据 session token 获取 user_id
     pub fn get_user_id_by_session(&self, token: &str) -> Result<i64, String> {
         auth::validate_session(&self.storage, token)
     }
@@ -31,7 +30,7 @@ pub fn auth_register(
     email: String,
     password: String,
 ) -> Result<AuthResponse, String> {
-    auth::register(&state.storage, &email, &password)
+    auth::register(&state.storage, &email, &email, &password)
 }
 
 #[command]
@@ -65,10 +64,8 @@ pub fn generate_text_to_image(
     aspect: String,
     count: u32,
 ) -> Result<GenerateResult, String> {
-    // 解析比例
     let aspect_ratio = parse_aspect(&aspect)?;
 
-    // 构建请求
     let req = GenerateRequest {
         prompt,
         negative_prompt,
@@ -78,13 +75,12 @@ pub fn generate_text_to_image(
         cfg_scale,
         aspect: aspect_ratio,
         reference_image: None,
+        reference_images: Vec::new(),
         strength: None,
         count,
     };
 
-    // 原型阶段跳过配额检查
-    let result = state.engine.generate(&req)?;
-    Ok(result)
+    state.engine.generate(&req)
 }
 
 #[command]
@@ -112,17 +108,17 @@ pub fn generate_image_to_image(
         cfg_scale,
         aspect: aspect_ratio,
         reference_image: Some(reference_image),
+        reference_images: Vec::new(),
         strength: Some(strength),
         count,
     };
 
-    let result = state.engine.generate(&req)?;
-    Ok(result)
+    state.engine.generate(&req)
 }
 
 #[command]
 pub fn cancel_job(_job_id: String) -> Result<(), String> {
-    // TODO: 实现作业取消
+    // Agnes API 不支持取消，或用 job_id 追踪
     Err("取消作业尚未实现".into())
 }
 
@@ -135,13 +131,8 @@ pub fn list_history(
     page: i32,
     _filter: Option<String>,
 ) -> Result<ArtworkListResponse, String> {
-    // 原型阶段返回空列表（无持久化）
-    // 正式接入后使用 session_token 验证用户
-    Ok(ArtworkListResponse {
-        items: vec![],
-        total: 0,
-        page,
-    })
+    // 原型阶段返回空列表
+    Ok(ArtworkListResponse { items: vec![], total: 0, page })
 }
 
 #[command]

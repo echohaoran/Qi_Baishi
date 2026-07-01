@@ -48,6 +48,38 @@
       outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
+    #toasts.toast-host {
+      right: 20px;
+      bottom: 24px;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    #toasts .toast {
+      max-width: min(280px, calc(100vw - 32px));
+      padding: 10px 14px;
+      gap: 10px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    #toasts .toast .seal.sm {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+    .art-card--previewable {
+      cursor: zoom-in;
+    }
+    .art-card--previewable .art-img {
+      cursor: inherit;
+    }
+    .art-card--previewable:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+    body.multiselect-mode .art-card--previewable {
+      cursor: default;
+    }
     .date-header {
       display: flex;
       align-items: baseline;
@@ -62,16 +94,6 @@
       height: 1px;
       background: var(--border);
     }
-    .empty-state {
-      padding: var(--space-16) var(--space-8);
-      text-align: center;
-      color: var(--muted);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-lg);
-      margin: var(--space-6) 0;
-    }
-    .empty-state h3 { color: var(--fg-2); margin: 0 0 var(--space-2); font-size: 18px; font-weight: 500; }
-    .empty-state p { margin: 0 0 var(--space-4); font-size: 14px; }
 
     /* Fav 转 button 后浏览器默认样式 reset */
     .art-card .fav {
@@ -85,6 +107,9 @@
       outline: 2px solid var(--accent);
       outline-offset: 2px;
       border-radius: 2px;
+    }
+    .art-card .fav {
+      z-index: 5;
     }
     .art-card:hover .fav,
     .art-card:focus-within .fav { opacity: 1; }
@@ -183,3 +208,385 @@
     @media (prefers-reduced-motion: reduce) {
       .btn-arrow[aria-busy="true"]::after { animation: none; }
     }
+
+    /* ─────────────────────────────────────────────────────────
+     * 删除 + 多选删除 样式 (在 history.html 范围内)
+     * ───────────────────────────────────────────────────────── */
+
+    /* btn-danger · 警告/危险操作 (赤陶土) */
+    .btn-danger {
+      background: #B23A3A;
+      border-color: #B23A3A;
+      color: #faf9f6;
+    }
+    .btn-danger:hover:not(:disabled) { background: #8a2828; border-color: #8a2828; }
+
+    /* 单张 art-card 右上的删除按钮 · 默认隐藏, hover card 时浮现 */
+    .art-card .card-delete {
+      position: absolute;
+      top: 8px;
+      right: 44px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(250, 249, 246, 0.94);
+      color: #B23A3A;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 150ms var(--ease), transform 150ms var(--ease), background 150ms var(--ease);
+      z-index: 4;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+    }
+    .art-card .card-delete[hidden],
+    .art-card .card-checkbox[hidden] {
+      display: none !important;
+    }
+    .art-card .card-delete svg { width: 16px; height: 16px; }
+    .art-card .card-delete:hover { background: #B23A3A; color: #faf9f6; }
+
+    /* 多选模式下删除按钮常驻显示, 方便用户多次操作 */
+    body.multiselect-mode .art-card .card-delete {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    body.multiselect-mode .art-card:hover .card-delete { opacity: 1; }
+
+    /* 单张卡左上角的 checkbox · 默认隐藏 */
+    .art-card .card-checkbox {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 28px;
+      height: 28px;
+      display: none;
+      place-items: center;
+      background: rgba(250, 249, 246, 0.94);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      z-index: 3;
+      cursor: pointer;
+    }
+    .art-card .card-checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #B23A3A;
+    }
+    body.multiselect-mode .art-card .card-checkbox:not([hidden]) { display: grid; }
+    /* 选中后卡上有红色边框 + 微微抬高 */
+    .art-card.selected {
+      box-shadow: 0 0 0 2px #B23A3A, 0 6px 18px rgba(178, 58, 58, 0.18);
+    }
+    /* 多选模式下 fav 按钮避开 checkbox 位置, 右移 */
+    body.multiselect-mode .art-card .fav {
+      right: 12px;
+    }
+    body.multiselect-mode .art-card .card-delete {
+      right: 48px;
+    }
+
+    /* 批量操作条 · 多选模式时浮动显示 */
+    .batch-bar {
+      display: none;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 12px 16px;
+      margin-bottom: var(--space-4);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(178, 58, 58, 0.08);
+      animation: batch-bar-in 220ms var(--ease);
+    }
+    .batch-bar:not([hidden]) { display: flex; }
+    .batch-bar .batch-label { font-size: 14px; color: var(--fg); }
+    .batch-bar .spacer { flex: 1; }
+    @keyframes batch-bar-in {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 多选模式下 .actions (放大/下载/再生成) 隐藏避免误点 */
+    body.multiselect-mode .art-card .actions { display: none; }
+
+    /* 顶部多选切换按钮 aria-pressed 状态 */
+    [data-action="toggle-select"][aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--accent-on);
+      border-color: var(--accent);
+    }
+
+/* ─────────────────────────────────────────────────────────
+ * 妙笔生花 · 文本作品卡片样式
+ * 文生文 / 润色结果: file_path 是文案正文, 渲染为「毛笔信笺」风格
+ * ───────────────────────────────────────────────────────── */
+.art-card--text .art-text {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: var(--space-5) var(--space-6);
+  background:
+    linear-gradient(180deg, rgba(250, 249, 246, 0.04) 0%, rgba(250, 249, 246, 0.02) 100%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.art-card--text .art-text::before {
+  content: '';
+  position: absolute;
+  top: 12px; left: 12px;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+.art-card--text .art-text-body {
+  flex: 1 1 auto;
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: var(--space-3);
+}
+.art-card--text .art-text-foot {
+  flex: 0 0 auto;
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.art-card--text .art-meta .sub {
+  color: var(--meta);
+}
+
+/* 文本卡片 hover 时不加 zoom 阴影, 保持「信笺」感 */
+.art-card--text:hover .art-text {
+  border-color: rgba(226, 226, 226, 0.5);
+}
+
+/* 历史作品大图预览 */
+.history-preview-open {
+  overflow: hidden;
+}
+.history-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+.history-preview__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(29, 24, 20, 0.22);
+  backdrop-filter: blur(10px) saturate(0.92);
+}
+.history-preview__panel {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100vw - 64px));
+  max-height: calc(100vh - 64px);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(248, 243, 227, 0.98) 0%, rgba(244, 236, 214, 0.95) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(63, 46, 32, 0.18), 0 8px 20px rgba(63, 46, 32, 0.1);
+  overflow: hidden;
+}
+.history-preview__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(248, 243, 227, 0.88);
+  color: var(--fg-2);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.history-preview__close:hover,
+.history-preview__close:focus-visible {
+  background: var(--surface);
+  color: var(--fg);
+}
+.history-preview__layout {
+  display: grid;
+  gap: 20px;
+  min-height: 0;
+}
+.history-preview__layout--image {
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
+  align-items: stretch;
+}
+.history-preview__layout--text {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+.history-preview__media {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.history-preview__image {
+  width: 100%;
+  max-height: calc(100vh - 180px);
+  object-fit: contain;
+  background: var(--surface);
+}
+.history-preview__sidebar,
+.history-preview__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+.history-preview__eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.history-preview__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.history-preview__title {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--fg);
+}
+.history-preview__sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+.history-preview__params {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.history-preview__param {
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.history-preview__param-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.history-preview__param-value {
+  display: block;
+  color: var(--fg);
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.history-preview__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.history-preview__section-title {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.history-preview__copy,
+.history-preview__text-body {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--fg);
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.history-preview__text-body {
+  min-height: 320px;
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+.history-preview__empty {
+  color: var(--meta);
+}
+
+[data-theme="dark"] .history-preview__backdrop {
+  background: rgba(10, 9, 8, 0.72);
+}
+[data-theme="dark"] .history-preview__panel {
+  background: linear-gradient(180deg, rgba(42, 38, 34, 0.96) 0%, rgba(26, 23, 20, 0.98) 100%);
+  border-color: rgba(240, 235, 224, 0.14);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.42);
+}
+[data-theme="dark"] .history-preview__close {
+  background: rgba(42, 38, 34, 0.9);
+}
+
+@media (max-width: 720px) {
+  .history-preview {
+    padding: 16px;
+  }
+  .history-preview__panel {
+    width: min(100vw - 32px, 100%);
+    max-height: calc(100vh - 32px);
+    padding: 14px;
+    border-radius: 16px;
+  }
+  .history-preview__image {
+    max-height: calc(100vh - 140px);
+  }
+  .history-preview__layout,
+  .history-preview__layout--image,
+  .history-preview__layout--text {
+    grid-template-columns: 1fr;
+  }
+  .history-preview__params {
+    grid-template-columns: 1fr;
+  }
+  .history-preview__text-body {
+    min-height: 220px;
+    max-height: none;
+  }
+}

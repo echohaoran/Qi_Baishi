@@ -11,10 +11,14 @@
 .window {
   display: grid;
   grid-template-rows: var(--titlebar-h) 1fr;
-  width: 100vw;
-  height: 100vh;
+  width: calc(100vw - (var(--space-3) * 2));
+  height: calc(100vh - (var(--space-3) * 2));
+  margin: var(--space-3);
   background: var(--bg);
   overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-xl) + var(--space-1));
+  box-shadow: var(--shadow-lg);
 }
 .titlebar {
   display: flex;
@@ -761,10 +765,21 @@ body[data-os="windows"] .titlebar .right { margin-left: auto; }
   :root { --sidebar-w: 200px; }
   .content-body { padding: var(--space-5); }
   .content-header { padding: var(--space-5); }
+  .window {
+    width: calc(100vw - (var(--space-2) * 2));
+    height: calc(100vh - (var(--space-2) * 2));
+    margin: var(--space-2);
+  }
 }
 @media (max-width: 720px) {
   .app { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+  .window {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 
 /* ── 夜墨暗色主题 · 组件覆盖 ────────────
@@ -810,4 +825,92 @@ body[data-os="windows"] .titlebar .right { margin-left: auto; }
 [data-theme="dark"] .seal {
   border-color: var(--accent-deep);
   box-shadow: inset 0 0 0 1px var(--accent-on), 0 0 0 1px var(--accent);
+}
+
+/* ── 最近作品状态：loading / loaded / empty / error ── */
+#recent-artworks {
+  min-height: 220px;
+  position: relative;
+}
+#recent-artworks[data-state="loading"],
+#recent-artworks[data-state="empty"],
+#recent-artworks[data-state="error"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--bg-2);
+  padding: 32px 24px;
+}
+#recent-artworks[data-state="loaded"] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.recent-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  text-decoration: none;
+}
+.recent-empty strong {
+  color: var(--fg);
+  font-size: 18px;
+  font-weight: 500;
+}
+.recent-empty--action {
+  cursor: pointer;
+  transition: color 200ms;
+}
+.recent-empty--action:hover {
+  color: var(--accent);
+}
+.recent-empty--action strong {
+  color: var(--accent);
+}
+.recent-empty__brush {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--accent-soft) 0%, transparent 60%);
+  position: relative;
+}
+.recent-empty__brush::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.6;
+  animation: recent-brush-pulse 2s ease-in-out infinite;
+}
+@keyframes recent-brush-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.25); opacity: 0.3; }
+}
+#recent-artworks[data-state="error"] .recent-empty {
+  color: var(--muted);
+}
+.art-img--text {
+  background: linear-gradient(135deg, rgba(122, 92, 70, 0.08), rgba(74, 53, 34, 0.18)) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.art-text-body {
+  font-family: var(--font-serif, "Noto Serif SC", Georgia, serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  font-style: italic;
+  text-align: center;
+  opacity: 0.85;
 }

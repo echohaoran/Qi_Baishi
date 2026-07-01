@@ -12,10 +12,14 @@
   
   <link rel="stylesheet" href="../css/ink-wash.css" />
   <link rel="stylesheet" href="../css/app-chrome.css" />
+  <link rel="stylesheet" href="../css/page-loader.css" />
   <link rel="stylesheet" href="../css/settings.css" />
 <script>try{var t=localStorage.getItem("baishi.theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="../js/page-loader.js"></script>
 </head>
 <body class="ink-wash-bg">
+  <!-- 水墨加载动画 -->
+  <div class="page-loader" id="page-loader"><div class="loader-ink"></div></div>
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
@@ -28,21 +32,19 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.4.2</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
-        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图/文</a>
+        <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
         <a href="image-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>图生图</a>
-        
-        
+        <a href="multi-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/><path d="M6 10v4M10 6h4M14 18h4M18 14v-4"/></svg>多图融合</a>
+
+
         <div class="nav-section">资源</div>
         <a href="presets.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6Z"/></svg>灵感墙</a>
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
-        <div class="foot">
-          <div class="user-chip"><div class="avatar">赵</div><div class="info"><div class="name">赵明远</div><div class="plan">开源版</div></div></div>
-        </div>
       </aside>
 
       <main class="content">
@@ -52,7 +54,6 @@
             <h1>设置 <span class="brush" style="color: var(--accent);">调墨研色</span></h1>
           </div>
           <div class="actions">
-            <button class="btn btn-secondary">放弃修改</button>
             <button class="btn btn-primary" id="save-btn">保存更改</button>
           </div>
         </div>
@@ -60,11 +61,7 @@
         <div class="content-body">
           <div class="settings-grid" data-od-id="settings">
             <nav class="sub-nav">
-              <div class="item active" data-tab="account">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-                账户
-              </div>
-              <div class="item" data-tab="api">
+              <div class="item active" data-tab="api">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 2 13 10M19 4l2 2M11 12l-7 7M5 19l-2 2M19 9l-3-3M9 19l-3-3"/></svg>
                 生图 API
               </div>
@@ -80,150 +77,86 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/></svg>
                 存储
               </div>
-              <div class="item" data-tab="advanced">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m12 15 4-4M12 15l-4-4M12 15v6M8 9l4-4 4 4"/></svg>
-                高级
-              </div>
               <div class="item" data-tab="about">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>
                 关于
               </div>
             </nav>
 
-            <!-- 账户 -->
-            <div class="panel active" id="panel-account">
-              <p class="eyebrow">账户</p>
-              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">资料与开源许可</h2>
 
-              <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">基本资料</h3>
-              <div class="form-grid">
-                <div class="field">
-                  <label>显示名</label>
-                  <input type="text" class="input" value="赵明远" />
-                </div>
-                <div class="field">
-                  <label>邮箱</label>
-                  <input type="email" class="input" value="zhao.mingyuan@example.com" />
-                </div>
-                <div class="field full">
-                  <label>个人简介</label>
-                  <textarea class="textarea" rows="2">自媒体创作者 · 江南山水题材 · 偏好飞白与写意 —</textarea>
-                </div>
-                <div class="field">
-                  <label>地区</label>
-                  <select class="select">
-                    <option>中国大陆</option>
-                    <option>中国香港</option>
-                    <option>中国台湾</option>
-                    <option>新加坡</option>
-                    <option>其他</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label>语言</label>
-                  <select class="select">
-                    <option>简体中文</option>
-                    <option>繁體中文</option>
-                    <option>English</option>
-                    <option>日本語</option>
-                  </select>
-                </div>
-              </div>
-
-              <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: var(--space-8) 0 var(--space-4);">安全</h3>
-              <div class="setting-row">
-                <div class="desc">
-                  <h4>登录密码</h4>
-                  <p>上次修改 47 天前 · 建议每 90 天更换</p>
-                </div>
-                <div class="control"><button class="btn btn-secondary btn-sm">修改密码</button></div>
-              </div>
-              <div class="danger-zone">
-                <h4>危险操作</h4>
-                <div class="setting-row" style="border-top: 0;">
-                  <div class="desc">
-                    <h4 style="color: var(--fg);">退出登录</h4>
-                    <p>当前设备退出，所有未保存草稿会保留在本地</p>
-                  </div>
-                  <div class="control"><button class="btn btn-secondary btn-sm">退出</button></div>
-                </div>
-                <div class="setting-row" style="border-top: 1px solid rgba(138, 42, 38, 0.2);">
-                  <div class="desc">
-                    <h4 style="color: var(--danger);">注销账户</h4>
-                    <p>所有作品、预设将永久删除，不可恢复</p>
-                  </div>
-                  <div class="control"><button class="btn btn-sm" style="background: var(--danger); color: var(--surface);">注销账户</button></div>
-                </div>
-              </div>
-            </div>
 
             <!-- API 配置 -->
-            <div class="panel" id="panel-api">
+            <div class="panel active" id="panel-api">
               <p class="eyebrow">生图 API</p>
               <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">图像生成服务配置</h2>
 
               <!-- 在线生图 API -->
               <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">在线生图 API</h3>
               <div class="card card-pad" style="margin-bottom: var(--space-8);">
-                <p style="color: var(--muted); font-size: 13px; margin-bottom: var(--space-5);">使用第三方在线图像生成服务，直接粘贴 API Key 与请求体即可调用。</p>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: var(--space-5);">从下拉菜单选择预设供应商 · 模型自动匹配 · 填入 API Key · 点击「测试连接」验证连通性 · 点击「保存设置」即可在三个生图页使用。</p>
+
                 <div class="form-grid">
+                  <!-- 供应商下拉 -->
                   <div class="field full">
-                    <label>API Key</label>
-                    <input type="password" class="input" placeholder="sk-xxxxxxxxxxxxxxxx" style="font-family: var(--font-mono); font-size: 13px;" />
+                    <label>选择供应商 <span class="meta" style="font-weight: normal;">(7 个内置 · 包含默认 Agnes)</span></label>
+                    <select id="image-api-provider" class="select"></select>
+                    <p class="field-hint" id="provider-endpoint-hint" style="font-size: 12px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); word-break: break-all;"></p>
+                    <p class="field-hint" id="provider-api-link-row" hidden style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+                      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);">
+                        <span style="color: var(--muted);">获取API：</span><a id="provider-api-link" href="#" target="_blank" rel="noreferrer noopener" style="color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px;">Agnes Images 2.1 Flash</a>
+                      </span>
+                    </p>
                   </div>
+
+                  <!-- 模型下拉 / 输入 -->
                   <div class="field full">
-                    <label>请求体 (Request Body)</label>
-                    <textarea class="textarea" rows="6" placeholder='{"model": "SDXL", "prompt": "水墨山水画", "width": 1024, "height": 1024}' style="font-family: var(--font-mono); font-size: 13px;"></textarea>
+                    <label>模型选择 <span class="meta" style="font-weight: normal;">· 自动匹配所选供应商</span></label>
+                    <div class="model-control-wrap">
+                      <select id="image-api-model" class="select"></select>
+                      <input type="text" id="image-api-model-input" class="input" placeholder="输入模型 ID" style="display: none; font-family: var(--font-mono); font-size: 13px;" />
+                    </div>
+                  </div>
+
+                  <!-- API Key -->
+                  <div class="field full">
+                    <label>API Key <span id="api-key-hint" class="meta" style="font-weight: normal;">· 以 sk- 开头</span></label>
+                    <input type="password" id="online-api-key" class="input" placeholder="sk-xxxxxxxxxxxxxxxx" style="font-family: var(--font-mono); font-size: 13px;" />
                   </div>
                 </div>
-                <div style="margin-top: var(--space-4); display: flex; gap: var(--space-3);">
-                  <button class="btn btn-primary btn-sm" id="test-online-api">发送请求</button>
-                  <button class="btn btn-secondary btn-sm">保存模板</button>
+
+                <!-- Custom 自定义字段 -->
+                <div class="custom-fields" id="custom-fields">
+                  <div class="form-grid">
+                    <div class="field full">
+                      <label>端点 URL (Endpoint)</label>
+                      <input type="text" id="custom-endpoint" class="input" placeholder="https://your-api.example.com/v1/images/generations" style="font-family: var(--font-mono); font-size: 13px;" />
+                      <p class="field-hint" style="font-size: 12px; color: var(--muted); margin-top: 4px;">完整 POST 端点 · 包含路径</p>
+                    </div>
+                    <div class="field full">
+                      <label>请求体模板 (JSON) <span class="meta" style="font-weight: normal;">· 支持占位符</span></label>
+                      <textarea id="custom-request-body" class="textarea" rows="6" placeholder='{"model": "...", "prompt": "{{prompt}}", "n": {{n}}, "size": "{{size}}"}' style="font-family: var(--font-mono); font-size: 12px;"></textarea>
+                      <p class="field-hint" style="font-size: 12px; color: var(--muted); margin-top: 4px;">可用占位符：<code style="font-family: var(--font-mono);">{{prompt}}</code> <code style="font-family: var(--font-mono);">{{n}}</code> <code style="font-family: var(--font-mono);">{{count}}</code> <code style="font-family: var(--font-mono);">{{seed}}</code> <code style="font-family: var(--font-mono);">{{steps}}</code> <code style="font-family: var(--font-mono);">{{cfg_scale}}</code> <code style="font-family: var(--font-mono);">{{aspect}}</code> <code style="font-family: var(--font-mono);">{{size}}</code> <code style="font-family: var(--font-mono);">{{width}}</code> <code style="font-family: var(--font-mono);">{{height}}</code> <code style="font-family: var(--font-mono);">{{negative_prompt}}</code> <code style="font-family: var(--font-mono);">{{model}}</code></p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 请求体预览 (只读) -->
+                <div class="request-preview">
+                  <div class="rp-label">请求体预览 (只读 · 由供应商 + 模型自动生成)</div>
+                  <div class="rp-tabs">
+                    <button class="rp-tab active" data-rp="t2i">文生图</button>
+                    <button class="rp-tab" data-rp="i2i">图生图 / 多图融合</button>
+                  </div>
+                  <pre id="request-preview-body" class="rp-body"></pre>
+                </div>
+
+                <!-- 操作 -->
+                <div class="provider-actions">
+                  <button class="btn btn-secondary btn-sm" id="test-online-api">测试连接</button>
+                  <button class="btn btn-primary btn-sm" id="save-image-api">保存设置</button>
+                  <span class="meta" id="provider-saved-hint" style="margin-left: auto;">未保存</span>
                 </div>
                 <div id="online-api-result" style="margin-top: var(--space-4); display: none;"></div>
-              </div>
-
-              <!-- 本地后端 API -->
-              <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">本地后端 API</h3>
-              <div class="card card-pad">
-                <p style="color: var(--muted); font-size: 13px; margin-bottom: var(--space-5);">接入本地部署的图像生成服务（Mimocode / SDXL / ComfyUI），配置后可在应用内直接生图。配置加密保存在本地 Keychain。</p>
-                <div class="form-grid">
-                  <div class="field full">
-                    <label>后端服务地址 (Endpoint)</label>
-                    <input type="text" class="input" value="http://127.0.0.1:7878" style="font-family: var(--font-mono); font-size: 13px;" />
-                  </div>
-                  <div class="field">
-                    <label>API Key</label>
-                    <input type="password" class="input" value="moyun_sk_4f2b7e9c1a8d6f3b" style="font-family: var(--font-mono); font-size: 13px;" />
-                  </div>
-                  <div class="field">
-                    <label>模型</label>
-                    <select class="select">
-                      <option>SDXL-BaiShi-v2（推荐）</option>
-                      <option>SDXL-Base-1.0</option>
-                      <option>FLUX.1-dev</option>
-                      <option>ComfyUI 自定义</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label>采样步数</label>
-                    <input type="number" class="input" value="28" />
-                  </div>
-                  <div class="field">
-                    <label>CFG Scale</label>
-                    <input type="number" class="input" value="7.5" step="0.5" />
-                  </div>
-                </div>
-                <div class="card" style="background: var(--bg-2); margin-top: var(--space-5);">
-                  <div class="row-between" style="align-items: start;">
-                    <div>
-                      <h4 style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">连接测试</h4>
-                      <p style="color: var(--muted); font-size: 13px;">验证 Endpoint / Key / 模型是否可用</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" id="test-local-api">运行测试</button>
-                  </div>
-                  <div id="local-api-result" style="margin-top: var(--space-4); display: none;"></div>
-                </div>
               </div>
 
             </div>
@@ -293,19 +226,19 @@
               <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">生图默认</h3>
               <div class="setting-row">
                 <div class="desc"><h4>默认画面比例</h4><p>新建创作时自动选中</p></div>
-                <div class="control"><select class="select" style="width: 140px;"><option>1:1</option><option>16:9</option><option>3:4</option></select></div>
+                <div class="control"><select id="pref-aspect" class="select" style="width: 140px;"><option>1:1</option><option>3:4</option><option>4:5</option><option>16:9</option><option>21:9</option></select></div>
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>默认出图数量</h4><p>单次生图张数</p></div>
-                <div class="control"><select class="select" style="width: 140px;"><option>1 张</option><option>4 张</option><option>8 张</option></select></div>
+                <div class="control"><select id="pref-count" class="select" style="width: 140px;"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>自动保存到历史</h4><p>生成的图片自动加入历史作品库</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+                <div class="control"><label class="toggle"><input id="pref-auto-save" type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>高精度模式（默认）</h4><p>默认开启 · 30% 质量加成</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+                <div class="control"><label class="toggle"><input id="pref-high-precision" type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
               </div>
 
               <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: var(--space-8) 0 var(--space-4);">外观</h3>
@@ -320,28 +253,28 @@
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>毛笔动效</h4><p>按钮点击 / 页面切换时的笔触动画</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+                <div class="control"><label class="toggle"><input id="pref-brush-anim" type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>显示尺寸基准</h4><p>真实像素 vs 缩放像素（影响打印尺寸）</p></div>
-                <div class="control"><select class="select" style="width: 140px;"><option>逻辑像素</option><option>物理像素</option></select></div>
+                <div class="control"><select id="pref-size-base" class="select" style="width: 140px;"><option>逻辑像素</option><option>物理像素</option></select></div>
               </div>
 
               <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: var(--space-8) 0 var(--space-4);">通知</h3>
               <div class="setting-row">
                 <div class="desc"><h4>系统通知</h4><p>生图完成 / 同步完成时显示</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+                <div class="control"><label class="toggle"><input id="pref-notify" type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="desc"><h4>声音提示</h4><p>朱砂印章音 · 自定义音效</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox"><span class="track"></span><span class="knob"></span></label></div>
+                <div class="control"><label class="toggle"><input id="pref-sound" type="checkbox"><span class="track"></span><span class="knob"></span></label></div>
               </div>
             </div>
 
             <!-- 存储 -->
             <div class="panel" id="panel-storage">
               <p class="eyebrow">存储</p>
-              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">本地缓存与 Pro</h2>
+              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">本地缓存管理</h2>
 
               <div class="card card-pad-lg" style="margin-bottom: var(--space-5);">
                 <div class="row-between" style="margin-bottom: var(--space-3);">
@@ -358,124 +291,64 @@
                   <button class="btn btn-ghost btn-sm" style="color: var(--danger);">全部清空</button>
                 </div>
               </div>
-
-              <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">付费支持 · Pro</h3>
-              <div class="card card-pad-lg" style="background: linear-gradient(135deg, rgba(168,50,46,0.06) 0%, rgba(29,24,20,0.04) 100%); border: 1px solid rgba(168,50,46,0.15);">
-                <div style="display: flex; gap: var(--space-5); align-items: flex-start; flex-wrap: wrap;">
-                  <div style="flex: 1; min-width: 200px;">
-                    <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-                      <span style="background: var(--accent); color: var(--bg); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px;">白</span>
-                      <div>
-                        <div style="font-family: var(--font-display); font-weight: 600; font-size: 18px;">白石 · Pro</div>
-                        <div style="font-size: 12px; color: var(--muted);">解锁全部功能 · 支持开源</div>
-                      </div>
-                    </div>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 2;">
-                      <li style="color: var(--fg);">✓ 无限次生图 · 无限制队列</li>
-                      <li style="color: var(--fg);">✓ 云端存储 · 多设备同步作品库</li>
-                      <li style="color: var(--fg);">✓ 高清输出 · 4K / 8K 超分辨率</li>
-                      <li style="color: var(--fg);">✓ 批量导出 · 无水印原图下载</li>
-                      <li style="color: var(--fg);">✓ 专属风格 · 抢先体验新模型</li>
-                    </ul>
-                  </div>
-                  <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding-top: var(--space-2);">
-                    <div style="text-align: center;">
-                      <div style="font-size: 12px; color: var(--muted); letter-spacing: 0.06em;">仅需</div>
-                      <div style="font-family: var(--font-display); font-size: 42px; font-weight: 700; color: var(--accent); line-height: 1;">¥29</div>
-                      <div style="font-size: 12px; color: var(--muted);">/ 月 · 随时取消</div>
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%;">升级至 Pro</button>
-                    <button class="btn btn-ghost btn-sm" style="font-size: 12px;">了解详情 →</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 高级 -->
-            <div class="panel" id="panel-advanced">
-              <p class="eyebrow">高级</p>
-              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">开发者与诊断</h2>
-
-              <div class="setting-row">
-                <div class="desc"><h4>调试日志</h4><p>本地记录所有 API 请求与生成参数</p></div>
-                <div class="control"><label class="toggle"><input type="checkbox"><span class="track"></span><span class="knob"></span></label></div>
-              </div>
-              <div class="setting-row">
-                <div class="desc"><h4>本地 API 端口</h4><p>供外部脚本调用白石的生图能力</p></div>
-                <div class="control"><input type="text" class="input" value="7879" style="width: 100px; font-family: var(--font-mono); text-align: center;" /></div>
-              </div>
-              <div class="setting-row">
-                <div class="desc"><h4>模型热重载</h4><p>无重启切换 SDXL / FLUX 模型</p></div>
-                <div class="control"><button class="btn btn-secondary btn-sm">管理模型</button></div>
-              </div>
-              <div class="setting-row">
-                <div class="desc"><h4>导出全部数据</h4><p>JSON 格式 · 含作品 / 预设 / 提示词历史</p></div>
-                <div class="control"><button class="btn btn-secondary btn-sm">导出</button></div>
-              </div>
-
-              <div class="card" style="background: var(--bg-2); margin-top: var(--space-6);">
-                <p class="micro" style="margin-bottom: var(--space-3);">系统信息</p>
-                <table class="ds-table" style="font-size: 13px;">
-                  <tbody>
-                    <tr><td class="meta">版本</td><td>0.4.2 · build 2026.06.29</td></tr>
-                    <tr><td class="meta">渲染层</td><td>Tauri 2.1 + wry</td></tr>
-                    <tr><td class="meta">模型引擎</td><td>SDXL-BaiShi-v2 · 4.2 GB</td></tr>
-                    <tr><td class="meta">本地算力</td><td>Apple M3 Max · 18 GB</td></tr>
-                    <tr><td class="meta">后端</td><td>Mimocode · 0.9.3 (Rust)</td></tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
             <!-- 关于 -->
             <div class="panel" id="panel-about">
               <p class="eyebrow">关于</p>
-              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">关于白石</h2>
+              <h2 style="margin-top: 6px; margin-bottom: var(--space-6);">白石 · 项目与更新</h2>
 
-              <div class="card card-pad-lg" style="text-align: center; margin-bottom: var(--space-6);">
-                <div class="seal" style="width: 72px; height: 72px; font-size: 36px; margin: 0 auto var(--space-4); display: flex; align-items: center; justify-content: center; background: var(--accent); color: var(--accent-on); border-radius: var(--radius-lg);">墨</div>
-                <h3 style="font-size: 22px; margin-bottom: 4px;">白石 Baishi</h3>
-                <p style="color: var(--muted); font-size: 14px; margin-bottom: var(--space-3);">版本 0.4.2 · build 2026.06.29</p>
-                <p style="color: var(--muted); font-size: 13px; line-height: 1.6; max-width: 44ch; margin: 0 auto var(--space-5);">白石是一款融合传统水墨美学的 AI 图像生成工具，支持文生图、图生图与风格迁移，让创作者以数字形式延续水墨精神。</p>
-                <button class="btn btn-secondary btn-sm" id="check-update">检查更新</button>
-                <p id="update-msg" style="color: var(--muted); font-size: 12px; margin-top: var(--space-3);"></p>
-              </div>
-
-              <h3 style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-4);">开源声明</h3>
-              <div class="card card-pad" style="margin-bottom: var(--space-5);">
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: var(--space-4);">白石遵循以下开源协议与第三方依赖：</p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); font-size: 13px;">
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Apache 2.0</span>
-                    <span style="color: var(--fg-2);">SDXL-BaiShi</span>
+              <div class="card card-pad-lg about-hero" style="margin-bottom: var(--space-5);">
+                <div class="about-mark">
+                  <span class="seal" style="background:url(../../assets/logo.png) center/cover;color:transparent;">白</span>
+                  <div>
+                    <h3>白石 Baishi</h3>
+                    <p>开源的文生图 / 图生图 / 文生文桌面创作工具，面向自媒体创作者、营销团队与设计师，聚焦中文创作流程与本地化工作台体验。</p>
                   </div>
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">MIT</span>
-                    <span style="color: var(--fg-2);">Mimocode Engine</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">BSD-3</span>
-                    <span style="color: var(--fg-2);">Diffusers</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Apache 2.0</span>
-                    <span style="color: var(--fg-2);">Tauri 2.1</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">MIT</span>
-                    <span style="color: var(--fg-2);">Hugging Face Diffusers</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="tag" style="background: var(--surface); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Apache 2.0</span>
-                    <span style="color: var(--fg-2);">Rust / wry</span>
-                  </div>
+                </div>
+                <div class="about-meta">
+                  <span class="badge">版本 v0.0.1_test</span>
+                  <span class="badge">Apache-2.0</span>
+                  <span class="badge">macOS / Windows</span>
                 </div>
               </div>
 
-              <div class="card card-pad">
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">© 2026 白石 Baishi · 仅供个人创作使用 · 不做任何明示或暗示保证</p>
+              <div class="card card-pad-lg" style="margin-bottom: var(--space-5);">
+                <h3 style="font-size: 16px; margin-bottom: var(--space-3);">开源说明</h3>
+                <div class="about-copy">
+                  <p>白石采用 <strong>Apache License 2.0</strong> 开源许可证发布，允许在保留许可证与版权声明的前提下进行使用、修改与再分发。</p>
+                  <p>本项目当前同步维护 GitHub、Gitea、Gitee 三个仓库，用于公开版本分发与团队协作。</p>
+                </div>
+                <div class="about-links">
+                  <a class="btn btn-secondary btn-sm" href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noreferrer noopener">查看 Apache-2.0</a>
+                  <a class="btn btn-ghost btn-sm" href="https://github.com/echohaoran/Qi_Baishi" target="_blank" rel="noreferrer noopener">GitHub 仓库</a>
+                  <a class="btn btn-ghost btn-sm" href="https://gitee.com/echohaoran/qi_baishi" target="_blank" rel="noreferrer noopener">Gitee 仓库</a>
+                </div>
+              </div>
+
+              <div class="card card-pad-lg" style="margin-bottom: var(--space-5);">
+                <h3 style="font-size: 16px; margin-bottom: var(--space-3);">项目说明</h3>
+                <div class="about-copy">
+                  <p>产品结构覆盖工作台、文生图、图生图、多图融合、灵感墙、历史作品与设置模块，强调统一的中文提示词工作流、预设管理和生成结果归档。</p>
+                  <p>当前原型重点放在前端交互闭环与多供应商 API 接入体验，便于验证从提示词输入、生成、收藏、回看，到设置配置的完整创作链路。</p>
+                </div>
+              </div>
+
+              <div class="card card-pad-lg">
+                <div class="row-between about-update-head">
+                  <div>
+                    <h3 style="font-size: 16px; margin-bottom: 4px;">更新功能</h3>
+                    <p class="meta">检查新版本、查看当前状态，并为后续自动更新预留入口。</p>
+                  </div>
+                  <span class="badge" id="about-update-status">当前已是最新配置</span>
+                </div>
+                <div class="about-actions">
+                  <button type="button" class="btn btn-primary btn-sm" id="about-check-update">检查更新</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="about-open-release">打开发布页</button>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -489,8 +362,8 @@
   </div>
 
   <div class="toast-host" id="toasts"></div>
-
-  
+  <script src="../js/baishi-shared.js"></script>
+  <script src="../js/api-client.js"></script>
   <script src="../js/settings.js"></script>
 </body>
 </html>

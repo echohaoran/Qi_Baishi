@@ -1,0 +1,8 @@
+.*
+**/.*
+!.gitignore
+
+src-tauri/baishi.db
+mr*.png
+
+docs/vibecoding_log.md

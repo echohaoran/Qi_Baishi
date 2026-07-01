@@ -4,4 +4,3 @@ pub mod storage;
 pub mod inference;
 pub mod commands;
 pub mod events;
-pub mod models;

@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
       // ── 画廊 · 25 款真实海报预设（素材来自 ~/Downloads/posters） ─────────────────────────
       const POSTER_DIR = '../../assets/posters/';
-      const presets = [
+      let presets = [
         { name: '写实人像', cat: '人物', desc: '饱经风霜的老渔夫，窗光写实，8K 细节。', prompt: 'Medium shot portrait of an elderly fisherman with weathered skin, deep wrinkles, intense blue eyes, wearing a worn raincoat, natural window lighting, photorealistic, ultra detailed, 8k', ratio: '3:4', strength: '0.70 - 0.85', img: POSTER_DIR + '01_portrait_realistic.png', tags: ['写实', '人像', '窗光'] },
         { name: '炭笔速写', cat: '人物', desc: '舞者动态炭笔，明暗对比强烈。', prompt: 'Charcoal sketch portrait of a ballerina in motion, flowing dress, dynamic pose, rough textured paper, dramatic chiaroscuro lighting, expressive strokes, high contrast', ratio: '3:4', strength: '0.65 - 0.80', img: POSTER_DIR + '02_portrait_sketch.png', tags: ['炭笔', '速写', '舞者'] },
         { name: '古典油画', cat: '人物', desc: '文艺复兴贵妇，晕涂法，暖金光。', prompt: 'Classical oil painting portrait of a renaissance noblewoman in velvet dress, soft sfumato technique, warm golden lighting, dark background, Old Masters style, museum quality', ratio: '3:4', strength: '0.60 - 0.80', img: POSTER_DIR + '03_portrait_oilpainting.png', tags: ['油画', '文艺复兴', '晕涂法'] },
@@ -335,23 +335,10 @@ document.addEventListener('DOMContentLoaded', function () {
         toast(willFavorite ? '已加入收藏' : '已取消收藏');
       });
   
-      // ── 妙笔生花 · 12 款文风预设 ─────────────────
-      const textStyles = [
-        { id: 'linqingyuan', name: '林清远风', cat: '文学', desc: '现代山水散文 · 留白与呼吸并重', prompt: '请用现代山水散文的笔法撰写。要求：①以景入情，留白三分；②多用短句与比喻，忌华丽辞藻；③面向安静的阅读者，节奏舒缓。', length: '300-500 字', strength: '0.65 - 0.85', sample: '山是静的。\n\n风过松林时，我听见自己的呼吸。\n\n墨痕未干，三两笔便把整片秋天\n收进了纸里。', ink: 'rgba(29,24,20,0.85)', tags: ['散文', '留白', '现代', '山水'] },
-        { id: 'luxun', name: '鲁迅风', cat: '文学', desc: '犀利杂文 · 一针见血', prompt: '请以鲁迅式杂文笔法撰写。要求：①语言犀利冷峻，态度鲜明；②善用反讽与排比；③观点直击人心，不绕弯子。', length: '200-400 字', strength: '0.70 - 0.90', sample: '沉默啊，沉默。\n\n不在沉默中爆发，\n就在沉默中灭亡。\n\n这世上最可怕的，\n从来不是刀剑。', ink: 'rgba(29,24,20,0.90)', tags: ['杂文', '犀利', '批判', '民国'] },
-        { id: 'zhangailing', name: '张爱玲风', cat: '文学', desc: '都市言情 · 苍凉而华美', prompt: '请用张爱玲式笔法撰写。要求：①苍凉底色里透出华美；②多用通感和意象；③女性视角细腻，命运感强。', length: '300-600 字', strength: '0.60 - 0.80', sample: '于千万人之中遇见你所遇见的人，\n于千万年之中，时间的无涯的荒野里，\n没有早一步，也没有晚一步，\n刚巧赶上了。', ink: 'rgba(168,50,46,0.55)', tags: ['言情', '苍凉', '意象', '民国'] },
-        { id: 'wangzengqi', name: '汪曾祺风', cat: '文学', desc: '平淡生活 · 烟火可亲', prompt: '请用汪曾祺式笔法撰写。要求：①记录日常小事；②语言干净温和；③于平淡中见真意。', length: '200-400 字', strength: '0.55 - 0.75', sample: '如果你来访我，我不在，\n请和我门外的花坐一会儿。\n\n它们很温暖，\n我注视它们很久了。', ink: 'rgba(74,90,72,0.70)', tags: ['生活', '清淡', '温情', '日常'] },
-        { id: 'guwen', name: '古文观止', cat: '古文', desc: '古典文言 · 骈散结合', prompt: '请用典雅文言文撰写。要求：①句式整散结合；②典故信手拈来；③意境深远，音韵和谐。', length: '100-300 字', strength: '0.75 - 0.95', sample: '山不在高，有仙则名。\n水不在深，有龙则灵。\n斯是陋室，惟吾德馨。\n\n苔痕上阶绿，草色入帘青。', ink: 'rgba(29,24,20,0.85)', tags: ['文言', '典雅', '骈文', '古意'] },
-        { id: 'libai', name: '李白风', cat: '古文', desc: '浪漫古诗 · 豪放飘逸', prompt: '请以李白式浪漫古诗笔法撰写。要求：①想象瑰丽，气象宏大；②多用夸张与神话意象；③情感奔放而不失天真。', length: '五言 / 七言', strength: '0.70 - 0.90', sample: '飞流直下三千尺，\n疑是银河落九天。\n\n举杯邀明月，\n对影成三人。', ink: 'rgba(106,138,138,0.75)', tags: ['古诗', '浪漫', '豪放', '唐诗'] },
-        { id: 'business', name: '商业文案', cat: '商业', desc: '卖点驱动 · 简洁有力', prompt: '请撰写商业推广文案。要求：①直击产品核心卖点；②开头3秒抓眼球；③动词驱动，忌形容词堆砌。', length: '50-150 字', strength: '0.80 - 1.00', sample: '一台懂你的工具。\n\n不是更快，是刚刚好。\n\n现在就开始，不再等待。', ink: 'rgba(168,50,46,0.70)', tags: ['商业', '卖点', '电商', '推广'] },
-        { id: 'academic', name: '学术论文', cat: '学术', desc: '严谨论证 · 逻辑清晰', prompt: '请用学术论文风格撰写。要求：①论点明确，论据充分；②引用规范，行文严谨；③避免主观表达。', length: '500-1500 字', strength: '0.70 - 0.90', sample: '本文基于田野调查数据，\n探讨传统水墨在数字媒介中的\n转译路径及其美学张力。\n\n研究表明，……', ink: 'rgba(29,24,20,0.75)', tags: ['学术', '严谨', '论证', '论文'] },
-        { id: 'social', name: '社交媒体', cat: '媒体', desc: '短句爆款 · 朗朗上口', prompt: '请撰写社交媒体文案。要求：①30字以内；②有节奏感，押韵或对仗；③可附 emoji 断点；④适合微博/小红书/朋友圈。', length: '20-50 字', strength: '0.65 - 0.85', sample: '今天的风，是宣纸的味道 🍃\n\n一笔落下，万物生。\n#水墨日常 #东方美学', ink: 'rgba(196,165,116,0.80)', tags: ['社交', '短句', '爆款', '种草'] },
-        { id: 'headline', name: '标题党', cat: '媒体', desc: '钩子开篇 · 一眼入魂', prompt: '请生成 10 个吸睛标题。要求：①8-20 字；②数字 / 反差 / 悬念任一驱动；③引发好奇，但不标题欺诈。', length: '8-20 字', strength: '0.75 - 0.95', sample: '① 一支毛笔，让 AI 学会了呼吸\n\n② 90 后辞职后，写下 100 万字水墨\n\n③ 你绝对想不到的留白', ink: 'rgba(168,50,46,0.65)', tags: ['标题', '钩子', '吸睛', '悬念'] },
-        { id: 'brand', name: '品牌故事', cat: '商业', desc: '温度叙事 · 缘起愿景', prompt: '请撰写品牌故事。要求：①以创始人初心切入；②讲清楚"为什么"而非"是什么"；③温度感强，可读性高。', length: '300-600 字', strength: '0.60 - 0.80', sample: '那年冬天，我父亲送了我一支毛笔。\n\n他说，笔是有重量的。\n\n十年后，这支笔还在，\n但它的重量，落到了更多人的手里。', ink: 'rgba(196,165,116,0.75)', tags: ['品牌', '故事', '温度', '初心'] },
-        { id: 'slogan', name: '广告金句', cat: '商业', desc: '极简一字 · 一句入心', prompt: '请生成广告金句。要求：①10 字以内；②有记忆点；③可独立成句；④适合海报或视频结尾。', length: '5-10 字', strength: '0.85 - 1.00', sample: '落笔之处，万象生。\n\n\n墨未干，心已远。', ink: 'rgba(29,24,20,0.90)', tags: ['金句', '极简', '海报', '记忆点'] }
-      ];
-  
+      // ── 妙笔生花 · 12 款文风预设（数据来源：text-styles.js 共享） ─────
+      const textStyles = (window.BaishiTextStyles ? window.BaishiTextStyles.list() : []);
       textStyles.forEach((p, i) => { p.id = p.id || 'tx' + String(i + 1).padStart(2, '0'); });
+
   
       const textGrid = document.getElementById('text-grid');
       function renderTextStyles(opts) {
@@ -682,6 +669,11 @@ document.addEventListener('DOMContentLoaded', function () {
         renderPresets();
         editorGallery.classList.remove('open');
         toast(editingGalleryId ? '已保存修改' : '已添加新风格');
+        if (window.BaiShiAPI && window.BaiShiAPI.savePreset) {
+          window.BaiShiAPI.savePreset({ name: data.name, category: data.cat, prompt: data.prompt || '', aspect: data.ratio || null }).then(function (r) {
+            if (r && r.success) toast('已同步到后端', 'success');
+          });
+        }
       });
   
       // ── Text editor modal ───────────────────────
@@ -838,6 +830,69 @@ document.addEventListener('DOMContentLoaded', function () {
         renderTextStyles();
         editorText.classList.remove('open');
         toast(editingTextId ? '已保存修改' : '已添加新文风');
+        // 同步到后端（原型阶段异步、不阻塞 UI）
+        if (window.BaiShiAPI && window.BaiShiAPI.savePreset) {
+          var saveData = { name: data.name, category: data.cat, prompt: data.prompt || '' };
+          if (data.ratio) saveData.aspect = data.ratio;
+          window.BaiShiAPI.savePreset(saveData).then(function (r) {
+            if (r && r.success) toast('已同步到后端', 'success');
+          });
+        }
       });
-    
+
+      /* ── 从后端加载预设（启动时调用） ───────────────── */
+      function bootstrapFromServer() {
+        if (!window.BaiShiAPI || !window.BaiShiAPI.listPresets) return;
+        Promise.all([
+          window.BaiShiAPI.listPresets('gallery'),
+          window.BaiShiAPI.listPresets('copywriting'),
+        ]).then(function (results) {
+          var gallery = (results[0] && results[0].data) || [];
+          var copywriting = (results[1] && results[1].data) || [];
+          // 合并策略：后端项 = 用户保存的项；与硬编码项按名称去重，后端项优先
+          if (gallery.length) {
+            var localNames = new Set(presets.map(function (p) { return p.name; }));
+            gallery.forEach(function (p) {
+              if (!localNames.has(p.name)) {
+                presets.push({
+                  id: p.id || ('srv_' + p.id),
+                  name: p.name,
+                  cat: p.category,
+                  desc: '',
+                  prompt: p.prompt,
+                  ratio: p.aspect || '16:9',
+                  strength: '0.70 - 0.85',
+                  img: '',
+                  tags: []
+                });
+              }
+            });
+            renderPresets({ animate: false });
+          }
+          if (copywriting.length) {
+            var localTxt = new Set(textStyles.map(function (p) { return p.name; }));
+            copywriting.forEach(function (p) {
+              if (!localTxt.has(p.name)) {
+                textStyles.push({
+                  id: p.id || ('srv_' + p.id),
+                  name: p.name,
+                  cat: p.category,
+                  desc: '',
+                  prompt: p.prompt,
+                  length: '300-500 字',
+                  strength: '0.65 - 0.85',
+                  sample: p.prompt,
+                  ink: 'rgba(29,24,20,0.85)',
+                  tags: []
+                });
+              }
+            });
+            renderTextStyles({ animate: false });
+          }
+        }).catch(function () {
+          // 后端不可用时保留硬编码
+        });
+      }
+      bootstrapFromServer();
+
 });

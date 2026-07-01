@@ -1,6 +1,6 @@
 /// 鉴权模块 — Argon2id 密码哈希与会话管理
 ///
-/// 遵循 server.md §9 安全与隐私规范
+/// 支持用户名注册、用户名/邮箱登录
 
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
@@ -11,8 +11,13 @@ use rand::Rng;
 use crate::types::*;
 use crate::storage::Storage;
 
-/// 注册新用户
-pub fn register(storage: &Storage, email: &str, password: &str) -> Result<AuthResponse, String> {
+/// 注册新用户（支持用户名）
+pub fn register(storage: &Storage, name: &str, email: &str, password: &str) -> Result<AuthResponse, String> {
+    // 用户名校验
+    if name.len() < 2 || name.len() > 32 {
+        return Err("用户名需要 2-32 个字符".into());
+    }
+
     // 密码强度校验
     if password.len() < 8 {
         return Err("密码至少需要 8 个字符".into());
@@ -38,7 +43,7 @@ pub fn register(storage: &Storage, email: &str, password: &str) -> Result<AuthRe
         .to_string();
 
     let user_id = storage
-        .create_user(email, &hash)
+        .create_user(name, email, &hash)
         .map_err(|e| format!("创建用户失败: {}", e))?;
 
     // 生成 session token
@@ -58,19 +63,25 @@ pub fn register(storage: &Storage, email: &str, password: &str) -> Result<AuthRe
     })
 }
 
-/// 登录
-pub fn login(storage: &Storage, email: &str, password: &str) -> Result<AuthResponse, String> {
-    let (user_id, stored_email, hash, created_at, plan_str) = storage
-        .get_user_by_email(email)
+/// 登录（支持用户名或邮箱）
+pub fn login(storage: &Storage, email_or_username: &str, password: &str) -> Result<AuthResponse, String> {
+    // 先按用户名查，再按邮箱查
+    // 先按用户名查，找不到再按邮箱查
+    let result = match storage.get_user_by_name(email_or_username) {
+        Ok(Some(user)) => Ok(Some(user)),
+        _ => storage.get_user_by_email(email_or_username),
+    };
+
+    let (user_id, _name, stored_email, hash, created_at, plan_str) = result
         .map_err(|e| e.to_string())?
-        .ok_or_else(|| "邮箱或密码错误".to_string())?;
+        .ok_or_else(|| "用户名/邮箱或密码错误".to_string())?;
 
     // 验证密码
     let parsed_hash = PasswordHash::new(&hash).map_err(|e| format!("哈希解析失败: {}", e))?;
     let argon2 = Argon2::default();
     argon2
         .verify_password(password.as_bytes(), &parsed_hash)
-        .map_err(|_| "邮箱或密码错误".to_string())?;
+        .map_err(|_| "用户名/邮箱或密码错误".to_string())?;
 
     // 生成 session token
     let token = generate_session_token();
@@ -88,6 +99,7 @@ pub fn login(storage: &Storage, email: &str, password: &str) -> Result<AuthRespo
         session_token: token,
         user: UserInfo {
             id: user_id,
+            name: _name,
             email: stored_email,
             plan,
             created_at,
