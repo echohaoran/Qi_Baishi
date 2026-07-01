@@ -33,12 +33,13 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
-
-      - name: Build arm64 dmg
-        working-directory: src-tauri
-        run: cargo tauri build --bundles dmg --target aarch64-apple-darwin --no-sign
+      - name: Build arm64 dmg with official Tauri action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          args: --bundles dmg --target aarch64-apple-darwin --config src-tauri/tauri.conf.json
 
       - name: Collect artifact
         run: |
@@ -71,12 +72,13 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
-
-      - name: Build intel dmg
-        working-directory: src-tauri
-        run: cargo tauri build --bundles dmg --target x86_64-apple-darwin --no-sign
+      - name: Build intel dmg with official Tauri action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          args: --bundles dmg --target x86_64-apple-darwin --config src-tauri/tauri.conf.json
 
       - name: Collect artifact
         run: |
@@ -109,12 +111,13 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
-
-      - name: Build x64 NSIS installer
-        working-directory: src-tauri
-        run: cargo tauri build --bundles nsis --target x86_64-pc-windows-msvc
+      - name: Build x64 NSIS installer with official Tauri action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          args: --bundles nsis --target x86_64-pc-windows-msvc --config src-tauri/tauri.conf.json
 
       - name: Collect artifact
         shell: pwsh
@@ -167,12 +170,13 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
-
-      - name: Build deb and rpm
-        working-directory: src-tauri
-        run: cargo tauri build --bundles deb,rpm --target x86_64-unknown-linux-gnu
+      - name: Build deb/rpm with official Tauri action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          args: --bundles deb,rpm --target x86_64-unknown-linux-gnu --config src-tauri/tauri.conf.json
 
       - name: Collect artifacts
         run: |
@@ -215,45 +219,16 @@ jobs:
           path: artifacts
           merge-multiple: false
 
-      - name: List downloaded artifacts
-        run: |
-          echo "==> Tree of artifacts/:"
-          find artifacts -type f -printf "%p (%s bytes)\n" | sort
-          echo
-          echo "==> Top-level artifact dirs:"
-          ls -1 artifacts
-
       - name: Stage release files
         run: |
           set -e
-          # 把不同子目录里的产物统一到 release/ 目录，文件名为最终 release 资产名
           mkdir -p release
-          declare -A pairs=(
-            ["BaiShi-arm64-dmg/BaiShi-arm64.dmg"]="BaiShi-arm64.dmg"
-            ["BaiShi-intel-dmg/BaiShi-intel.dmg"]="BaiShi-intel.dmg"
-            ["BaiShi-x86_64-exe/BaiShi-x86_64-setup.exe"]="BaiShi-x86_64-setup.exe"
-            ["BaiShi-x86_64-deb/BaiShi-x86_64.deb"]="BaiShi-x86_64.deb"
-            ["BaiShi-x86_64-rpm/BaiShi-x86_64.rpm"]="BaiShi-x86_64.rpm"
-          )
-          for src in "${!pairs[@]}"; do
-            dst="release/${pairs[$src]}"
-            # download-artifact 可能在顶层，也可能在 artifacts/<name>/ 下，先做模糊匹配
-            found=$(find artifacts -type f -name "$(basename "$src")" | head -n 1 || true)
-            if [ -n "$found" ] && [ -e "$found" ]; then
-              cp -f "$found" "$dst"
-              echo "  staged: $dst <- $found"
-            else
-              echo "  MISSING: artifacts/**/${src}"
-            fi
-          done
-          echo
-          echo "==> release/ contents:"
+          cp artifacts/BaiShi-arm64-dmg/BaiShi-arm64.dmg release/BaiShi-arm64.dmg
+          cp artifacts/BaiShi-intel-dmg/BaiShi-intel.dmg release/BaiShi-intel.dmg
+          cp artifacts/BaiShi-x86_64-exe/BaiShi-x86_64-setup.exe release/BaiShi-x86_64-setup.exe
+          cp artifacts/BaiShi-x86_64-deb/BaiShi-x86_64.deb release/BaiShi-x86_64.deb
+          cp artifacts/BaiShi-x86_64-rpm/BaiShi-x86_64.rpm release/BaiShi-x86_64.rpm
           ls -la release
-
-          if [ -z "$(ls -A release 2>/dev/null)" ]; then
-            echo "::error::No release artifacts were downloaded. Aborting release."
-            exit 1
-          fi
 
       - name: Generate release notes
         id: notes
@@ -294,7 +269,7 @@ jobs:
             | Linux    | x64                | RPM | `BaiShi-x86_64.rpm` |
 
             ### Notes
-            - macOS builds are **unsigned** - you may need to right-click -> Open to bypass Gatekeeper.
+            - macOS builds are unsigned; first launch may require right-click -> Open.
             - Windows build is an NSIS installer.
             - Linux DEB/RPM are provided for Debian/Ubuntu and Fedora/RHEL-based distributions respectively.
           draft: false
