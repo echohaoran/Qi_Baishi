@@ -359,6 +359,11 @@ cargo tauri build
 
 - 当前本地构建得到的 `.app` 可作为 macOS 本地测试基线
 - 本地 DMG 封装链路曾出现与 `.app` 行为不一致的问题，不再作为推荐发布方式
+- 若 macOS 中把应用复制到 `/Applications` 后仍出现启动异常、权限残留或注入异常，可先执行以下命令清理扩展属性后再重试：
+
+```bash
+xattr -cr "/Applications/白石 BaiShi.app"
+```
 
 ### GitHub Actions 官方构建链路
 
