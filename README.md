@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="front/assets/logo.png" alt="白石 BaiShi Logo" width="96" />
+  <img src="assets/readme/logo-rounded.png" alt="白石 BaiShi Logo" width="96" />
   <h1>白石 BaiShi</h1>
   <p>本地优先的中文创作工作台，整合文生文、文生图、图生图、多图融合、灵感墙与历史管理。</p>
 </div>

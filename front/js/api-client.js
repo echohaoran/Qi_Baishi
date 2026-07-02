@@ -267,7 +267,7 @@
     /* ─── 历史 ──────────────────────────── */
     listHistory: async function (page, filter) {
       var tauriRes = await invokeCommand('list_history', {
-        sessionToken: null,
+        _session_token: null,
         page: page || 1,
         filter: filter || null,
       }, function (result) {
@@ -282,7 +282,7 @@
     },
 
     toggleFavorite: async function (artworkId) {
-      var tauriRes = await invokeCommand('toggle_favorite', { artworkId: artworkId }, function (result) {
+      var tauriRes = await invokeCommand('toggle_favorite', { artwork_id: artworkId }, function (result) {
         return { success: true, data: result };
       });
       if (tauriRes) return tauriRes;
@@ -320,7 +320,7 @@
 
     /* ─── 设置 ──────────────────────────── */
     getSettings: async function (userId) {
-      var tauriRes = await invokeCommand('get_settings', { userId: userId || 1 }, function (result) {
+      var tauriRes = await invokeCommand('get_settings', { user_id: userId || 1 }, function (result) {
         return { success: true, data: result };
       });
       if (tauriRes) return tauriRes;
@@ -329,7 +329,7 @@
 
     updateSettings: async function (userId, data) {
       var tauriRes = await invokeCommand('update_settings', {
-        userId: userId || 1,
+        user_id: userId || 1,
         settings: data,
       }, function () {
         return { success: true };
@@ -361,7 +361,7 @@
     /* ─── 历史作品删除 ─────────────────────── */
     // 单删 · body: { id: 57 }
     deleteArtwork: async function (id) {
-      var tauriRes = await invokeCommand('delete_artwork', { artworkId: id }, function () {
+      var tauriRes = await invokeCommand('delete_artwork', { artwork_id: id }, function () {
         return { success: true };
       });
       if (tauriRes) return tauriRes;

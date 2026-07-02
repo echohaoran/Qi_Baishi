@@ -92,7 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
     grid.setAttribute('aria-busy', 'false');
     grid.innerHTML = '';
     items.forEach(function (a) {
-      var url = a.file_path || '';
+      var url = (window.BaishiShared && window.BaishiShared.safeImageSrc)
+        ? window.BaishiShared.safeImageSrc(a.file_path)
+        : (a.file_path || '');
       var isText = a.style_id === 'copywriting';
       var card = document.createElement('a');
       card.href = 'history.html';

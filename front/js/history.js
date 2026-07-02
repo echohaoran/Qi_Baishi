@@ -1,6 +1,13 @@
 // history.js — 历史作品（全部接通后端）
 document.addEventListener('DOMContentLoaded', function () {
 
+  function safeImageSrc(value) {
+    if (window.BaishiShared && typeof window.BaishiShared.safeImageSrc === 'function') {
+      return window.BaishiShared.safeImageSrc(value);
+    }
+    return value || '';
+  }
+
   // 工具
   function toast(msg, kind) {
     if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
@@ -181,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     card.dataset.search = buildSearchIndex(a);
     card.dataset.favorite = a.is_favorite ? 'true' : 'false';
     card.dataset.artworkId = a.id;
-    var url = a.file_path || '';
+    var url = safeImageSrc(a.file_path);
     var time = formatTime(a.created_at);
     var sourceLabel = sourceToLabel(a.style_id);
     // ✅ 妙笔生花作品: file_path 是文案正文, 走文本卡片渲染
@@ -235,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // 图片作品（text-to-image / image-to-image / multi-image）
       card.innerHTML =
         '<div class="art-img" role="img" aria-label="' + escapeAttr(a.prompt) + ' · ' + (a.aspect || '1:1') + '"'
-        + (url ? ' style="background-image:url(\'' + url + '\');background-size:cover;background-position:center;cursor:pointer;"' : ' data-art="h' + a.id + '"')
+        + (url ? ' style="background-image:url(\'' + escapeAttr(url) + '\');background-size:cover;background-position:center;cursor:pointer;"' : ' data-art="h' + a.id + '"')
         + '></div>'
       + '<div class="actions">'
       +   '<button type="button" class="icon-btn" data-action="zoom" aria-label="放大预览" title="放大"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>'
@@ -354,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function openArtworkPreview(artwork) {
     var isText = artwork && artwork.style_id === 'copywriting';
-    var url = artwork && artwork.file_path ? artwork.file_path : '';
+    var url = artwork && artwork.file_path ? safeImageSrc(artwork.file_path) : '';
     if (!isText && !url) { toast('该作品无图片可预览', 'warn'); return; }
     closeArtworkPreview();
     var overlay = document.createElement('div');

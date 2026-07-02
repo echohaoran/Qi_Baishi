@@ -121,6 +121,23 @@
     });
   }
 
+  function normalizeAssetPath(input) {
+    var value = String(input == null ? '' : input).trim();
+    if (!value) return '';
+    if (/^(data:|https?:|blob:|file:|asset:)/i.test(value)) return value;
+    if (value.indexOf('../') === 0 || value.indexOf('./') === 0 || value.charAt(0) === '/') return value;
+    if (/^[A-Za-z]:[\\/]/.test(value)) return 'file:///' + value.replace(/\\/g, '/');
+    if (value.indexOf('assets/') === 0 || value.indexOf('Templete/') === 0 || value.indexOf('front/') === 0) {
+      return '../' + value;
+    }
+    return value;
+  }
+
+  function safeImageSrc(input, fallback) {
+    var value = normalizeAssetPath(input);
+    return value || (fallback || '');
+  }
+
   // ─── 右下角操作提示 ─────────────────────────────────
   function toast(message, kind, options) {
     var host = document.getElementById('toasts');
@@ -484,6 +501,8 @@
     setTask: setTask,
     clearTask: clearTask,
     subscribeTasks: subscribeTasks,
+    normalizeAssetPath: normalizeAssetPath,
+    safeImageSrc: safeImageSrc,
     // 右下角操作提示
     toast: toast,
   };

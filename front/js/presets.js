@@ -1,5 +1,12 @@
 // Auto-extracted from presets.html
 document.addEventListener('DOMContentLoaded', function () {
+      function safeImageSrc(value) {
+        if (window.BaishiShared && typeof window.BaishiShared.safeImageSrc === 'function') {
+          return window.BaishiShared.safeImageSrc(value);
+        }
+        return value || '';
+      }
+
       function byId(id) {
         return document.getElementById(id);
       }
@@ -250,8 +257,9 @@ document.addEventListener('DOMContentLoaded', function () {
           card.className = 'style-card' + (editMode.gallery ? ' editable' : '');
           card.style.setProperty('--i', i);
           card.dataset.id = p.id;
-          const previewBg = p.img
-            ? `<img class="preview-img" src="${p.img}" alt="${p.name}" loading="lazy" />`
+          const imgSrc = safeImageSrc(p.img);
+          const previewBg = imgSrc
+            ? `<img class="preview-img" src="${imgSrc}" alt="${p.name}" loading="lazy" />`
             : `<div class="preview-fallback" style="background:${p.g || genGradient(p.name)};"></div>`;
           const tagChips = (p.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('');
           card.innerHTML = `
@@ -318,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         var fit = isLandscape ? 'contain' : 'cover';
         var inner = p.img
-          ? '<img src="' + p.img + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:' + fit + ';display:block;" />'
+          ? '<img src="' + safeImageSrc(p.img) + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:' + fit + ';display:block;" />'
           : '<div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 30%, ' + (p.ink || 'rgba(29,24,20,0.6)') + ' 0%, transparent 50%),radial-gradient(ellipse 50% 30% at 70% 70%, ' + (p.ink || 'rgba(29,24,20,0.6)') + ' 0%, transparent 60%);mix-blend-mode:multiply;opacity:0.6;"></div>';
         art.innerHTML = inner + '<div class="detail-caption">' + p.name + ' · ' + p.cat + ' · ' + p.ratio + '</div>';
         if (!art.innerHTML || art.innerHTML.trim() === '') {
