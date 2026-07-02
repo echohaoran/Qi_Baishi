@@ -6,7 +6,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-v0.1.4-b93a32" alt="version" />
-  <img src="https://img.shields.io/badge/license-Apache%202.0-7b6a58" alt="license" />
+  <img src="https://img.shields.io/badge/license-GPL%20v3-7b6a58" alt="license" />
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-e6dcc8" alt="platform" />
   <img src="https://img.shields.io/badge/runtime-Tauri%202-cb4b3f" alt="tauri" />
   <img src="https://img.shields.io/badge/backend-Rust%20%2B%20Axum-8b3f36" alt="rust" />
@@ -24,7 +24,18 @@
 白石是一个本地优先的桌面生图原型项目，面向自媒体创作者、营销和设计师。当前仓库包含一套可直接打开联调的前端页面，以及一套 Rust 后端，用于本地持久化、历史记录管理、预设管理和第三方图像/文本生成接口转发。
 
 当前版本：`v0.1.4`
-开源许可证：Apache License 2.0
+开源许可证：GNU General Public License v3.0
+
+## 开源协议说明
+
+本项目当前采用 `GNU General Public License v3.0` 开源发布。你可以在遵守 GPL v3 条款的前提下使用、学习、修改和再分发本项目。
+
+- 如果你分发本项目的原始版本或修改版本，必须一并提供 GPL v3 许可证文本，并保留原有版权与许可证声明
+- 如果你分发了修改后的版本，需明确标注你做过修改
+- 如果你分发可执行程序或安装包，也需要按 GPL v3 的要求向接收方提供对应源码，或提供取得对应源码的方式
+- 你不能把基于本项目修改后再分发的版本改成闭源专有发布
+
+仓库根目录中的 [LICENSE](LICENSE) 文件为当前协议正文。若你计划将本项目代码并入其他项目、进行商业分发，或与第三方代码混合发布，建议先自行确认许可证兼容性与履约方式。
 
 ## 仓库概览
 

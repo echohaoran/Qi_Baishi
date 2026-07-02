@@ -11,7 +11,7 @@
 - 后端：`src-tauri/` 下 Rust + Axum + Rusqlite + Tauri
 - 联调主入口：`cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev`
 - 默认地址：`http://localhost:3456`
-- 开源许可证：Apache License 2.0
+- 开源许可证：GNU General Public License v3.0
 
 ## 不要再写错的项目事实
 
