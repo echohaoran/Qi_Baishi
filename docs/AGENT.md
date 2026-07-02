@@ -103,3 +103,9 @@
 - 任何涉及 README 或 `docs/` 的改动，都以当前代码为准
 - 遇到过时叙述，应直接纠正，不保留历史误导描述
 - `docs/vibecoding_log.md` 记录当前基线与近期待办，不再堆叠失效流水账
+- 文档职责需要保持分层，避免同一套接口在多处重复维护：
+  - `README.md`：项目总览、启动方式、构建发布、接口高层摘要
+  - `src-tauri/API.md`：唯一准确的 HTTP / Tauri 接口文档来源
+  - `docs/DEVELOPER/front.md`：前端页面、脚本分工与联调约定
+  - `docs/DEVELOPER/server.md`：后端模块结构、运行方式、数据流与实现约束
+- 若接口有变更，应优先更新 `src-tauri/API.md`，再检查 README 中的高层摘要是否需要同步

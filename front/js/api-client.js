@@ -18,6 +18,33 @@
 (function () {
   var BASE = 'http://localhost:3456';
 
+  function getTauriInvoke() {
+    if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') {
+      return window.__TAURI_INTERNALS__.invoke;
+    }
+    if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+      return window.__TAURI__.core.invoke;
+    }
+    if (window.__TAURI__ && typeof window.__TAURI__.invoke === 'function') {
+      return window.__TAURI__.invoke;
+    }
+    return null;
+  }
+
+  async function invokeCommand(cmd, args, mapper) {
+    var invoke = getTauriInvoke();
+    if (!invoke) return null;
+    try {
+      var result = await invoke(cmd, args || {});
+      return mapper ? mapper(result) : { success: true, data: result };
+    } catch (err) {
+      return {
+        success: false,
+        error: 'Tauri invoke 失败（' + cmd + '）：' + ((err && err.message) ? err.message : String(err)),
+      };
+    }
+  }
+
   async function api(path, options) {
     options = options || {};
     var headers = { 'Content-Type': 'application/json' };
@@ -31,7 +58,14 @@
         body: options.body || undefined,
       });
     } catch (err) {
-      return { success: false, error: '网络错误：' + (err && err.message ? err.message : err) };
+      var msg = (err && err.message ? err.message : String(err || '未知错误'));
+      var tauriReady = !!getTauriInvoke();
+      return {
+        success: false,
+        error: tauriReady
+          ? ('本地 HTTP 服务不可达（已检测到 Tauri，可是当前请求仍走到 ' + BASE + path + '）：' + msg)
+          : ('网络错误：' + msg + '（未检测到 Tauri invoke，当前运行环境可能不是打包态，或注入失败。诊断：__TAURI__=' + !!window.__TAURI__ + '，__TAURI_INTERNALS__=' + !!window.__TAURI_INTERNALS__ + '）')
+      };
     }
 
     // 后端错误 (413/415/500 等) 会返回 text/plain 而非 application/json,
@@ -70,6 +104,17 @@
       api_key: apiKey || '',
       mode: mode,
     };
+  }
+
+  async function invokeOrApi(cmd, payload, path) {
+    var tauriRes = await invokeCommand(cmd, { req: payload }, function (result) {
+      return { success: true, data: result };
+    });
+    if (tauriRes && tauriRes.success) return tauriRes;
+    return api(path, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   window.BaiShiAPI = {
@@ -112,9 +157,8 @@
         endpoint: cfg.endpoint || null,
         api_key: apiKey || null,
         request_body: cfg.request_body || null,
-        mode: 't2i',
       };
-      return api('/api/generate/text', { method: 'POST', body: JSON.stringify(payload) });
+      return invokeOrApi('generate_text_to_image_remote', payload, '/api/generate/text');
     },
 
     imageToImage: function (params) {
@@ -137,9 +181,8 @@
         endpoint: cfg.endpoint || null,
         api_key: apiKey || null,
         request_body: cfg.request_body || null,
-        mode: 'i2i',
       };
-      return api('/api/generate/image', { method: 'POST', body: JSON.stringify(payload) });
+      return invokeOrApi('generate_image_to_image_remote', payload, '/api/generate/image');
     },
 
     cancelGeneration: function (jobId) {
@@ -158,15 +201,13 @@
       if (!textApi.model) {
         return Promise.resolve({ success: false, error: '未选择模型 · 请先在「设置 → 生文 API」中选择模型并保存' });
       }
-      return api('/api/text/enhance', {
-        method: 'POST',
-        body: JSON.stringify({
-          prompt: prompt,
-          api_url: textApi.url,
-          api_key: textApi.key || '',
-          model: textApi.model,
-        }),
-      });
+      var payload = {
+        prompt: prompt,
+        api_url: textApi.url,
+        api_key: textApi.key || '',
+        model: textApi.model,
+      };
+      return invokeOrApi('enhance_text_remote', payload, '/api/text/enhance');
     },
 
     /* ─── 妙笔生花 · 生成文案（调用户配置的生文 API） ───── */
@@ -179,21 +220,60 @@
       if (!textApi.model) {
         return Promise.resolve({ success: false, error: '未选择模型 · 请先在「设置 → 生文 API」中选择模型并保存' });
       }
-      return api('/api/text/generate', {
-        method: 'POST',
-        body: JSON.stringify({
-          prompt: prompt,
-          system_prompt: opts.system_prompt || '你是一位专业的中文文案写手，擅长根据用户需求撰写高质量的中文文案。要求：①语言生动、语感好；②根据用户指定的风格（鲁迅风、张爱玲风、商业文案等）调整语气；③结构清晰，逻辑通顺；④遵守用户给出的字数限制。',
-          api_url: textApi.url,
-          api_key: textApi.key || '',
-          model: textApi.model,
-          max_tokens: opts.max_tokens || 800,
-        }),
+      var payload = {
+        prompt: prompt,
+        system_prompt: opts.system_prompt || '你是一位专业的中文文案写手，擅长根据用户需求撰写高质量的中文文案。要求：①语言生动、语感好；②根据用户指定的风格（鲁迅风、张爱玲风、商业文案等）调整语气；③结构清晰，逻辑通顺；④遵守用户给出的字数限制。',
+        api_url: textApi.url,
+        api_key: textApi.key || '',
+        model: textApi.model,
+        max_tokens: opts.max_tokens || 800,
+      };
+      return invokeOrApi('generate_text_remote', payload, '/api/text/generate');
+    },
+
+    testImageApiConnection: function (params) {
+      var payload = {
+        endpoint: params.endpoint,
+        api_key: params.api_key || '',
+        body_json: params.body_json,
+      };
+      return invokeCommand('test_image_api_connection', { req: payload }, function (result) {
+        return { success: true, data: result };
+      }).then(function (tauriRes) {
+        if (tauriRes) return tauriRes;
+        var parsed = JSON.parse(payload.body_json || '{}');
+        var headers = { 'Content-Type': 'application/json' };
+        if (payload.api_key) headers.Authorization = 'Bearer ' + payload.api_key;
+        var startedAt = Date.now();
+        return fetch(payload.endpoint, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(parsed),
+        }).then(function (resp) {
+          return {
+            success: true,
+            data: {
+              status: resp.status,
+              content_type: resp.headers.get('content-type') || '',
+              took_ms: Date.now() - startedAt,
+            },
+          };
+        });
+      }).catch(function (err) {
+        return { success: false, error: normalizeInvokeError(err) };
       });
     },
 
     /* ─── 历史 ──────────────────────────── */
-    listHistory: function (page, filter) {
+    listHistory: async function (page, filter) {
+      var tauriRes = await invokeCommand('list_history', {
+        sessionToken: null,
+        page: page || 1,
+        filter: filter || null,
+      }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       var qs = [];
       qs.push('user_id=1');
       if (page) qs.push('page=' + page);
@@ -201,7 +281,11 @@
       return api('/api/history?' + qs.join('&'));
     },
 
-    toggleFavorite: function (artworkId) {
+    toggleFavorite: async function (artworkId) {
+      var tauriRes = await invokeCommand('toggle_favorite', { artworkId: artworkId }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/history/favorite', {
         method: 'POST',
         body: JSON.stringify({ artwork_id: artworkId }),
@@ -209,12 +293,25 @@
     },
 
     /* ─── 预设 ──────────────────────────── */
-    listPresets: function (category) {
+    listPresets: async function (category) {
+      var tauriRes = await invokeCommand('list_presets', { category: category || null }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       var qs = category ? '?category=' + encodeURIComponent(category) : '';
       return api('/api/presets' + qs);
     },
 
-    savePreset: function (data) {
+    savePreset: async function (data) {
+      var tauriRes = await invokeCommand('save_preset', {
+        name: data.name,
+        category: data.category,
+        prompt: data.prompt,
+        aspect: data.aspect || null,
+      }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/presets', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -222,11 +319,22 @@
     },
 
     /* ─── 设置 ──────────────────────────── */
-    getSettings: function (userId) {
+    getSettings: async function (userId) {
+      var tauriRes = await invokeCommand('get_settings', { userId: userId || 1 }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/settings/' + (userId || 1));
     },
 
-    updateSettings: function (userId, data) {
+    updateSettings: async function (userId, data) {
+      var tauriRes = await invokeCommand('update_settings', {
+        userId: userId || 1,
+        settings: data,
+      }, function () {
+        return { success: true };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/settings/' + (userId || 1), {
         method: 'POST',
         body: JSON.stringify(data),
@@ -234,13 +342,29 @@
     },
 
     /* ─── 存储 ──────────────────────────── */
-    getStorageInfo: function () {
+    getStorageInfo: async function () {
+      var tauriRes = await invokeCommand('get_storage_info', {}, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/storage/info');
+    },
+
+    cleanupHistory: async function (days) {
+      var tauriRes = await invokeCommand('cleanup_history', { days: days }, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
+      throw new Error('当前开发 HTTP 服务暂未提供历史清理接口');
     },
 
     /* ─── 历史作品删除 ─────────────────────── */
     // 单删 · body: { id: 57 }
-    deleteArtwork: function (id) {
+    deleteArtwork: async function (id) {
+      var tauriRes = await invokeCommand('delete_artwork', { artworkId: id }, function () {
+        return { success: true };
+      });
+      if (tauriRes) return tauriRes;
       return api('/api/history/delete', {
         method: 'POST',
         body: JSON.stringify({ id: id }),

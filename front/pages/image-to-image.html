@@ -21,13 +21,12 @@
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
-      <div class="title"><span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 图生图</span></div>
+      <div class="title" style="-webkit-app-region: drag;"><span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 图生图</span></div>
       <div class="right">
-        <div class="os-toggle"><button data-os-set="macos" class="active">macOS</button><button data-os-set="windows">Windows</button></div>
-        <button class="icon-btn" title="历史">
+        <button class="icon-btn" title="历史" style="-webkit-app-region: no-drag;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
         </button>
-        <button class="icon-btn" title="保存预设">
+        <button class="icon-btn" title="保存预设" style="-webkit-app-region: no-drag;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8M7 3v5h8"></path></svg>
         </button>
       </div>
@@ -35,7 +34,8 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="nav-scroll">
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"></path><path d="M16 18h16M16 24h12M16 30h8"></path></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>文生图</a>
@@ -47,6 +47,12 @@
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
+              </div>
+
+        <div class="foot">
+          <div class="page-indicator">当前页面</div>
+          <div class="page-indicator-value">图生图</div>
+        </div>
       </aside>
 
       <main class="content">
@@ -143,6 +149,11 @@
 
                 <details style="margin-top: var(--space-4);">
                   <summary style="cursor: pointer; font-size: 13px; color: var(--muted); user-select: none;">＋ 负面提示词</summary>
+                  <div class="row" style="gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2);">
+                    <button type="button" class="btn btn-secondary btn-sm" data-neg-preset="通用瑕疵">通用瑕疵</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-neg-preset="水墨杂讯">水墨杂讯</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-neg-preset="人物修正">人物修正</button>
+                  </div>
                   <textarea class="textarea" id="negative-prompt" rows="2" placeholder="不希望在生成结果中出现的元素，例如：模糊、变形、签名、水印 —" data-test="negative-prompt" style="margin-top: var(--space-2); font-size: 13px;"></textarea>
                 </details>
               </section>
@@ -242,10 +253,10 @@
               </div>
 
               <div id="result-grid" class="grid-2" style="margin-top: var(--space-4); display: none;">
-                <div class="art-card"><div class="art-img" data-art="i1"></div><div class="art-meta"><div class="title">化境作品 #1</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.2s</span></div></div></div>
-                <div class="art-card"><div class="art-img" data-art="i2"></div><div class="art-meta"><div class="title">化境作品 #2</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.4s</span></div></div></div>
-                <div class="art-card"><div class="art-img" data-art="i3"></div><div class="art-meta"><div class="title">化境作品 #3</div><div class="sub"><span>原图 · SDXL</span><span class="num">15.9s</span></div></div></div>
-                <div class="art-card"><div class="art-img" data-art="i4"></div><div class="art-meta"><div class="title">化境作品 #4</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.1s</span></div></div></div>
+                <div class="art-card"><div class="art-img" data-art="i1"></div><div class="art-meta"><div class="title" style="-webkit-app-region: drag;">化境作品 #1</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.2s</span></div></div></div>
+                <div class="art-card"><div class="art-img" data-art="i2"></div><div class="art-meta"><div class="title" style="-webkit-app-region: drag;">化境作品 #2</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.4s</span></div></div></div>
+                <div class="art-card"><div class="art-img" data-art="i3"></div><div class="art-meta"><div class="title" style="-webkit-app-region: drag;">化境作品 #3</div><div class="sub"><span>原图 · SDXL</span><span class="num">15.9s</span></div></div></div>
+                <div class="art-card"><div class="art-img" data-art="i4"></div><div class="art-meta"><div class="title" style="-webkit-app-region: drag;">化境作品 #4</div><div class="sub"><span>原图 · SDXL</span><span class="num">16.1s</span></div></div></div>
               </div>
             </section>
           </div>

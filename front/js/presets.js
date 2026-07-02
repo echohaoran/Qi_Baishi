@@ -1,13 +1,8 @@
 // Auto-extracted from presets.html
 document.addEventListener('DOMContentLoaded', function () {
-  
-      document.querySelectorAll('[data-os-set]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.body.dataset.os = btn.dataset.osSet;
-          document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-        });
-      });
-  
+      function byId(id) {
+        return document.getElementById(id);
+      }
       function toast(msg, kind = 'success') {
         if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
           return window.BaishiShared.toast(msg, kind);
@@ -17,7 +12,10 @@ document.addEventListener('DOMContentLoaded', function () {
       // ── Sub-nav 切换 ───────────────────────────
       function switchTab(tab) {
         document.querySelectorAll('.sub-nav .item').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        ['panel-gallery', 'panel-copywriting'].forEach(id => {
+          const panel = document.getElementById(id);
+          if (panel) panel.classList.remove('active');
+        });
         const target = document.getElementById('panel-' + tab);
         if (target) target.classList.add('active');
       }
@@ -38,8 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
         else renderTextStyles({ animate: false });
         toast(editMode[panel] ? '已进入管理模式 · 增删改启用' : '已退出管理模式');
       }
-      document.getElementById('edit-toggle-gallery').addEventListener('click', () => toggleEditMode('gallery'));
-      document.getElementById('edit-toggle-copywriting').addEventListener('click', () => toggleEditMode('copywriting'));
+      const editToggleGallery = byId('edit-toggle-gallery');
+      const editToggleCopywriting = byId('edit-toggle-copywriting');
+      if (editToggleGallery) editToggleGallery.addEventListener('click', () => toggleEditMode('gallery'));
+      if (editToggleCopywriting) editToggleCopywriting.addEventListener('click', () => toggleEditMode('copywriting'));
   
       // ── filter / search / sort（画廊 / 妙笔生花） ─────────────
       const filterState = { gallery: { cat: 'all', q: '', sort: 'newest' }, copywriting: { cat: 'all', q: '', sort: 'newest' } };
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   
       // ── 画廊 · 25 款真实海报预设（素材来自 ~/Downloads/posters） ─────────────────────────
-      const POSTER_DIR = 'assets/posters/';
+      const POSTER_DIR = '../assets/posters/';
       let presets = [
         { name: '写实人像', cat: '人物', desc: '饱经风霜的老渔夫，窗光写实，8K 细节。', prompt: 'Medium shot portrait of an elderly fisherman with weathered skin, deep wrinkles, intense blue eyes, wearing a worn raincoat, natural window lighting, photorealistic, ultra detailed, 8k', ratio: '3:4', strength: '0.70 - 0.85', img: POSTER_DIR + '01_portrait_realistic.png', tags: ['写实', '人像', '窗光'] },
         { name: '炭笔速写', cat: '人物', desc: '舞者动态炭笔，明暗对比强烈。', prompt: 'Charcoal sketch portrait of a ballerina in motion, flowing dress, dynamic pose, rough textured paper, dramatic chiaroscuro lighting, expressive strokes, high contrast', ratio: '3:4', strength: '0.65 - 0.80', img: POSTER_DIR + '02_portrait_sketch.png', tags: ['炭笔', '速写', '舞者'] },
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
       presets.forEach((p, i) => { p.id = p.id || 'gp' + String(i + 1).padStart(2, '0'); });
   
-      const presetGrid = document.getElementById('preset-grid');
+      const presetGrid = byId('preset-grid');
       function makeAddCard(label, onClick) {
         const card = document.createElement('div');
         card.className = 'add-card';
@@ -281,10 +281,11 @@ document.addEventListener('DOMContentLoaded', function () {
           presetGrid.appendChild(card);
         });
       }
-      renderPresets();
+      if (presetGrid) renderPresets();
   
-      const detail = document.getElementById('detail');
-      const favoriteBtn = document.getElementById('favorite-preset');
+      const detail = byId('detail');
+      const favoriteBtn = byId('favorite-preset');
+      const usePresetBtn = byId('use-preset');
       const favSet = new Set();
       let currentDetailId = null;
       function syncFavoriteBtn() {
@@ -297,16 +298,17 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       function openDetail(p) {
         currentDetailId = p.id;
-        document.getElementById('detailName').textContent = p.name;
-        document.getElementById('detail-cat').textContent = p.cat;
-        document.getElementById('detail-desc').textContent = p.desc;
-        document.getElementById('detail-prompt').textContent = p.prompt;
-        const art = document.getElementById('detail-art');
+        if (!detail) return;
+        byId('detailName').textContent = p.name;
+        byId('detail-cat').textContent = p.cat;
+        byId('detail-desc').textContent = p.desc;
+        byId('detail-prompt').textContent = p.prompt;
+        const art = byId('detail-art');
         art.style.background = p.img ? '' : (p.g || genGradient(p.name));
         // 根据比例判断横图/竖图：宽/高 > 1.3 为横图 → 上下排列
         var ratioParts = /^(\d+)\s*:\s*(\d+)$/.exec((p.ratio || '4:5').trim());
         var isLandscape = ratioParts && parseFloat(ratioParts[1]) / parseFloat(ratioParts[2]) > 1.3;
-        var detailPanel = document.getElementById('detail');
+        var detailPanel = byId('detail');
         detailPanel.classList.toggle('landscape', isLandscape);
         // 设置 art 容器比例匹配图片原始比例
         if (ratioParts) {
@@ -319,11 +321,14 @@ document.addEventListener('DOMContentLoaded', function () {
           ? '<img src="' + p.img + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:' + fit + ';display:block;" />'
           : '<div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 30%, ' + (p.ink || 'rgba(29,24,20,0.6)') + ' 0%, transparent 50%),radial-gradient(ellipse 50% 30% at 70% 70%, ' + (p.ink || 'rgba(29,24,20,0.6)') + ' 0%, transparent 60%);mix-blend-mode:multiply;opacity:0.6;"></div>';
         art.innerHTML = inner + '<div class="detail-caption">' + p.name + ' · ' + p.cat + ' · ' + p.ratio + '</div>';
+        if (!art.innerHTML || art.innerHTML.trim() === '') {
+          art.innerHTML = '<div class="detail-caption">' + p.name + '</div>';
+        }
         syncFavoriteBtn();
         detailPanel.classList.add('open');
       }
-      document.getElementById('detail-close').addEventListener('click', () => detail.classList.remove('open'));
-      detail.addEventListener('click', e => { if (e.target === detail) detail.classList.remove('open'); });
+      if (byId('detail-close') && detail) byId('detail-close').addEventListener('click', () => detail.classList.remove('open'));
+      if (detail) detail.addEventListener('click', e => { if (e.target === detail) detail.classList.remove('open'); });
       favoriteBtn.addEventListener('click', () => {
         if (!currentDetailId) return;
         const willFavorite = !favSet.has(currentDetailId);
@@ -331,13 +336,29 @@ document.addEventListener('DOMContentLoaded', function () {
         syncFavoriteBtn();
         toast(willFavorite ? '已加入收藏' : '已取消收藏');
       });
-  
+      if (usePresetBtn) {
+        usePresetBtn.addEventListener('click', () => {
+          if (!currentDetailId) return;
+          const currentPreset = presets.find(function (item) { return item.id === currentDetailId; });
+          if (!currentPreset) {
+            toast('未找到当前预设', 'error');
+            return;
+          }
+          try {
+            sessionStorage.setItem('baishi_preset_prompt', currentPreset.prompt || '');
+            sessionStorage.setItem('baishi_preset_name', currentPreset.name || '');
+            sessionStorage.setItem('baishi_preset_ratio', currentPreset.ratio || '1:1');
+          } catch (err) {}
+          window.location.href = 'text-to-image.html?from=preset';
+        });
+      }
+
       // ── 妙笔生花 · 12 款文风预设（数据来源：text-styles.js 共享） ─────
       const textStyles = (window.BaishiTextStyles ? window.BaishiTextStyles.list() : []);
       textStyles.forEach((p, i) => { p.id = p.id || 'tx' + String(i + 1).padStart(2, '0'); });
 
   
-      const textGrid = document.getElementById('text-grid');
+      const textGrid = byId('text-grid');
       function renderTextStyles(opts) {
         const animate = !opts || opts.animate !== false;
         textGrid.classList.toggle('enter', animate);
@@ -373,12 +394,12 @@ document.addEventListener('DOMContentLoaded', function () {
           textGrid.appendChild(card);
         });
       }
-      renderTextStyles();
+      if (textGrid) renderTextStyles();
   
       wireFilter('gallery', renderPresets);
       wireFilter('copywriting', renderTextStyles);
   
-      const textDetail = document.getElementById('text-detail');
+      const textDetail = byId('text-detail');
       let currentDetailTextId = null;
       let detailTags = [];
 
@@ -430,9 +451,9 @@ document.addEventListener('DOMContentLoaded', function () {
         textDetail.classList.add('open');
       }
 
-      document.getElementById('text-detail-close').addEventListener('click', () => textDetail.classList.remove('open'));
-      textDetail.addEventListener('click', e => { if (e.target === textDetail) textDetail.classList.remove('open'); });
-      document.getElementById('text-detail-save').addEventListener('click', () => {
+      if (byId('text-detail-close') && textDetail) byId('text-detail-close').addEventListener('click', () => textDetail.classList.remove('open'));
+      if (textDetail) textDetail.addEventListener('click', e => { if (e.target === textDetail) textDetail.classList.remove('open'); });
+      if (byId('text-detail-save')) document.getElementById('text-detail-save').addEventListener('click', () => {
         const currentPreset = currentDetailTextId ? textStyles.find(function(p){ return p.id === currentDetailTextId; }) : null;
         if (!currentPreset) { toast('未找到文风数据', 'error'); return; }
         currentPreset.desc = document.getElementById('text-detail-desc').value.trim();
@@ -444,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
         textDetail.classList.remove('open');
         toast('已保存修改');
       });
-      document.getElementById('text-detail-cancel').addEventListener('click', () => textDetail.classList.remove('open'));
+      if (byId('text-detail-cancel') && textDetail) document.getElementById('text-detail-cancel').addEventListener('click', () => textDetail.classList.remove('open'));
   
       // ── Delete confirmation (inline overlay) ───────────────────
       function hideAllDeleteConfirms() {
@@ -495,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   
       // ── Gallery editor modal ───────────────────────
-      const editorGallery = document.getElementById('editor-gallery');
+      const editorGallery = byId('editor-gallery');
       let editingGalleryId = null;
       let editorUploadDataUri = null;
 
@@ -503,7 +524,7 @@ document.addEventListener('DOMContentLoaded', function () {
       function triggerUpload() {
         document.getElementById('editor-upload-input').click();
       }
-      document.getElementById('editor-upload-input').addEventListener('change', function(e) {
+      if (byId('editor-upload-input')) document.getElementById('editor-upload-input').addEventListener('change', function(e) {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -513,11 +534,11 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         reader.readAsDataURL(file);
       });
-      document.getElementById('editor-upload-area').addEventListener('click', function(e) {
+      if (byId('editor-upload-area')) document.getElementById('editor-upload-area').addEventListener('click', function(e) {
         if (e.target.closest('.upload-change-btn') || e.target.closest('#editor-upload-change')) return;
         triggerUpload();
       });
-      document.getElementById('editor-upload-change').addEventListener('click', function(e) {
+      if (byId('editor-upload-change')) document.getElementById('editor-upload-change').addEventListener('click', function(e) {
         e.stopPropagation();
         triggerUpload();
       });
@@ -555,8 +576,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         updateEditorGalleryPreview();
       }
-      document.getElementById('editor-gallery-cat').addEventListener('change', handleCatChange);
-      document.getElementById('editor-gallery-cat-new').addEventListener('keydown', function(e) {
+      if (byId('editor-gallery-cat')) document.getElementById('editor-gallery-cat').addEventListener('change', handleCatChange);
+      if (byId('editor-gallery-cat-new')) document.getElementById('editor-gallery-cat-new').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
           var v = this.value.trim();
@@ -574,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       });
-      document.getElementById('editor-gallery-cat-new').addEventListener('blur', function(e) {
+      if (byId('editor-gallery-cat-new')) document.getElementById('editor-gallery-cat-new').addEventListener('blur', function(e) {
         var v = this.value.trim();
         if (v) {
           var sel = document.getElementById('editor-gallery-cat');
@@ -637,11 +658,11 @@ document.addEventListener('DOMContentLoaded', function () {
         updateEditorGalleryPreview();
         editorGallery.classList.add('open');
       }
-      document.getElementById('editor-gallery-name').addEventListener('input', updateEditorGalleryPreview);
-      document.getElementById('editor-gallery-close').addEventListener('click', () => editorGallery.classList.remove('open'));
-      editorGallery.addEventListener('click', e => { if (e.target === editorGallery) editorGallery.classList.remove('open'); });
-      document.getElementById('editor-gallery-cancel').addEventListener('click', () => editorGallery.classList.remove('open'));
-      document.getElementById('editor-gallery-save').addEventListener('click', () => {
+      if (byId('editor-gallery-name')) document.getElementById('editor-gallery-name').addEventListener('input', updateEditorGalleryPreview);
+      if (byId('editor-gallery-close') && editorGallery) document.getElementById('editor-gallery-close').addEventListener('click', () => editorGallery.classList.remove('open'));
+      if (editorGallery) editorGallery.addEventListener('click', e => { if (e.target === editorGallery) editorGallery.classList.remove('open'); });
+      if (byId('editor-gallery-cancel') && editorGallery) document.getElementById('editor-gallery-cancel').addEventListener('click', () => editorGallery.classList.remove('open'));
+      if (byId('editor-gallery-save')) document.getElementById('editor-gallery-save').addEventListener('click', () => {
         const name = document.getElementById('editor-gallery-name').value.trim();
         if (!name) { toast('请输入风格名称', 'error'); document.getElementById('editor-gallery-name').focus(); return; }
         const cat = document.getElementById('editor-gallery-cat').value;
@@ -674,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   
       // ── Text editor modal ───────────────────────
-      const editorText = document.getElementById('editor-text');
+      const editorText = byId('editor-text');
       let editingTextId = null;
       let editingTags = [];
       function renderTagInputs() {
@@ -765,15 +786,15 @@ document.addEventListener('DOMContentLoaded', function () {
         updateEditorTextPreview();
         editorText.classList.add('open');
       }
-      document.getElementById('editor-text-name').addEventListener('input', updateEditorTextPreview);
-      document.getElementById('editor-text-sample').addEventListener('input', updateEditorTextPreview);
-      document.getElementById('editor-text-close').addEventListener('click', () => editorText.classList.remove('open'));
-      editorText.addEventListener('click', e => { if (e.target === editorText) editorText.classList.remove('open'); });
-      document.getElementById('editor-text-cancel').addEventListener('click', () => editorText.classList.remove('open'));
+      if (byId('editor-text-name')) document.getElementById('editor-text-name').addEventListener('input', updateEditorTextPreview);
+      if (byId('editor-text-sample')) document.getElementById('editor-text-sample').addEventListener('input', updateEditorTextPreview);
+      if (byId('editor-text-close') && editorText) document.getElementById('editor-text-close').addEventListener('click', () => editorText.classList.remove('open'));
+      if (editorText) editorText.addEventListener('click', e => { if (e.target === editorText) editorText.classList.remove('open'); });
+      if (byId('editor-text-cancel') && editorText) document.getElementById('editor-text-cancel').addEventListener('click', () => editorText.classList.remove('open'));
 
       // ── Text custom category events ──────────────────────────
-      document.getElementById('editor-text-cat').addEventListener('change', handleTextCatChange);
-      document.getElementById('editor-text-cat-new').addEventListener('keydown', function(e) {
+      if (byId('editor-text-cat')) document.getElementById('editor-text-cat').addEventListener('change', handleTextCatChange);
+      if (byId('editor-text-cat-new')) document.getElementById('editor-text-cat-new').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
           var v = this.value.trim();
@@ -789,7 +810,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       });
-      document.getElementById('editor-text-cat-new').addEventListener('blur', function(e) {
+      if (byId('editor-text-cat-new')) document.getElementById('editor-text-cat-new').addEventListener('blur', function(e) {
         var v = this.value.trim();
         if (v) {
           var sel = document.getElementById('editor-text-cat');
@@ -802,7 +823,7 @@ document.addEventListener('DOMContentLoaded', function () {
         this.style.display = 'none';
       });
 
-      document.getElementById('editor-text-save').addEventListener('click', () => {
+      if (byId('editor-text-save')) document.getElementById('editor-text-save').addEventListener('click', () => {
         const name = document.getElementById('editor-text-name').value.trim();
         if (!name) { toast('请输入文风名称', 'error'); document.getElementById('editor-text-name').focus(); return; }
         var catVal = document.getElementById('editor-text-cat').value;

@@ -114,40 +114,34 @@ src-tauri/
 
 Tauri 入口，通过 `invoke_handler` 暴露命令给桌面端。
 
-## 6. 当前接口
+## 6. 接口文档约定
 
-### 鉴权
+本文件不再维护完整接口清单、请求体和返回结构，避免与 `src-tauri/API.md` 发生双份漂移。
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
+当前约定如下：
 
-说明：后端仍保留鉴权接口，但前端当前没有独立登录页。
+- `src-tauri/API.md`：唯一准确的接口文档来源
+- `docs/DEVELOPER/server.md`：只描述后端模块结构、运行方式、数据流和实现约束
+- `README.md`：只保留面向使用者的高层接口摘要与文档导航
 
-### 图像生成
+当前真实接口范围包含：
 
-- `POST /api/generate/text`
-- `POST /api/generate/image`
-- `POST /api/generate/cancel`
+- 鉴权：`/api/auth/*`
+- 图像生成：`/api/generate/*`
+- 文本能力：`/api/text/*`
+- 历史与预设：`/api/history*`、`/api/presets`
+- 设置与存储：`/api/settings/{user_id}`、`/api/storage/info`
+- 健康检查：`/api/health`
 
-### 文本生成
+如需查看：
 
-- `POST /api/text/enhance`
-- `POST /api/text/generate`
+- 精确路由名
+- 请求参数
+- 返回结构
+- 默认值
+- Tauri `invoke` 命令列表
 
-### 历史与预设
-
-- `GET /api/history`
-- `POST /api/history/favorite`
-- `POST /api/history/delete`
-- `POST /api/history/batch-delete`
-- `GET/POST /api/presets`
-
-### 设置与健康检查
-
-- `GET/POST /api/settings/{user_id}`
-- `GET /api/storage/info`
-- `GET /api/health`
+请直接查阅 `src-tauri/API.md`。
 
 ## 7. 图像供应商模板机制
 

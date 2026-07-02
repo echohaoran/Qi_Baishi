@@ -22,7 +22,11 @@
     TEXT_API: 'baishi.api.text',
     PREFS: 'baishi.prefs',
     SESSION: 'baishi.session',
+    TASKS: 'baishi.tasks',
   };
+
+  var taskListeners = [];
+  var TASK_RUNNING_TIMEOUT_MS = 3 * 60 * 1000;
 
   var DEFAULT_PREFS = {
     defaultAspect: '1:1',
@@ -178,7 +182,7 @@
     node.dataset.toastKey = key;
     node.dataset.lastShownAt = String(now);
     node.innerHTML =
-      '<span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>' +
+      '<span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>' +
       '<span>' + escapeHtml(text) + '</span>';
 
     host.appendChild(node);
@@ -369,6 +373,83 @@
   function setSession(s) { return safeSet(STORAGE.SESSION, s); }
   function clearSession() { try { localStorage.removeItem(STORAGE.SESSION); } catch (e) {} }
 
+  // ─── 全局任务中心 ───────────────────────────────────────
+  function loadTasks() {
+    return safeGet(STORAGE.TASKS, {});
+  }
+
+  function notifyTaskListeners(taskKey, task) {
+    taskListeners.slice().forEach(function (listener) {
+      try { listener(taskKey, task); } catch (e) {}
+    });
+  }
+
+  function saveTasks(tasks) {
+    var ok = safeSet(STORAGE.TASKS, tasks || {});
+    return ok ? tasks : loadTasks();
+  }
+
+  function getTask(taskKey) {
+    var tasks = loadTasks();
+    var task = tasks && tasks[taskKey] ? tasks[taskKey] : null;
+    if (
+      task &&
+      task.status === 'running' &&
+      task.updatedAt &&
+      (Date.now() - task.updatedAt > TASK_RUNNING_TIMEOUT_MS)
+    ) {
+      task = Object.assign({}, task, {
+        status: 'error',
+        stepText: '任务已过期，请重新生成',
+        error: task.error || '任务长时间未完成，已自动结束',
+        updatedAt: Date.now(),
+        expiredAt: Date.now()
+      });
+      tasks[taskKey] = task;
+      saveTasks(tasks);
+    }
+    return task;
+  }
+
+  function setTask(taskKey, patch) {
+    if (!taskKey) return null;
+    var tasks = loadTasks();
+    var prev = tasks[taskKey] || { key: taskKey, status: 'idle', updatedAt: 0 };
+    var next = Object.assign({}, prev, patch || {}, {
+      key: taskKey,
+      updatedAt: Date.now()
+    });
+    tasks[taskKey] = next;
+    saveTasks(tasks);
+    notifyTaskListeners(taskKey, next);
+    return next;
+  }
+
+  function clearTask(taskKey) {
+    if (!taskKey) return;
+    var tasks = loadTasks();
+    if (!tasks[taskKey]) return;
+    delete tasks[taskKey];
+    saveTasks(tasks);
+    notifyTaskListeners(taskKey, null);
+  }
+
+  function subscribeTasks(listener) {
+    if (typeof listener !== 'function') return function () {};
+    taskListeners.push(listener);
+    return function unsubscribe() {
+      taskListeners = taskListeners.filter(function (item) { return item !== listener; });
+    };
+  }
+
+  window.addEventListener('storage', function (event) {
+    if (event.key !== STORAGE.TASKS) return;
+    var tasks = loadTasks();
+    Object.keys(tasks || {}).forEach(function (taskKey) {
+      notifyTaskListeners(taskKey, tasks[taskKey]);
+    });
+  });
+
   // 暴露
   window.BaishiShared = {
     STORAGE: STORAGE,
@@ -397,6 +478,12 @@
     getSession: getSession,
     setSession: setSession,
     clearSession: clearSession,
+    // 任务中心
+    loadTasks: loadTasks,
+    getTask: getTask,
+    setTask: setTask,
+    clearTask: clearTask,
+    subscribeTasks: subscribeTasks,
     // 右下角操作提示
     toast: toast,
   };

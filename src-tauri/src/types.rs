@@ -164,6 +164,77 @@ pub struct GeneratedImage {
     pub seed: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct RemoteImageRequest {
+    pub prompt: String,
+    #[serde(default)]
+    pub negative_prompt: Option<String>,
+    #[serde(default)]
+    pub style_id: Option<String>,
+    #[serde(default)]
+    pub seed: Option<u64>,
+    #[serde(default)]
+    pub steps: Option<u32>,
+    #[serde(default)]
+    pub cfg_scale: Option<f32>,
+    #[serde(default)]
+    pub aspect: Option<String>,
+    #[serde(default)]
+    pub reference_image: Option<String>,
+    #[serde(default)]
+    pub reference_images: Option<Vec<String>>,
+    #[serde(default)]
+    pub strength: Option<f32>,
+    #[serde(default)]
+    pub count: Option<u32>,
+    #[serde(default)]
+    pub endpoint: Option<String>,
+    #[serde(default)]
+    pub api_key: Option<String>,
+    #[serde(default)]
+    pub request_body: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct RemoteTextRequest {
+    pub prompt: String,
+    #[serde(default)]
+    pub api_url: Option<String>,
+    #[serde(default)]
+    pub api_key: Option<String>,
+    #[serde(default)]
+    pub model: Option<String>,
+    #[serde(default)]
+    pub system_prompt: Option<String>,
+    #[serde(default)]
+    pub max_tokens: Option<u32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PromptEnhanceResult {
+    pub enhanced: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TextGenerateResult {
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConnectionTestResult {
+    pub status: u16,
+    pub content_type: String,
+    pub took_ms: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct RemoteConnectionTestRequest {
+    pub endpoint: String,
+    #[serde(default)]
+    pub api_key: Option<String>,
+    pub body_json: String,
+}
+
 // ─── 生成进度（预留事件） ────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -308,4 +379,8 @@ pub struct StorageInfo {
     pub used: u64,
     pub available: u64,
     pub models_size: u64,
+    pub total_history_count: u64,
+    pub month_count: u64,
+    pub week_count: u64,
+    pub day_count: u64,
 }

@@ -41,7 +41,7 @@
     .preset-detail.open { display: grid; }
     .preset-detail .panel {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(138, 122, 90, 0.12);
       border-radius: var(--radius-xl);
       max-width: 1080px;
       width: calc(100% - 64px);
@@ -50,14 +50,14 @@
       grid-template-columns: 1.4fr 1fr;
       overflow: hidden;
       box-shadow: var(--shadow-lg);
-      animation: ink-spread 280ms var(--ease) both;
+      animation: preset-panel-enter 280ms var(--ease) both;
     }
     .preset-detail .left {
       background: var(--bg-2);
       display: grid;
       place-items: center;
       padding: var(--space-8);
-      border-right: 1px solid var(--border);
+      border-right: 1px solid rgba(138, 122, 90, 0.1);
     }
     .preset-detail .left .art {
       position: relative;
@@ -88,7 +88,7 @@
     .preset-detail.landscape .left {
       padding: var(--space-5) var(--space-5) 0;
       border-right: 0;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(138, 122, 90, 0.1);
     }
     .preset-detail.landscape .left .art {
       max-height: 50vh;
@@ -128,8 +128,16 @@
       padding: var(--space-4) 0 var(--space-2) var(--space-3);
     }
 
-    .panel { display: none; }
-    .panel.active { display: block; animation: ink-fade 300ms var(--ease) both; }
+    #panel-gallery,
+    #panel-copywriting { display: none; }
+
+    #panel-gallery.active,
+    #panel-copywriting.active { display: block; animation: ink-fade 300ms var(--ease) both; }
+
+    .preset-detail .panel,
+    .text-detail .panel {
+      display: grid;
+    }
     .panel-title {
       margin: 0 0 var(--space-6);
       font-size: 28px; font-weight: 600;
@@ -233,7 +241,7 @@
       grid-template-columns: 1.2fr 1fr;
       overflow: hidden;
       box-shadow: var(--shadow-lg);
-      animation: ink-spread 280ms var(--ease) both;
+      animation: preset-panel-enter 280ms var(--ease) both;
     }
     .text-detail .left {
       background: transparent;
@@ -610,4 +618,9 @@
         animation: none !important;
       }
       .sub-nav .item::before { transition: none; }
+    }
+
+    @keyframes preset-panel-enter {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }

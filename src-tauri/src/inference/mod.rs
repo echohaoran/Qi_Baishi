@@ -11,7 +11,6 @@ use crate::types::*;
 use serde_json::{json, Value};
 use uuid::Uuid;
 use std::time::Instant;
-use std::sync::Arc;
 use base64::{Engine as _, engine::general_purpose};
 
 const DEFAULT_AGNES_ENDPOINT: &str = "https://apihub.agnes-ai.com/v1/images/generations";
@@ -94,7 +93,7 @@ impl GenericEngine {
         let response = request
             .send()
             .await
-            .map_err(|e| format!("API 请求失败: {}", e))?;
+            .map_err(|e| format_request_error(&endpoint, e))?;
 
         let status = response.status();
         let content_type = response
@@ -155,6 +154,22 @@ impl GenericEngine {
             took_ms,
         })
     }
+}
+
+fn format_request_error(endpoint: &str, err: reqwest::Error) -> String {
+    if err.is_timeout() {
+        return format!("API 请求超时：{}", endpoint);
+    }
+    if err.is_connect() {
+        return format!("API 连接失败：{} · {}", endpoint, err);
+    }
+    if err.is_request() {
+        return format!("API 请求构造失败：{} · {}", endpoint, err);
+    }
+    if err.is_body() {
+        return format!("API 请求体发送失败：{} · {}", endpoint, err);
+    }
+    format!("API 请求失败：{} · {}", endpoint, err)
 }
 
 /// 同步接口
@@ -247,8 +262,8 @@ fn build_request_body(req: &GenerateRequest, cfg: &UserGenerationConfig) -> Resu
             normalize_loose_template_types(&mut body);
             normalize_provider_specific_fields(&mut body, endpoint, is_i2i);
 
-            // I2I 自动注入: Agnes 官方文档要求 extra_body.image: [array] + response_format
-            // 兼容用户模板中可能不包含 extra_body 的场景
+            // I2I 自动注入: Agnes 官方文档要求 image 放在顶层数组，
+            // response_format 放在 extra_body 中。
             apply_i2i_defaults(&mut body, &all_images);
 
             return Ok(body);
@@ -273,12 +288,10 @@ fn build_request_body(req: &GenerateRequest, cfg: &UserGenerationConfig) -> Resu
         body["seed"] = json!(seed);
     }
     if is_i2i {
-        // 切换到 I2I 规范：extra_body.image 数组 + response_format
+        // 切换到 I2I 规范：顶层 image 数组 + extra_body.response_format
         body.as_object_mut().unwrap().remove("size");
-        body["extra_body"] = json!({
-            "image": all_images,
-            "response_format": "url"
-        });
+        body["image"] = json!(all_images);
+        body["extra_body"] = json!({ "response_format": "url" });
     }
     if let Some(np) = &req.negative_prompt {
         body["negative_prompt"] = json!(np);
@@ -354,18 +367,24 @@ fn normalize_provider_specific_fields(body: &mut Value, endpoint: &str, is_i2i: 
     }
 }
 
-/// I2I 模式补全: 确保 extra_body.image 是数组、移除顶层 response_format
+/// I2I 模式补全: Agnes 官方文档要求 image 为顶层数组，response_format 在 extra_body 中。
 /// Agnes 官方文档要求：
-///   1. 图生图参数必须放在 extra_body 里 (不是顶层)
-///   2. image 字段是 string[] (数组)，支持 URL 或 Data URI Base64
-///   3. response_format 也在 extra_body 里 (url / b64_json)
-///   4. 请勿在顶层放 response_format, 也请勿传递 tags: ["img2img"]
+///   1. image 字段是顶层 string[] (数组)，支持 URL 或 Data URI Base64
+///   2. response_format 在 extra_body 里 (url / b64_json)
+///   3. 请勿在顶层放 response_format
 fn apply_i2i_defaults(body: &mut Value, images: &[String]) {
     if images.is_empty() { return; }  // 不是 I2I 模式, 不动
 
     // 1) 移除顶层 response_format (Agnes 文档: 请勿放在顶层)
     if let Some(map) = body.as_object_mut() {
         map.remove("response_format");
+        if !map.contains_key("image") {
+            map.insert("image".to_string(), json!(images));
+        } else if let Some(arr) = map.get_mut("image").and_then(|v| v.as_array_mut()) {
+            if arr.is_empty() {
+                *arr = images.iter().map(|s| json!(s)).collect();
+            }
+        }
     }
 
     // 2) 确保 extra_body 存在
@@ -375,16 +394,7 @@ fn apply_i2i_defaults(body: &mut Value, images: &[String]) {
 
     let extra = body.get_mut("extra_body").and_then(|v| v.as_object_mut());
     if let Some(extra) = extra {
-        // 3) 注入 image 数组 (只有当 user 模板里没明确给出时, 避免覆盖用户填写)
-        if !extra.contains_key("image") {
-            extra.insert("image".to_string(), json!(images));
-        } else if let Some(arr) = extra.get_mut("image").and_then(|v| v.as_array_mut()) {
-            // 模板里给了 image 但不是数组 (e.g. 字符串) → 转成数组
-            if arr.is_empty() {
-                *arr = images.iter().map(|s| json!(s)).collect();
-            }
-        }
-        // 4) 默认 response_format: "url" (模板里没指定时)
+        // 3) 默认 response_format: "url" (模板里没指定时)
         if !extra.contains_key("response_format") {
             extra.insert("response_format".to_string(), json!("url"));
         }
@@ -468,6 +478,3 @@ pub fn check_quota(quota: u32, used: u32, cost: u32) -> Result<(), String> {
     }
     Ok(())
 }
-
-#[allow(dead_code)]
-fn _unused_arc_check() -> Arc<()> { Arc::new(()) }

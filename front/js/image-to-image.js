@@ -1,13 +1,8 @@
 // image-to-image.js — 图生图（笔意化境）
 // 上传 / 拖放 真实存储，智能润色 / 生成 全部接通后端
 document.addEventListener('DOMContentLoaded', function () {
-  // OS 切换
-  document.querySelectorAll('[data-os-set]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.body.dataset.os = btn.dataset.osSet;
-      document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
+  const TASK_KEY = 'image-to-image';
+  ;
 
   // Toast
   function toast(msg, kind) {
@@ -15,11 +10,32 @@ document.addEventListener('DOMContentLoaded', function () {
       return window.BaishiShared.toast(msg, kind);
     }
   }
+  function getTaskStore() {
+    return window.BaishiShared || null;
+  }
 
   // ── 上传参考图（点击 + 拖放） ──
   const dropzone = document.getElementById('dropzone');
   const preview = document.getElementById('preview');
   const previewImg = document.getElementById('preview-img');
+  const NEGATIVE_PRESET_MAP = {
+    '通用瑕疵': '模糊, 低清晰度, 变形, 畸形, 多余肢体, 错误解剖, 水印, 签名, logo, 文字, 裁切, 过曝, 欠曝',
+    '水墨杂讯': '脏点, 墨块堆积, 杂色, 背景污渍, 边缘脏污, 重影, 结构混乱',
+    '人物修正': '脸部崩坏, 五官错位, 手部畸形, 多手指, 眼神异常, 姿态僵硬'
+  };
+
+  document.querySelectorAll('[data-neg-preset]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById('negative-prompt');
+      if (!target) return;
+      var value = NEGATIVE_PRESET_MAP[btn.dataset.negPreset] || '';
+      if (!value) return;
+      target.value = target.value.trim() ? (target.value.trim() + ', ' + value) : value;
+      if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
+        window.BaishiShared.toast('已填入负面提示词 · ' + btn.dataset.negPreset, 'success');
+      }
+    });
+  });
   const previewName = document.getElementById('preview-name');
   const previewMeta = document.getElementById('preview-meta');
   let refImageDataUrl = null;
@@ -373,17 +389,58 @@ document.addEventListener('DOMContentLoaded', function () {
     if (step) step.textContent = t;
   }
 
+  function setGenerateBusy(isBusy) {
+    var genBtn = document.getElementById('generate-btn');
+    if (!genBtn) return;
+    genBtn.disabled = !!isBusy;
+    genBtn.innerHTML = isBusy ? '<span>化境中…</span>' : '<span>开始生成</span>';
+  }
+
   // ── 生成（图生图） ──
   var genBtn = document.getElementById('generate-btn');
   var generating = false;
+  function applyTaskState(task) {
+    if (!task) return;
+    if (task.input && task.input.prompt) {
+      prompt.value = task.input.prompt;
+      var cc = document.getElementById('char-count');
+      if (cc) cc.textContent = task.input.prompt.length;
+    }
+    if (task.status === 'running') {
+      generating = true;
+      setGenerateBusy(true);
+      showLoading();
+      setLoadingStep(task.stepText || '正在后台生成…');
+      return;
+    }
+    if (task.status === 'success' && task.result && Array.isArray(task.result.images)) {
+      generating = false;
+      setGenerateBusy(false);
+      hideLoading();
+      renderResults(task.result.images, task.result.ratio || '1:1', '生成');
+      return;
+    }
+    if (task.status === 'error') {
+      generating = false;
+      setGenerateBusy(false);
+      hideLoading();
+      document.getElementById('result-empty').style.display = 'grid';
+      if (task.error) toast(task.error, 'warn');
+    }
+  }
+  applyTaskState(getTaskStore() && getTaskStore().getTask ? getTaskStore().getTask(TASK_KEY) : null);
+  if (getTaskStore() && typeof getTaskStore().subscribeTasks === 'function') {
+    getTaskStore().subscribeTasks(function (taskKey, task) {
+      if (taskKey !== TASK_KEY || !task) return;
+      applyTaskState(task);
+    });
+  }
   genBtn.addEventListener('click', async function () {
     if (generating) return;
     if (!refImageDataUrl) { toast('请先上传参考图', 'error'); return; }
     if (!prompt.value.trim()) { toast('请先输入提示词', 'error'); return; }
     generating = true;
-    var origHtml = genBtn.innerHTML;
-    genBtn.innerHTML = '<span>化境中…</span>';
-    genBtn.disabled = true;
+    setGenerateBusy(true);
     showLoading();
     setLoadingStep('正在连接后端…');
 
@@ -400,8 +457,26 @@ document.addEventListener('DOMContentLoaded', function () {
     var hpEl = document.getElementById('high-precision');
     var highPrecision = hpEl ? hpEl.checked : true;
     var steps = highPrecision ? 50 : 30;
+    if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+      getTaskStore().setTask(TASK_KEY, {
+        status: 'running',
+        startedAt: Date.now(),
+        stepText: '正在连接后端…',
+        input: {
+          prompt: prompt.value.trim(),
+          ratio: ratio,
+          count: count,
+          strength: strength,
+          negativePrompt: negativePrompt,
+          highPrecision: highPrecision
+        }
+      });
+    }
 
     setLoadingStep('发送化境请求…');
+    if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+      getTaskStore().setTask(TASK_KEY, { status: 'running', stepText: '发送化境请求…' });
+    }
     var r = await window.BaiShiAPI.imageToImage({
       prompt: prompt.value.trim(),
       reference_image: refImageDataUrl,
@@ -409,7 +484,6 @@ document.addEventListener('DOMContentLoaded', function () {
       style_id: 'image-to-image',
       seed: seed > 0 ? seed : null,
       steps: steps,
-      cfg_scale: strength,
       aspect: ratio,
       count: count,
       negative_prompt: negativePrompt,
@@ -417,14 +491,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     generating = false;
-    genBtn.innerHTML = origHtml;
-    genBtn.disabled = false;
+    setGenerateBusy(false);
     hideLoading();
 
     if (r && r.success) {
       renderResults(r.data.images || [], ratio, '生成');
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'success',
+          finishedAt: Date.now(),
+          stepText: '已完成',
+          result: {
+            images: r.data.images || [],
+            ratio: ratio,
+            took_ms: r.data.took_ms || 0
+          }
+        });
+      }
       toast('生成完成 · ' + (r.data.images || []).length + ' 张 · ' + (r.data.took_ms / 1000).toFixed(1) + 's');
     } else {
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'error',
+          finishedAt: Date.now(),
+          stepText: '生成失败',
+          error: (r && r.error) ? r.error : '未知错误'
+        });
+      }
       document.getElementById('result-empty').style.display = 'grid';
       toast('生成失败：' + (r && r.error ? r.error : '未知'), 'error');
     }

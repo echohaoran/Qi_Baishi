@@ -4,7 +4,7 @@
       gap: var(--space-3);
       padding: var(--space-4) var(--space-5);
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(138, 122, 90, 0.12);
       border-radius: var(--radius-lg);
       margin-bottom: var(--space-5);
       flex-wrap: wrap;
@@ -73,7 +73,7 @@
       content: "";
       flex: 1;
       height: 1px;
-      background: var(--border);
+      background: rgba(138, 122, 90, 0.14);
     }
 
     /* Fav 转 button 后浏览器默认样式 reset */

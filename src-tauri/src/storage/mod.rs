@@ -507,7 +507,55 @@ impl Storage {
         let used = dir_size(&self.data_dir.join("artworks"));
         let models_size = dir_size(&self.data_dir.join("models"));
         let available = 0; // 平台相关，原型阶段返回 0
-        StorageInfo { used, available, models_size }
+        let conn = self.conn.lock().unwrap();
+        let now = Utc::now().timestamp();
+        let day_cutoff = now - 24 * 60 * 60;
+        let week_cutoff = now - 7 * 24 * 60 * 60;
+        let month_cutoff = now - 30 * 24 * 60 * 60;
+
+        let total_history_count: u64 = conn.query_row(
+            "SELECT COUNT(*) FROM artworks",
+            [],
+            |row| row.get(0),
+        ).unwrap_or(0);
+
+        let month_count: u64 = conn.query_row(
+            "SELECT COUNT(*) FROM artworks WHERE created_at >= ?1",
+            params![month_cutoff],
+            |row| row.get(0),
+        ).unwrap_or(0);
+
+        let week_count: u64 = conn.query_row(
+            "SELECT COUNT(*) FROM artworks WHERE created_at >= ?1",
+            params![week_cutoff],
+            |row| row.get(0),
+        ).unwrap_or(0);
+
+        let day_count: u64 = conn.query_row(
+            "SELECT COUNT(*) FROM artworks WHERE created_at >= ?1",
+            params![day_cutoff],
+            |row| row.get(0),
+        ).unwrap_or(0);
+
+        StorageInfo {
+            used,
+            available,
+            models_size,
+            total_history_count,
+            month_count,
+            week_count,
+            day_count,
+        }
+    }
+
+    pub fn cleanup_history_older_than_days(&self, days: i64) -> SqlResult<usize> {
+        let days = days.clamp(1, 5);
+        let cutoff = Utc::now().timestamp() - days * 24 * 60 * 60;
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "DELETE FROM artworks WHERE created_at < ?1 AND is_favorite = 0",
+            params![cutoff],
+        )
     }
 
     /// 获取用户数据目录

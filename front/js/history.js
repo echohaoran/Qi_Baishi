@@ -8,13 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // OS 切换
-  document.querySelectorAll('[data-os-set]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.body.dataset.os = btn.dataset.osSet;
-      document.querySelectorAll('[data-os-set]').forEach(function (b) { b.classList.toggle('active', b === btn); });
-    });
-  });
+  ;
 
   // 网格 / 列表切换
   document.querySelectorAll('.hist-toolbar .os-toggle button').forEach(function (b) {

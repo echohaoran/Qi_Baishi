@@ -23,16 +23,16 @@
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
-      <div class="title"><span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 设置</span></div>
+      <div class="title" style="-webkit-app-region: drag;"><span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 设置</span></div>
       <div class="right">
-        <div class="os-toggle"><button data-os-set="macos" class="active">macOS</button><button data-os-set="windows">Windows</button></div>
-        <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v6M12 22v-6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/></svg></button>
+        <button class="icon-btn" style="-webkit-app-region: no-drag;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v6M12 22v-6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/></svg></button>
       </div>
     </header>
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="nav-scroll">
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
@@ -45,6 +45,12 @@
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
+              </div>
+
+        <div class="foot">
+          <div class="page-indicator">当前页面</div>
+          <div class="page-indicator-value">设置</div>
+        </div>
       </aside>
 
       <main class="content">
@@ -281,14 +287,55 @@
                   <h3 style="font-size: 16px;">本地缓存</h3>
                   <span class="num" data-storage-num style="color: var(--fg); font-weight: 600;">加载中…</span>
                 </div>
-                <div style="height: 8px; background: var(--border); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: var(--space-3);">
-                  <div data-storage-bar style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-deep)); border-radius: var(--radius-pill); transition: width 0.3s ease;"></div>
+                <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4);">
+                  <div class="card" style="padding: var(--space-4); background: var(--bg-2); border: 1px solid var(--border); display: flex; align-items: stretch; justify-content: space-between; gap: var(--space-3);">
+                    <div>
+                      <div class="micro" style="margin-bottom: 8px;">总缓存</div>
+                      <div data-storage-total-count style="font-size: 30px; font-weight: 700; color: var(--fg); line-height: 1;">加载中…</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">全部历史作品</div>
+                    </div>
+                    <div data-storage-total-chart style="display:flex; align-items:flex-end; gap:4px; min-width:56px; justify-content:flex-end;"></div>
+                  </div>
+                  <div class="card" style="padding: var(--space-4); background: var(--bg-2); border: 1px solid var(--border); display: flex; align-items: stretch; justify-content: space-between; gap: var(--space-3);">
+                    <div>
+                      <div class="micro" style="margin-bottom: 8px;">月缓存</div>
+                      <div data-storage-month-count style="font-size: 30px; font-weight: 700; color: var(--fg); line-height: 1;">加载中…</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">近 30 天历史作品</div>
+                    </div>
+                    <div data-storage-month-chart style="display:flex; align-items:flex-end; gap:4px; min-width:56px; justify-content:flex-end;"></div>
+                  </div>
+                  <div class="card" style="padding: var(--space-4); background: var(--bg-2); border: 1px solid var(--border); display: flex; align-items: stretch; justify-content: space-between; gap: var(--space-3);">
+                    <div>
+                      <div class="micro" style="margin-bottom: 8px;">周缓存</div>
+                      <div data-storage-week-count style="font-size: 30px; font-weight: 700; color: var(--fg); line-height: 1;">加载中…</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">近 7 天历史作品</div>
+                    </div>
+                    <div data-storage-week-chart style="display:flex; align-items:flex-end; gap:4px; min-width:56px; justify-content:flex-end;"></div>
+                  </div>
+                  <div class="card" style="padding: var(--space-4); background: var(--bg-2); border: 1px solid var(--border); display: flex; align-items: stretch; justify-content: space-between; gap: var(--space-3);">
+                    <div>
+                      <div class="micro" style="margin-bottom: 8px;">天缓存</div>
+                      <div data-storage-day-count style="font-size: 30px; font-weight: 700; color: var(--fg); line-height: 1;">加载中…</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">近 24 小时历史作品</div>
+                    </div>
+                    <div data-storage-day-chart style="display:flex; align-items:flex-end; gap:4px; min-width:56px; justify-content:flex-end;"></div>
+                  </div>
                 </div>
-                <p data-storage-hint style="font-size: 13px; color: var(--muted);">所有生成的作品会优先缓存到本地 · 离线时可访问</p>
+                <div class="card" style="background: var(--bg-2); padding: var(--space-4); margin-bottom: var(--space-4); border: 1px solid var(--border);">
+                  <div class="row-between" style="gap: var(--space-4); align-items: center; margin-bottom: 8px;">
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: var(--fg);">缓存周期</div>
+                      <div data-storage-retention-label style="font-size: 13px; color: var(--muted); margin-top: 4px;">2 天 · 默认增量清理历史作品</div>
+                    </div>
+                    <span class="badge" data-storage-retention-badge>2 天</span>
+                  </div>
+                  <input id="storage-retention-days" type="range" min="1" max="5" step="1" value="2" style="width: 100%;" />
+                </div>
+                <p data-storage-hint style="font-size: 13px; color: var(--muted);">当前图片历史保存的是 URL / Base64 引用，存储卡片按月 / 周 / 天展示历史作品数量，并展示模型目录占用。</p>
                 <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2);">
-                  <button class="btn btn-secondary btn-sm">清理 30 天前</button>
-                  <button class="btn btn-secondary btn-sm">仅保留收藏</button>
-                  <button class="btn btn-ghost btn-sm" style="color: var(--danger);">全部清空</button>
+                  <button class="btn btn-secondary btn-sm" id="storage-cleanup-now">按缓存周期清理</button>
+                  <button class="btn btn-secondary btn-sm" id="storage-keep-favorites">仅保留收藏</button>
+                  <button class="btn btn-ghost btn-sm" id="storage-clear-all" style="color: var(--danger);">全部清空</button>
                 </div>
               </div>
             </div>
@@ -300,7 +347,7 @@
 
               <div class="card card-pad-lg about-hero" style="margin-bottom: var(--space-5);">
                 <div class="about-mark">
-                  <span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span>
+                  <span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span>
                   <div>
                     <h3>白石 Baishi</h3>
                     <p>开源的文生图 / 图生图 / 文生文桌面创作工具，面向自媒体创作者、营销团队与设计师，聚焦中文创作流程与本地化工作台体验。</p>

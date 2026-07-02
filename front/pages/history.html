@@ -20,9 +20,8 @@
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
-      <div class="title"><span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 历史作品</span></div>
+      <div class="title" style="-webkit-app-region: drag;"><span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 历史作品</span></div>
       <div class="right">
-        <div class="os-toggle"><button type="button" data-os-set="macos" class="active">macOS</button><button type="button" data-os-set="windows">Windows</button></div>
         <button type="button" class="icon-btn" aria-label="日历视图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M8 6V4M16 6V4M3 10h18M5 16h14M5 20h14"/></svg></button>
         <button type="button" class="icon-btn" aria-label="导出"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
       </div>
@@ -30,7 +29,8 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="nav-scroll">
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a><a href="text-to-image.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h10"/></svg>文生图</a>
@@ -43,6 +43,12 @@
         <a href="history.html" class="nav-item active" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
+              </div>
+
+        <div class="foot">
+          <div class="page-indicator">当前页面</div>
+          <div class="page-indicator-value">历史作品</div>
+        </div>
       </aside>
 
       <main class="content">
@@ -90,10 +96,6 @@
             </button>
             <span class="spacer"></span>
             <span class="meta" aria-live="polite" aria-atomic="true">共 <span class="num" id="hist-total" style="color: var(--accent); font-weight: 600;">0</span> 件 · 已收藏 <span class="num" id="hist-fav-count" style="color: var(--accent); font-weight: 600;">0</span></span>
-            <div class="os-toggle" style="margin-left: var(--space-3);" role="tablist" aria-label="布局切换">
-              <button type="button" class="active" role="tab" aria-selected="true">网格</button>
-              <button type="button" role="tab" aria-selected="false">列表</button>
-            </div>
           </div>
 
           <div class="batch-bar" id="batch-bar" hidden role="region" aria-label="批量操作">

@@ -3,6 +3,7 @@
 // states: 5 dead buttons 已激活
 // storage: 编辑输出 + 用户模板库
 document.addEventListener('DOMContentLoaded', function () {
+  var TASK_KEY = 'copywriting';
 
   /* ─── Toast ───────────────────────────────────────── */
   function toast(msg, kind = 'success') {
@@ -10,14 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
       return window.BaishiShared.toast(msg, kind);
     }
   }
+  function getTaskStore() {
+    return window.BaishiShared || null;
+  }
 
-  /* ─── OS 切换 ─────────────────────────────────────── */
-  document.querySelectorAll('[data-os-set]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.body.dataset.os = btn.dataset.osSet;
-      document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
+  ;
 
   /* ─── 模板数据 — 从 text-styles.js 同步加载 ─────────── */
   const textStyles = (window.BaishiTextStyles ? window.BaishiTextStyles.list() : []);
@@ -143,6 +141,51 @@ document.addEventListener('DOMContentLoaded', function () {
   function setLoadingStep(text) {
     var stepEl = document.getElementById('output-loading-step');
     if (stepEl) stepEl.textContent = text;
+  }
+  function applyCopyTaskState(task) {
+    if (!task) return;
+    var input = document.getElementById('copy-input');
+    var output = document.getElementById('output-text');
+    var actions = document.getElementById('output-actions');
+    var placeholder = document.getElementById('output-placeholder');
+    var btn1 = document.getElementById('generate-btn');
+    var btn2 = document.getElementById('generate-btn2');
+    var regenBtn = document.getElementById('regenerate-result');
+    var defaultLabel1 = (btn1 && btn1.dataset.defaultLabel) || (btn1 && btn1.textContent) || '生成文案';
+
+    if (task.input && input && !input.value.trim()) {
+      input.value = task.input.prompt || '';
+    }
+    if (task.status === 'running') {
+      showLoading(task.stepText || '正在后台生成…');
+      if (btn1) { btn1.setAttribute('aria-busy', 'true'); btn1.disabled = true; }
+      if (btn2) { btn2.setAttribute('aria-busy', 'true'); btn2.disabled = true; }
+      if (regenBtn) { regenBtn.setAttribute('aria-busy', 'true'); regenBtn.disabled = true; }
+      return;
+    }
+    if (task.status === 'success' && task.result && task.result.text) {
+      hideLoading();
+      if (placeholder) placeholder.style.display = 'none';
+      if (output) {
+        output.textContent = task.result.text;
+        output.dataset.original = task.result.text;
+      }
+      if (actions) actions.style.display = 'flex';
+      updateCharCount();
+      setOutputView('review');
+      if (btn1) { btn1.removeAttribute('aria-busy'); btn1.disabled = false; btn1.textContent = defaultLabel1; }
+      if (btn2) { btn2.removeAttribute('aria-busy'); btn2.disabled = false; btn2.textContent = '生成文案'; }
+      if (regenBtn) { regenBtn.removeAttribute('aria-busy'); regenBtn.disabled = false; regenBtn.textContent = '重新生成'; }
+      return;
+    }
+    if (task.status === 'error') {
+      hideLoading();
+      if (placeholder) placeholder.style.display = '';
+      if (btn1) { btn1.removeAttribute('aria-busy'); btn1.disabled = false; btn1.textContent = defaultLabel1; }
+      if (btn2) { btn2.removeAttribute('aria-busy'); btn2.disabled = false; btn2.textContent = '生成文案'; }
+      if (regenBtn) { regenBtn.removeAttribute('aria-busy'); regenBtn.disabled = false; regenBtn.textContent = '重新生成'; }
+      if (task.error) toast(task.error, 'warn');
+    }
   }
 
   var outputState = { view: 'review' };
@@ -398,6 +441,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // ① 点击瞬间: 显示 loading (隐藏 placeholder / output / actions)
     showLoading('正在连接后端');
     setBusy(btn1); setBusy(btn2); setBusy(regenBtn);
+    if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+      getTaskStore().setTask(TASK_KEY, {
+        status: 'running',
+        startedAt: Date.now(),
+        stepText: '正在连接后端',
+        input: { prompt: input.value.trim() }
+      });
+    }
 
     // 关键修复: 生成前先 ensure 配置就位 (如未配置则从后端兜底)
     // 这样即使 bootstrap 还没完成, doGenerate 也不会读到空配置
@@ -416,9 +467,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 阶段文字时序: 连接后端 → 发送请求 → 等待 LLM → 处理完成
-    var stepTimer  = setTimeout(function () { setLoadingStep('发送文案生成请求'); }, 400);
-    var stepTimer2 = setTimeout(function () { setLoadingStep('等待 LLM 响应…'); }, 1600);
-    var stepTimer3 = setTimeout(function () { setLoadingStep('处理完成 · 返回文案中…'); }, 3000);
+    var stepTimer  = setTimeout(function () {
+      setLoadingStep('发送文案生成请求');
+      if (getTaskStore() && getTaskStore().setTask) getTaskStore().setTask(TASK_KEY, { status: 'running', stepText: '发送文案生成请求' });
+    }, 400);
+    var stepTimer2 = setTimeout(function () {
+      setLoadingStep('等待 LLM 响应…');
+      if (getTaskStore() && getTaskStore().setTask) getTaskStore().setTask(TASK_KEY, { status: 'running', stepText: '等待 LLM 响应…' });
+    }, 1600);
+    var stepTimer3 = setTimeout(function () {
+      setLoadingStep('处理完成 · 返回文案中…');
+      if (getTaskStore() && getTaskStore().setTask) getTaskStore().setTask(TASK_KEY, { status: 'running', stepText: '处理完成 · 返回文案中…' });
+    }, 3000);
 
     function finishWithSuccess(text) {
       clearTimeout(stepTimer); clearTimeout(stepTimer2); clearTimeout(stepTimer3);
@@ -437,6 +497,14 @@ document.addEventListener('DOMContentLoaded', function () {
       updateCharCount();
       setOutputView('review');
       clearBusy(btn1, defaultLabel1); clearBusy(btn2, '生成文案'); clearBusy(regenBtn, '重新生成');
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'success',
+          finishedAt: Date.now(),
+          stepText: '已完成',
+          result: { text: text }
+        });
+      }
     }
     function finishWithError(errMsg) {
       clearTimeout(stepTimer); clearTimeout(stepTimer2); clearTimeout(stepTimer3);
@@ -448,6 +516,14 @@ document.addEventListener('DOMContentLoaded', function () {
       syncOutputView();
       toast(errMsg || '生成失败', 'warn');
       clearBusy(btn1, defaultLabel1); clearBusy(btn2, '生成文案'); clearBusy(regenBtn, '重新生成');
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'error',
+          finishedAt: Date.now(),
+          stepText: '生成失败',
+          error: errMsg || '生成失败'
+        });
+      }
     }
 
     if (window.BaiShiAPI && window.BaiShiAPI.generateCopywriting) {
@@ -468,6 +544,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var _topGenBtn = document.getElementById('generate-btn');
   if (_topGenBtn) _topGenBtn.dataset.defaultLabel = _topGenBtn.textContent || '\u751F\u6210\u6587\u6848';
+  applyCopyTaskState(getTaskStore() && getTaskStore().getTask ? getTaskStore().getTask(TASK_KEY) : null);
+  if (getTaskStore() && typeof getTaskStore().subscribeTasks === 'function') {
+    getTaskStore().subscribeTasks(function (taskKey, task) {
+      if (taskKey !== TASK_KEY || !task) return;
+      applyCopyTaskState(task);
+    });
+  }
 
   var _generateBtn = document.getElementById('generate-btn');
   var _generateBtn2 = document.getElementById('generate-btn2');

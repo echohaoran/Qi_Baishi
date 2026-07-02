@@ -2,6 +2,8 @@
 
 本文档说明当前 `front/` 目录的结构、共享机制、页面职责和开发约束。
 
+配套视觉与风格约束请同时参见 `docs/DEVELOPER/front_style.md`。
+
 ## 1. 现状概览
 
 - 技术栈：HTML + CSS + 原生 JavaScript

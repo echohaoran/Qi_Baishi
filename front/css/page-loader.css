@@ -110,7 +110,7 @@
 }
 
 .page-loader.is-visible .loader-ink::before {
-  animation: ink-spread 1.32s cubic-bezier(0.2, 0, 0, 1) forwards;
+  animation: loader-ink-spread 1.32s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
 
 /* ── 墨韵（最外圈淡影） ────────────────────────── */
@@ -138,7 +138,7 @@
   100% { transform: scale(3.5); opacity: 0; }
 }
 
-@keyframes ink-spread {
+@keyframes loader-ink-spread {
   0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
   40%  { transform: translate(-50%, -50%) scale(5); opacity: 0.15; }
   100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }

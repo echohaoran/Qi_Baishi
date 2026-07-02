@@ -17,21 +17,30 @@
         "height": 900,
         "minWidth": 1024,
         "minHeight": 700,
-        "titleBarStyle": "Visible",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "decorations": true,
         "center": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src https://fonts.gstatic.com"
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://localhost:* https:; img-src 'self' data: blob: asset: https://asset.localhost https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com"
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg", "msi", "nsis"],
+    "targets": [
+      "app",
+      "dmg",
+      "msi",
+      "nsis"
+    ],
     "icon": [
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "../front/assets"
     ],
     "category": "GraphicsDesign",
     "shortDescription": "水墨生图桌面应用",

@@ -1,23 +1,21 @@
 // text-to-image.js — 文生图（落笔生画）
 // 智能润色 / 生图 全部接通后端
 document.addEventListener('DOMContentLoaded', function () {
+  const TASK_KEY = 'text-to-image';
   let resultPreviewModal = null;
   let resultPreviewImage = null;
   let resultPreviewMeta = null;
 
-  // OS 切换
-  document.querySelectorAll('[data-os-set]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.body.dataset.os = btn.dataset.osSet;
-      document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
+  ;
 
   // Toast
   function toast(msg, kind) {
     if (window.BaishiShared && typeof window.BaishiShared.toast === 'function') {
       return window.BaishiShared.toast(msg, kind);
     }
+  }
+  function getTaskStore() {
+    return window.BaishiShared || null;
   }
 
   // 字符计数
@@ -316,6 +314,53 @@ document.addEventListener('DOMContentLoaded', function () {
     if (step) step.textContent = t;
   }
 
+  function setGenerateBusy(isBusy) {
+    const genBtn = document.getElementById('generate-btn');
+    if (!genBtn) return;
+    genBtn.disabled = !!isBusy;
+    genBtn.innerHTML = isBusy ? '<span>落笔中…</span>' : '<span>开始生成</span>';
+  }
+
+  function applyTaskState(task) {
+    if (!task) return;
+    if (task.input && !prompt.value.trim() && task.input.prompt) {
+      prompt.value = task.input.prompt;
+      charCount.textContent = task.input.prompt.length;
+    }
+    if (task.input && task.input.ratio) {
+      document.querySelectorAll('#ratio-opts .opt').forEach(function (opt) {
+        opt.classList.toggle('active', opt.dataset.v === task.input.ratio);
+      });
+      var ratioVal = document.getElementById('ratio-val');
+      if (ratioVal) ratioVal.textContent = task.input.ratio;
+    }
+    if (task.input && task.input.count) {
+      batchSlider.value = String(task.input.count);
+      batchVal.textContent = String(task.input.count) + ' 张';
+    }
+    if (task.status === 'running') {
+      generating = true;
+      setGenerateBusy(true);
+      showLoading();
+      setLoadingStep(task.stepText || '正在后台生成…');
+      return;
+    }
+    if (task.status === 'success' && task.result && Array.isArray(task.result.images)) {
+      generating = false;
+      setGenerateBusy(false);
+      hideLoading();
+      renderResults(task.result.images || [], task.result.ratio || '1:1', '生图');
+      return;
+    }
+    if (task.status === 'error') {
+      generating = false;
+      setGenerateBusy(false);
+      hideLoading();
+      document.getElementById('result-empty').style.display = 'grid';
+      if (task.error) toast(task.error, 'warn');
+    }
+  }
+
   function ensureResultPreviewModal() {
     if (resultPreviewModal) return resultPreviewModal;
     resultPreviewModal = document.createElement('div');
@@ -361,13 +406,18 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── 生图（调后端） ──
   const genBtn = document.getElementById('generate-btn');
   let generating = false;
+  applyTaskState(getTaskStore() && getTaskStore().getTask ? getTaskStore().getTask(TASK_KEY) : null);
+  if (getTaskStore() && typeof getTaskStore().subscribeTasks === 'function') {
+    getTaskStore().subscribeTasks(function (taskKey, task) {
+      if (taskKey !== TASK_KEY || !task) return;
+      applyTaskState(task);
+    });
+  }
   genBtn.addEventListener('click', async () => {
     if (generating) return;
     if (!prompt.value.trim()) { toast('请先输入提示词', 'error'); return; }
     generating = true;
-    const origHtml = genBtn.innerHTML;
-    genBtn.innerHTML = '<span>落笔中…</span>';
-    genBtn.disabled = true;
+    setGenerateBusy(true);
     showLoading();
     setLoadingStep('正在连接后端…');
 
@@ -383,8 +433,27 @@ document.addEventListener('DOMContentLoaded', function () {
     var hpEl = document.getElementById('high-precision');
     var highPrecision = hpEl ? hpEl.checked : false;
     var steps = highPrecision ? 50 : 30;
+    if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+      getTaskStore().setTask(TASK_KEY, {
+        status: 'running',
+        startedAt: Date.now(),
+        stepText: '正在连接后端…',
+        input: {
+          prompt: prompt.value.trim(),
+          ratio: ratio,
+          count: count,
+          seed: seed > 0 ? seed : 0,
+          cfg: cfg,
+          negativePrompt: negativePrompt,
+          highPrecision: highPrecision
+        }
+      });
+    }
 
     setLoadingStep('发送生图请求…');
+    if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+      getTaskStore().setTask(TASK_KEY, { status: 'running', stepText: '发送生图请求…' });
+    }
     const r = await window.BaiShiAPI.textToImage({
       prompt: prompt.value.trim(),
       negative_prompt: negativePrompt,
@@ -397,17 +466,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     generating = false;
-    genBtn.innerHTML = origHtml;
-    genBtn.disabled = false;
+    setGenerateBusy(false);
     hideLoading();
 
     if (r && r.success) {
       renderResults(r.data.images || [], ratio, '生图');
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'success',
+          finishedAt: Date.now(),
+          stepText: '已完成',
+          result: {
+            images: r.data.images || [],
+            ratio: ratio,
+            took_ms: r.data.took_ms || 0,
+          }
+        });
+      }
       var tagBits = [ratio, count + '张', cfg.toFixed(2)];
       if (highPrecision) tagBits.push('高精度');
       if (negativePrompt) tagBits.push('有负向');
       toast('生图完成 · ' + (r.data.images || []).length + ' 张 · ' + (r.data.took_ms / 1000).toFixed(1) + 's · ' + tagBits.join(' · '));
     } else {
+      if (getTaskStore() && typeof getTaskStore().setTask === 'function') {
+        getTaskStore().setTask(TASK_KEY, {
+          status: 'error',
+          finishedAt: Date.now(),
+          stepText: '生成失败',
+          error: (r && r.error) ? r.error : '未知错误'
+        });
+      }
       document.getElementById('result-empty').style.display = 'grid';
       toast('生图失败：' + (r && r.error ? r.error : '未知'), 'error');
     }

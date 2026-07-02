@@ -31,6 +31,28 @@ struct AppState {
     engine: GenericEngine,
 }
 
+fn load_retention_days(storage: &Storage) -> i64 {
+    let default_days = 2i64;
+    let settings = match storage.get_settings(1) {
+        Ok(s) => s,
+        Err(_) => return default_days,
+    };
+    let shortcuts = match settings.shortcuts {
+        Some(s) if !s.trim().is_empty() => s,
+        _ => return default_days,
+    };
+    let parsed: serde_json::Value = match serde_json::from_str(&shortcuts) {
+        Ok(v) => v,
+        Err(_) => return default_days,
+    };
+    parsed
+        .get("storage")
+        .and_then(|v| v.get("retentionDays"))
+        .and_then(|v| v.as_i64())
+        .map(|days| days.clamp(1, 5))
+        .unwrap_or(default_days)
+}
+
 // ─── API 请求类型 ─────────────────────────────────────────
 
 #[derive(Deserialize)]
@@ -170,6 +192,9 @@ async fn main() {
     env_logger::init();
 
     let port = std::env::var("BAISHI_PORT").unwrap_or_else(|_| "3456".to_string());
+    let repo_root = resolve_repo_root();
+    let front_dir = repo_root.join("front");
+    let assets_dir = front_dir.join("assets");
     let data_dir = get_data_dir();
     let api_key = std::env::var("BAISHI_API_KEY").unwrap_or_else(|_| {
         "sk-ZpxAQINPD8XUWRkWdSzugoT2a3Q3Cj48CHTtEVJaodPgUxkF".to_string()
@@ -179,17 +204,30 @@ async fn main() {
     println!("║     白石 BaiShi · 开发 HTTP 服务器       ║");
     println!("╠══════════════════════════════════════════╣");
     println!("║  数据目录: {:?}", data_dir);
+    println!("║  前端目录: {:?}", front_dir);
+    println!("║  资源目录: {:?}", assets_dir);
     println!("║  默认 API: {}...", &api_key[..12.min(api_key.len())]);
     println!("║  服务端口: http://localhost:{}", port);
     println!("╚══════════════════════════════════════════╝");
 
     let storage = Storage::open(data_dir).expect("无法初始化数据库");
+    let retention_days = load_retention_days(&storage);
+    match storage.cleanup_history_older_than_days(retention_days) {
+        Ok(removed) => println!(
+            "║  启动清理: {} 天周期 · 已清理 {} 条非收藏历史",
+            retention_days, removed
+        ),
+        Err(err) => println!(
+            "║  启动清理: {} 天周期 · 清理失败: {}",
+            retention_days, err
+        ),
+    }
     let engine = GenericEngine::new(api_key);
 
     let state = Arc::new(AppState { storage, engine });
 
     let app = Router::new()
-        .nest_service("/assets", ServeDir::new("../assets"))
+        .nest_service("/assets", ServeDir::new(&assets_dir))
         .route("/api/auth/register", post(api_register))
         .route("/api/auth/login", post(api_login))
         .route("/api/auth/logout", post(api_logout))
@@ -210,7 +248,7 @@ async fn main() {
         // 文本润色（生文 API 调用）
         .route("/api/text/enhance", post(api_enhance_text))
         .route("/api/text/generate", post(api_generate_text_llm))
-        .fallback_service(ServeDir::new("../front").append_index_html_on_directories(true))
+        .fallback_service(ServeDir::new(&front_dir).append_index_html_on_directories(true))
         // body limit 必须在外层，覆盖所有路由（含 fallback_service）
         .layer(DefaultBodyLimit::max(50 * 1024 * 1024))
         .layer(CorsLayer::permissive())
@@ -223,6 +261,17 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+fn resolve_repo_root() -> PathBuf {
+    if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+        let manifest_path = PathBuf::from(manifest_dir);
+        if let Some(parent) = manifest_path.parent() {
+            return parent.to_path_buf();
+        }
+        return manifest_path;
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
 // ─── API 处理器 ───────────────────────────────────────────
@@ -529,9 +578,6 @@ struct ApiEnhanceRequest {
     api_key: Option<String>,
     #[serde(default)]
     model: Option<String>,
-    /// 可选：润色风格
-    #[serde(default)]
-    style: Option<String>,
 }
 
 async fn api_enhance_text(
@@ -554,8 +600,6 @@ async fn api_enhance_text(
             .filter(|s| !s.is_empty())
             .unwrap_or_else(|| "gpt-4o-mini".to_string()),
     };
-    let style = req.style.unwrap_or_else(|| "绘画提示词".to_string());
-
     let system = "你是一位精通视觉艺术的提示词工程师。用户会给你一句中文短语或粗略描述，请改写为一段富有画面感的中文提示词，要求：①保留原意但增加具体视觉细节（光线、构图、色彩、笔触、氛围）；②使用适合 AI 图像生成的描述性语言；③直接返回润色后的提示词，不要解释、不要加引号、不要 markdown 标记。";
     let user = req.prompt.clone();
 

@@ -9,14 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 标记已访问，后续打开 index.html 自动跳转到 workspace
   try { localStorage.setItem('baishi.has_visited', '1'); } catch (e) {}
 
-  // OS 切换
-  document.querySelectorAll('[data-os-set]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const os = btn.dataset.osSet;
-      document.body.dataset.os = os;
-      document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
+  ;
 
   // Toast
   function toast(msg, kind) {

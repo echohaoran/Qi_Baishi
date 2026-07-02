@@ -23,16 +23,16 @@
   <div class="window">
     <header class="titlebar">
       <div class="lights"><span class="light close"></span><span class="light min"></span><span class="light max"></span></div>
-      <div class="title"><span class="seal sm" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 灵感墙</span></div>
+      <div class="title" style="-webkit-app-region: drag;"><span class="seal sm" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><span>白石 · 灵感墙</span></div>
       <div class="right">
-        <div class="os-toggle"><button data-os-set="macos" class="active">macOS</button><button data-os-set="windows">Windows</button></div>
-        <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+        <button class="icon-btn" style="-webkit-app-region: no-drag;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       </div>
     </header>
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="nav-scroll">
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
         <a href="copywriting.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 38V14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4Z"/><path d="M16 18h16M16 24h12M16 30h8"/></svg>文生文</a>
@@ -44,6 +44,12 @@
         <a href="history.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史作品</a>
         <div class="nav-section">账户</div>
         <a href="settings.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/></svg>设置</a>
+              </div>
+
+        <div class="foot">
+          <div class="page-indicator">当前页面</div>
+          <div class="page-indicator-value">灵感墙</div>
+        </div>
       </aside>
 
       <main class="content">
@@ -143,7 +149,7 @@
             <p class="eyebrow" id="detail-cat">山水</p>
             <h2 id="detailName" style="margin-top: 6px;">飞白山水</h2>
           </div>
-          <button class="icon-btn" id="detail-close">
+          <button class="icon-btn" id="detail-close" style="-webkit-app-region: no-drag;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
           </button>
         </div>
@@ -162,7 +168,10 @@
             <div class="num" style="font-weight: 600; color: var(--fg); margin-top: 4px;">0.70 - 0.85</div>
           </div>
         </div>
-        <button class="btn btn-secondary btn-block" id="favorite-preset" style="margin-top: auto;">收藏</button>
+        <div class="row" style="gap: var(--space-2); margin-top: auto;">
+          <button class="btn btn-secondary btn-block" id="favorite-preset">收藏</button>
+          <button class="btn btn-primary btn-block" id="use-preset">使用</button>
+        </div>
       </div>
     </div>
   </div>
@@ -179,7 +188,7 @@
             <p class="eyebrow" id="text-detail-cat">文学</p>
             <h2 id="text-detail-name" style="margin-top: 6px;">鲁迅风</h2>
           </div>
-          <button class="icon-btn" id="text-detail-close">
+          <button class="icon-btn" id="text-detail-close" style="-webkit-app-region: no-drag;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
           </button>
         </div>
@@ -241,7 +250,7 @@
             <p class="eyebrow" id="editor-gallery-mode">编辑风格</p>
             <h2 id="editor-gallery-title" style="margin-top: 6px;">编辑风格</h2>
           </div>
-          <button class="icon-btn" id="editor-gallery-close">
+          <button class="icon-btn" id="editor-gallery-close" style="-webkit-app-region: no-drag;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
           </button>
         </div>
@@ -303,7 +312,7 @@
             <p class="eyebrow" id="editor-text-mode">编辑文生文风格</p>
             <h2 id="editor-text-title" style="margin-top: 6px;">编辑文风</h2>
           </div>
-          <button class="icon-btn" id="editor-text-close">
+          <button class="icon-btn" id="editor-text-close" style="-webkit-app-region: no-drag;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6 18 18M6 18 18 6"/></svg>
           </button>
         </div>

@@ -1,13 +1,7 @@
 // settings.js — 设置页（生图 API · 生文 API · 偏好 · 存储）
 // 全部按钮接通后端 + localStorage，并实时影响生图请求体
 document.addEventListener('DOMContentLoaded', function () {
-  /* ── OS 切换 ───────────────────────────────────── */
-  document.querySelectorAll('[data-os-set]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.body.dataset.os = btn.dataset.osSet;
-      document.querySelectorAll('[data-os-set]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
+  ;
 
   /* ── 工具 ─────────────────────────────────────── */
   function toast(msg, kind, options) {
@@ -546,7 +540,6 @@ document.addEventListener('DOMContentLoaded', function () {
       testBtn.disabled = true;
       var orig = testBtn.textContent;
       testBtn.textContent = '请求中…';
-      var t0 = Date.now();
       try {
         var testVars = {
           prompt: 'test', n: 1, count: 1, seed: 0, steps: 1, cfg_scale: 7,
@@ -554,26 +547,32 @@ document.addEventListener('DOMContentLoaded', function () {
           negative_prompt: '', reference_image: '', image: '', strength: 0.5
         };
         var testBody = window.BaishiShared ? window.BaishiShared.applyTemplate(bodyTpl, testVars) : bodyTpl;
-        var parsed;
-        try { parsed = JSON.parse(testBody); } catch (e) { throw new Error('模板替换后不是合法 JSON：' + e.message); }
-        var headers = { 'Content-Type': 'application/json' };
-        if (key) headers['Authorization'] = 'Bearer ' + key;
-        var ctrl = new AbortController();
-        var to = setTimeout(function () { ctrl.abort(); }, 8000);
-        var resp = await fetch(endpoint, { method: 'POST', headers: headers, body: JSON.stringify(parsed), signal: ctrl.signal });
-        clearTimeout(to);
-        var took = Date.now() - t0;
-        var ct = resp.headers.get('content-type') || '';
+        try { JSON.parse(testBody); } catch (e) { throw new Error('模板替换后不是合法 JSON：' + e.message); }
+        var resp = await window.BaiShiAPI.testImageApiConnection({
+          endpoint: endpoint,
+          api_key: key,
+          body_json: testBody,
+        });
+        if (!resp || !resp.success || !resp.data) {
+          throw new Error((resp && resp.error) ? resp.error : '测试连接失败');
+        }
+        var took = resp.data.took_ms || 0;
+        var ct = resp.data.content_type || '';
         resultBox.innerHTML = '<div style="background: rgba(79, 107, 58, 0.08); border: 1px solid var(--success); border-radius: var(--radius); padding: var(--space-3) var(--space-4); font-size: 13px;">'
-          + '<div style="color: var(--success); font-weight: 600; margin-bottom: 4px;">✓ 连接成功 · HTTP ' + resp.status + ' · 供应商 ' + p.name + ' · 模型 ' + p.model + '</div>'
+          + '<div style="color: var(--success); font-weight: 600; margin-bottom: 4px;">✓ 连接成功 · HTTP ' + resp.data.status + ' · 供应商 ' + p.name + ' · 模型 ' + p.model + '</div>'
           + '<div class="meta">耗时 ' + took + 'ms · ' + (ct || '无 Content-Type') + ' · 端点 <code>' + endpoint + '</code></div>'
           + '</div>';
-        toast('连接成功 · HTTP ' + resp.status);
+        toast('连接成功 · HTTP ' + resp.data.status);
       } catch (err) {
-        var took = Date.now() - t0;
+        var errMsg = (err && err.message) ? err.message : String(err || '未知错误');
+        if (errMsg.indexOf('operation timed out') !== -1 || errMsg.indexOf('超时') !== -1) {
+          errMsg = '请求超时，请稍后重试或检查网络 / 供应商响应速度';
+        } else if (errMsg === 'Load failed' || errMsg === 'TypeError: Load failed') {
+          errMsg = '网络请求被拦截或连接失败（开发态可检查本地服务，打包态可检查系统网络权限）';
+        }
         resultBox.innerHTML = '<div style="background: rgba(196, 74, 68, 0.08); border: 1px solid var(--danger); border-radius: var(--radius); padding: var(--space-3) var(--space-4); font-size: 13px;">'
           + '<div style="color: var(--danger); font-weight: 600; margin-bottom: 4px;">✗ 请求失败 · 供应商 ' + p.name + ' · 模型 ' + p.model + '</div>'
-          + '<div class="meta">' + (err.message || err) + ' · 耗时 ' + took + 'ms</div>'
+          + '<div class="meta">' + errMsg + '</div>'
           + '<div class="meta" style="margin-top: 4px;">端点 <code>' + endpoint + '</code></div>'
           + '</div>';
         toast('请求失败', 'error');
@@ -760,6 +759,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (models.length === 0) throw new Error('未返回模型');
       } catch (err) {
         errMsg = err && err.message ? err.message : String(err);
+        if (errMsg === 'Load failed' || errMsg === 'TypeError: Load failed') {
+          errMsg = '网络请求被拦截或连接失败（打包态请检查 Tauri CSP、外网连接放行或系统网络权限）';
+        }
         source = 'fallback';
         var lc = url.toLowerCase();
         if (lc.indexOf('127.0.0.1') !== -1 || lc.indexOf('localhost') !== -1 || lc.indexOf('ollama') !== -1 || lc.indexOf('lm-studio') !== -1 || lc.indexOf('1234') !== -1 || lc.indexOf('11434') !== -1 || lc.indexOf('vllm') !== -1) {
@@ -832,29 +834,75 @@ document.addEventListener('DOMContentLoaded', function () {
    * 存储面板 · 3 个按钮绑事件
    * ════════════════════════════════════════════════ */
   function bindStorage() {
-    var btns = document.querySelectorAll('#panel-storage button');
-    if (btns.length < 3) return;
-    btns[0].addEventListener('click', () => {
-      if (!confirm('确定清理 30 天前的本地缓存？此操作不可恢复。')) return;
-      // 原型阶段暂未实现真实清理，提示用户
-      toast('已标记清理 30 天前作品（原型阶段不实际删除）', 'success');
-    });
-    btns[1].addEventListener('click', () => {
-      if (!confirm('确定仅保留收藏作品？其他所有本地缓存将被清理。')) return;
-      toast('已切换为「仅保留收藏」模式（原型阶段不实际删除）', 'success');
-    });
-    btns[2].addEventListener('click', () => {
-      if (!confirm('确定清空所有本地缓存？此操作不可恢复。')) return;
+    function getRetentionDays() {
       try {
-        var keys = Object.keys(localStorage);
-        var removed = 0;
-        keys.forEach(k => {
-          if (k.indexOf('baishi.') === 0 && k !== 'baishi.theme' && k !== 'baishi.session') {
-            localStorage.removeItem(k); removed++;
-          }
-        });
-        toast('已清空 ' + removed + ' 项本地缓存（主题与会话保留）', 'success');
-      } catch (e) { toast('清空失败：' + e.message, 'error'); }
+        var raw = localStorage.getItem('baishi.storage.retentionDays');
+        var n = parseInt(raw || '2', 10);
+        return Math.min(5, Math.max(1, isNaN(n) ? 2 : n));
+      } catch (e) {
+        return 2;
+      }
+    }
+    function setRetentionDays(days) {
+      var safe = Math.min(5, Math.max(1, parseInt(days || '2', 10) || 2));
+      try { localStorage.setItem('baishi.storage.retentionDays', String(safe)); } catch (e) {}
+      return safe;
+    }
+    function updateRetentionUi(days) {
+      var safe = Math.min(5, Math.max(1, parseInt(days || '2', 10) || 2));
+      var slider = document.getElementById('storage-retention-days');
+      var label = document.querySelector('[data-storage-retention-label]');
+      var badge = document.querySelector('[data-storage-retention-badge]');
+      if (slider) slider.value = String(safe);
+      if (label) label.textContent = safe + ' 天 · 跟随设置增量清理非收藏历史作品';
+      if (badge) badge.textContent = safe + ' 天';
+    }
+
+    var slider = document.getElementById('storage-retention-days');
+    var cleanupBtn = document.getElementById('storage-cleanup-now');
+    var keepFavBtn = document.getElementById('storage-keep-favorites');
+    var clearAllBtn = document.getElementById('storage-clear-all');
+
+    updateRetentionUi(getRetentionDays());
+
+    if (slider) {
+      slider.addEventListener('input', function () {
+        updateRetentionUi(slider.value);
+      });
+      slider.addEventListener('change', function () {
+        var days = setRetentionDays(slider.value);
+        updateRetentionUi(days);
+        toast('已更新缓存周期为 ' + days + ' 天', 'success');
+      });
+    }
+
+    if (cleanupBtn) cleanupBtn.addEventListener('click', async function () {
+      var days = getRetentionDays();
+      if (!(window.BaiShiAPI && window.BaiShiAPI.cleanupHistory)) {
+        toast('当前运行环境未接通历史清理接口', 'warn');
+        return;
+      }
+      cleanupBtn.disabled = true;
+      var orig = cleanupBtn.textContent;
+      cleanupBtn.textContent = '清理中…';
+      try {
+        var r = await window.BaiShiAPI.cleanupHistory(days);
+        var count = r && r.data != null ? r.data : 0;
+        toast('已清理 ' + count + ' 条超过 ' + days + ' 天的非收藏历史', 'success');
+        loadStorageInfo();
+      } catch (e) {
+        toast('清理失败：' + e.message, 'error');
+      }
+      cleanupBtn.textContent = orig;
+      cleanupBtn.disabled = false;
+    });
+
+    if (keepFavBtn) keepFavBtn.addEventListener('click', function () {
+      toast('当前自动清理默认保留收藏作品', 'success');
+    });
+
+    if (clearAllBtn) clearAllBtn.addEventListener('click', function () {
+      toast('为保护历史作品，当前版本暂不提供一键全清空', 'warn');
     });
   }
 
@@ -865,35 +913,86 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bytes === null || bytes === undefined || isNaN(bytes)) return '—';
     return (bytes / (1024 * 1024 * 1024)).toFixed(2);
   }
+  function renderStorageMiniChart(host, values, tone) {
+    if (!host) return;
+    host.innerHTML = '';
+    var max = Math.max.apply(null, values.concat([1]));
+    values.forEach(function (value, idx) {
+      var bar = document.createElement('span');
+      var h = Math.max(8, Math.round((value / max) * 40));
+      bar.style.width = '9px';
+      bar.style.height = h + 'px';
+      bar.style.borderRadius = '999px';
+      bar.style.display = 'inline-block';
+      bar.style.opacity = idx === values.length - 1 ? '1' : '0.78';
+      bar.style.background = tone || 'linear-gradient(180deg, var(--accent), var(--accent-deep))';
+      host.appendChild(bar);
+    });
+  }
   function loadStorageInfo() {
     var numEl   = document.querySelector('#panel-storage .num');
-    var barEl   = document.querySelector('#panel-storage [data-storage-bar]');
+    var totalCountEl = document.querySelector('#panel-storage [data-storage-total-count]');
+    var monthCountEl = document.querySelector('#panel-storage [data-storage-month-count]');
+    var weekCountEl = document.querySelector('#panel-storage [data-storage-week-count]');
+    var dayCountEl = document.querySelector('#panel-storage [data-storage-day-count]');
+    var totalChartEl = document.querySelector('#panel-storage [data-storage-total-chart]');
+    var monthChartEl = document.querySelector('#panel-storage [data-storage-month-chart]');
+    var weekChartEl = document.querySelector('#panel-storage [data-storage-week-chart]');
+    var dayChartEl = document.querySelector('#panel-storage [data-storage-day-chart]');
     var hintEl  = document.querySelector('#panel-storage [data-storage-hint]');
-    if (!numEl || !barEl) return;
-    if (!window.BaishiApi || !window.BaishiApi.getStorageInfo) {
-      numEl.textContent = '— / — GB';
-      if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实占用）';
+    if (!numEl || !totalCountEl || !monthCountEl || !weekCountEl || !dayCountEl) return;
+    function renderEmptyCharts() {
+      renderStorageMiniChart(totalChartEl, [0, 0, 0, 0], 'linear-gradient(180deg, rgba(186,173,145,0.9), rgba(160,145,118,0.65))');
+      renderStorageMiniChart(monthChartEl, [0, 0, 0, 0], 'linear-gradient(180deg, rgba(186,173,145,0.9), rgba(160,145,118,0.65))');
+      renderStorageMiniChart(weekChartEl, [0, 0, 0, 0], 'linear-gradient(180deg, rgba(186,173,145,0.9), rgba(160,145,118,0.65))');
+      renderStorageMiniChart(dayChartEl, [0, 0, 0, 0], 'linear-gradient(180deg, rgba(186,173,145,0.9), rgba(160,145,118,0.65))');
+    }
+    if (!window.BaiShiAPI || !window.BaiShiAPI.getStorageInfo) {
+      numEl.textContent = '— / —';
+      totalCountEl.textContent = '—';
+      monthCountEl.textContent = '—';
+      weekCountEl.textContent = '—';
+      dayCountEl.textContent = '—';
+      renderEmptyCharts();
+      if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实历史缓存统计）';
       return;
     }
-    window.BaishiApi.getStorageInfo()
+    window.BaiShiAPI.getStorageInfo()
       .then(function (res) {
         if (!res || res.success !== true || !res.data) {
-          numEl.textContent = '— / — GB';
+          numEl.textContent = '— / —';
+          totalCountEl.textContent = '—';
+          monthCountEl.textContent = '—';
+          weekCountEl.textContent = '—';
+          dayCountEl.textContent = '—';
+          renderEmptyCharts();
           if (hintEl) hintEl.textContent = '开发服务未返回数据';
-          barEl.style.width = '0%';
           return;
         }
-        var used = res.data.used || 0;
-        var total = res.data.total || 0;
-        numEl.textContent = formatGB(used) + ' / ' + formatGB(total) + ' GB';
-        var pct = total > 0 ? Math.min(100, Math.round(used / total * 100)) : 0;
-        barEl.style.width = pct + '%';
-        if (hintEl) hintEl.textContent = '已用 ' + pct + '% · 来自 baishi-dev /api/storage/info';
+        var totalCount = res.data.total_history_count || 0;
+        var modelsSize = res.data.models_size || 0;
+        var monthCount = res.data.month_count || 0;
+        var weekCount = res.data.week_count || 0;
+        var dayCount = res.data.day_count || 0;
+        numEl.textContent = totalCount + ' 条历史 · 模型 ' + formatGB(modelsSize) + ' GB';
+        totalCountEl.textContent = totalCount + ' 条';
+        monthCountEl.textContent = monthCount + ' 条';
+        weekCountEl.textContent = weekCount + ' 条';
+        dayCountEl.textContent = dayCount + ' 条';
+        renderStorageMiniChart(totalChartEl, [monthCount, weekCount, dayCount, totalCount], 'linear-gradient(180deg, var(--accent), var(--accent-deep))');
+        renderStorageMiniChart(monthChartEl, [0, Math.max(monthCount - weekCount, 0), weekCount, dayCount], 'linear-gradient(180deg, rgba(179,69,60,0.95), rgba(125,42,36,0.82))');
+        renderStorageMiniChart(weekChartEl, [0, Math.max(weekCount - dayCount, 0), dayCount, Math.max(Math.floor(dayCount * 0.7), 1)], 'linear-gradient(180deg, rgba(138,122,90,0.95), rgba(90,72,52,0.82))');
+        renderStorageMiniChart(dayChartEl, [Math.max(Math.floor(dayCount * 0.35), 0), Math.max(Math.floor(dayCount * 0.6), 0), Math.max(Math.floor(dayCount * 0.82), 0), dayCount], 'linear-gradient(180deg, rgba(119,104,78,0.92), rgba(77,63,45,0.86))');
+        if (hintEl) hintEl.textContent = '近 30 天 ' + monthCount + ' 条 · 近 7 天 ' + weekCount + ' 条 · 近 24 小时 ' + dayCount + ' 条 · 图片当前以 URL / Base64 引用形式入库';
       })
-      .catch(function (err) {
-        numEl.textContent = '— / — GB';
-        if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实占用）';
-        barEl.style.width = '0%';
+      .catch(function () {
+        numEl.textContent = '— / —';
+        totalCountEl.textContent = '—';
+        monthCountEl.textContent = '—';
+        weekCountEl.textContent = '—';
+        dayCountEl.textContent = '—';
+        renderEmptyCharts();
+        if (hintEl) hintEl.textContent = '未连接开发服务（启动 baishi-dev 后可显示真实历史缓存统计）';
       });
   }
 
@@ -944,13 +1043,22 @@ document.addEventListener('DOMContentLoaded', function () {
         var prefs = window.BaishiShared.getPrefs();
         var active = window.BaishiShared.getActiveProvider();
         var textApi = window.BaishiShared.getTextApi();
+        var retentionDays = (function () {
+          try {
+            var raw = localStorage.getItem('baishi.storage.retentionDays');
+            var n = parseInt(raw || '2', 10);
+            return Math.min(5, Math.max(1, isNaN(n) ? 2 : n));
+          } catch (e) {
+            return 2;
+          }
+        })();
         var payload = {
           theme: localStorage.getItem('baishi.theme') || 'light',
           api_endpoint: (active && active.endpoint) || null,
           api_key: (document.getElementById('online-api-key') || {}).value || null,
           // 关键修复 #2: payload 显式包含 text_api_model, 后端 SQLite 落盘
           text_api_model: (textApi && textApi.model) || null,
-          shortcuts: JSON.stringify({ prefs: prefs, textApi: textApi })
+          shortcuts: JSON.stringify({ prefs: prefs, textApi: textApi, storage: { retentionDays: retentionDays } })
         };
         var r = await window.BaiShiAPI.updateSettings(1, payload);
         if (r && r.success) toast('设置已保存至后端', 'success');

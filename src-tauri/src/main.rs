@@ -53,6 +53,12 @@ fn main() {
             commands::get_settings,
             commands::update_settings,
             commands::get_storage_info,
+            commands::cleanup_history,
+            commands::test_image_api_connection,
+            commands::generate_text_to_image_remote,
+            commands::generate_image_to_image_remote,
+            commands::enhance_text_remote,
+            commands::generate_text_remote,
         ])
         .run(tauri::generate_context!())
         .expect("启动白石 BaiShi 失败");
