@@ -45,6 +45,32 @@
     }
   }
 
+  function compareVersionLike(a, b) {
+    function parse(v) {
+      return String(v || '')
+        .trim()
+        .replace(/^v/i, '')
+        .split('.')
+        .map(function (part) {
+          var n = parseInt(part, 10);
+          return isNaN(n) ? null : n;
+        });
+    }
+    var left = parse(a);
+    var right = parse(b);
+    if (!left.length || left.indexOf(null) !== -1 || !right.length || right.indexOf(null) !== -1) {
+      return null;
+    }
+    var len = Math.max(left.length, right.length);
+    while (left.length < len) left.push(0);
+    while (right.length < len) right.push(0);
+    for (var i = 0; i < len; i += 1) {
+      if (left[i] > right[i]) return 1;
+      if (left[i] < right[i]) return -1;
+    }
+    return 0;
+  }
+
   async function api(path, options) {
     options = options || {};
     var headers = { 'Content-Type': 'application/json' };
@@ -356,6 +382,43 @@
       });
       if (tauriRes) return tauriRes;
       throw new Error('当前开发 HTTP 服务暂未提供历史清理接口');
+    },
+
+    checkAppUpdate: async function () {
+      var tauriRes = await invokeCommand('check_app_update', {}, function (result) {
+        return { success: true, data: result };
+      });
+      if (tauriRes) return tauriRes;
+
+      try {
+        var currentVersion = '0.1.4';
+        if (window.__APP_VERSION__) currentVersion = String(window.__APP_VERSION__);
+        var resp = await fetch('https://api.github.com/repos/echohaoran/Qi_Baishi/releases/latest', {
+          headers: {
+            'Accept': 'application/vnd.github+json',
+          },
+        });
+        var text = await resp.text();
+        if (!resp.ok) {
+          return { success: false, error: 'GitHub Releases 返回异常（' + resp.status + '）：' + text.slice(0, 200) };
+        }
+        var json = JSON.parse(text);
+        var latestVersion = String(json.tag_name || '').replace(/^v/i, '');
+        var cmp = compareVersionLike(latestVersion, currentVersion);
+        return {
+          success: true,
+          data: {
+            currentVersion: currentVersion,
+            latestVersion: latestVersion,
+            hasUpdate: cmp == null ? (latestVersion !== currentVersion) : cmp > 0,
+            releaseUrl: json.html_url || 'https://github.com/echohaoran/Qi_Baishi/releases/latest',
+            publishedAt: json.published_at || null,
+            body: json.body || null,
+          },
+        };
+      } catch (err) {
+        return { success: false, error: '检查 GitHub Releases 失败：' + ((err && err.message) ? err.message : String(err)) };
+      }
     },
 
     /* ─── 历史作品删除 ─────────────────────── */

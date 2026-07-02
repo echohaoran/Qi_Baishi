@@ -64,6 +64,33 @@ cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev
 
 若前端看起来“已经压缩”，仍可能因为 Data URL 总长度超限而失败。
 
+## 4.1 图生图 / 多图融合偶发无法上传图片
+
+典型现象：
+
+- 点击上传没有反应
+- 同一张图有时选不中
+- 多切换几次页面后又恢复正常
+
+当前已确认的高概率原因：
+
+- 页面曾经使用运行时临时创建的 `<input type="file">` 触发系统选图
+- 在桌面 WebView / Tauri 安装版里，这种动态 input 可能偶发不稳定
+- 同一文件重复选择时，若 input 的 `value` 未清空，`change` 事件也可能不触发
+
+当前修复策略：
+
+- 图生图与多图融合页面都改成使用“持久存在的隐藏 file input”
+- 每次选择前后都主动清空 `value`
+- 页面 `pageshow` 时也会重置 input 状态
+
+相关文件：
+
+- `front/pages/image-to-image.html`
+- `front/pages/multi-image.html`
+- `front/js/image-to-image.js`
+- `front/js/multi-image.js`
+
 ## 5. 存储页显示的不是本地图片体积
 
 当前设置页“本地缓存管理”展示的是历史记录统计，而不是下载到磁盘的真实图片文件体积。
@@ -109,6 +136,7 @@ cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev
 
 1. 先生成 artifacts
 2. 再由 `release` job 上传到 GitHub Releases
+3. 应用内“检查更新”依赖 GitHub Releases 最新版本接口；若返回失败，优先确认对应 tag 的 Release 是否已经创建完成
 
 所以“有 artifacts”不等于“一定已经进 Release”。
 
@@ -125,6 +153,28 @@ cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev
 
 - `origin` 的 fetch 指向 GitHub 仓库
 - 已执行 `gh auth login`
+
+## 8.1 安装版点击外链没有打开默认浏览器
+
+典型现象：
+
+- 设置页“获取API”点击后没有反应
+- 关于页“发布页”入口点击后没有拉起系统默认浏览器
+
+当前已确认原因：
+
+- 安装版里单纯依赖 `<a target="_blank">` 或 `window.open(...)` 不够稳定
+
+当前修复策略：
+
+- 设置页不再强依赖直接拉起默认浏览器
+- “获取API”和“关于”中的仓库发布页都改为显示原始链接，点击后复制到剪贴板，由用户自行粘贴到浏览器打开
+- 这样可以绕开部分安装版环境下外链打开不稳定的问题
+
+相关文件：
+
+- `front/js/settings.js`
+- `front/pages/settings.html`
 
 ## 9. 哪些文档该看哪里
 

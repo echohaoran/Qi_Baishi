@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── 上传参考图（点击 + 拖放） ──
   const dropzone = document.getElementById('dropzone');
+  const uploadInput = document.getElementById('image-upload-input');
   const preview = document.getElementById('preview');
   const previewImg = document.getElementById('preview-img');
   const NEGATIVE_PRESET_MAP = {
@@ -106,13 +107,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function pickFile() {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/png,image/jpeg,image/webp';
-    input.addEventListener('change', function () {
-      if (input.files && input.files[0]) handleFile(input.files[0]);
+    if (!uploadInput) return;
+    uploadInput.value = '';
+    uploadInput.click();
+  }
+
+  if (uploadInput) {
+    uploadInput.addEventListener('change', function () {
+      if (uploadInput.files && uploadInput.files[0]) handleFile(uploadInput.files[0]);
+      uploadInput.value = '';
     });
-    input.click();
   }
 
   dropzone.addEventListener('click', pickFile);
@@ -128,6 +132,10 @@ document.addEventListener('DOMContentLoaded', function () {
     refImageName = '';
     preview.style.display = 'none';
     dropzone.style.display = 'block';
+  });
+
+  window.addEventListener('pageshow', function () {
+    if (uploadInput) uploadInput.value = '';
   });
 
   // 字符计数

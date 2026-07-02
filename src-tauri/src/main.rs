@@ -54,6 +54,7 @@ fn main() {
             commands::update_settings,
             commands::get_storage_info,
             commands::cleanup_history,
+            commands::check_app_update,
             commands::test_image_api_connection,
             commands::generate_text_to_image_remote,
             commands::generate_image_to_image_remote,

@@ -14,7 +14,7 @@
 
 ## 1. 概览
 
-- 当前版本：`v0.1.0`
+- 当前版本：`v0.1.4`
 - 开发服务基地址：`http://localhost:3456/api`
 - 启动命令：`cargo run --manifest-path src-tauri/Cargo.toml --bin baishi-dev`
 - 打包态：前端优先使用 Tauri `invoke`，在浏览器联调或注入缺失时回退本地 HTTP
@@ -74,7 +74,7 @@
   "success": true,
   "data": {
     "status": "ok",
-    "version": "v0.0.1_test",
+    "version": "v0.1.4",
     "engine": "generic"
   },
   "error": null

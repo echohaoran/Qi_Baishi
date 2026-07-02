@@ -109,6 +109,34 @@ document.addEventListener('DOMContentLoaded', function () {
     var providerApiLink = document.getElementById('provider-api-link');
     if (!providerSelect) return;
 
+    if (providerApiLink) {
+      providerApiLink.addEventListener('click', async function (e) {
+        var href = providerApiLink.getAttribute('href');
+        if (!href) return;
+        e.preventDefault();
+        var copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(href);
+            copied = true;
+          }
+        } catch (err) {}
+        if (!copied) {
+          try {
+            var temp = document.createElement('input');
+            temp.value = href;
+            document.body.appendChild(temp);
+            temp.select();
+            temp.setSelectionRange(0, temp.value.length);
+            copied = document.execCommand('copy');
+            temp.remove();
+          } catch (err) {}
+        }
+        if (copied) toast('原文链接已复制，请粘贴到浏览器打开', 'success');
+        else toast('复制失败，请手动复制该链接', 'warn');
+      });
+    }
+
     var DEFAULT_PROVIDER = 'Agnes Images 2.1 Flash';
 
     /* ── 7 个内置供应商 · 每个支持多个模型 ── */
@@ -481,7 +509,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (providerApiLinkRow && providerApiLink) {
         if (p.officialUrl) {
           providerApiLink.href = p.officialUrl;
-          providerApiLink.textContent = p.name;
+          providerApiLink.textContent = p.officialUrl;
+          providerApiLink.title = '点击复制原文链接';
           providerApiLinkRow.hidden = false;
         } else {
           providerApiLink.removeAttribute('href');
@@ -999,16 +1028,87 @@ document.addEventListener('DOMContentLoaded', function () {
   function bindAbout() {
     var checkBtn = document.getElementById('about-check-update');
     var releaseBtn = document.getElementById('about-open-release');
+    var releaseLink = document.getElementById('about-release-link');
     var status = document.getElementById('about-update-status');
+    var currentVersionEl = document.getElementById('about-current-version');
+    var latestVersionEl = document.getElementById('about-latest-version');
+    var publishedEl = document.getElementById('about-latest-published');
+    var notesEl = document.getElementById('about-update-notes');
     if (!checkBtn || !releaseBtn || !status) return;
 
-    checkBtn.addEventListener('click', () => {
-      status.textContent = '已于刚刚检查更新';
-      toast('当前已是最新版本（原型阶段）', 'success', { duration: 4800, fadeDuration: 240 });
+    var releaseUrl = 'https://github.com/echohaoran/Qi_Baishi';
+    var fallbackCurrentVersion = '0.1.4';
+    if (releaseLink) {
+      releaseLink.href = releaseUrl;
+      releaseLink.textContent = releaseUrl;
+      releaseLink.title = '点击复制原文链接';
+    }
+    if (currentVersionEl) currentVersionEl.textContent = 'v' + fallbackCurrentVersion;
+
+    function formatPublishedAt(value) {
+      if (!value) return '未知';
+      var date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+      var yyyy = date.getFullYear();
+      var mm = String(date.getMonth() + 1).padStart(2, '0');
+      var dd = String(date.getDate()).padStart(2, '0');
+      var hh = String(date.getHours()).padStart(2, '0');
+      var mi = String(date.getMinutes()).padStart(2, '0');
+      return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + mi;
+    }
+
+    function summarizeNotes(body) {
+      var text = String(body || '').trim();
+      if (!text) return '该版本未提供更新说明。';
+      return text.length > 220 ? (text.slice(0, 220) + '…') : text;
+    }
+
+    checkBtn.addEventListener('click', async () => {
+      var originalText = checkBtn.textContent;
+      checkBtn.disabled = true;
+      checkBtn.textContent = '检查中…';
+      status.textContent = '正在连接 GitHub Releases';
+      if (notesEl) notesEl.textContent = '正在读取最新版本信息…';
+
+      try {
+        var result = await window.BaiShiAPI.checkAppUpdate();
+        if (!result || !result.success || !result.data) {
+          throw new Error((result && result.error) || '未获取到版本信息');
+        }
+
+        var data = result.data;
+        var currentVersion = String(data.currentVersion || fallbackCurrentVersion).replace(/^v/i, '');
+        var latestVersion = String(data.latestVersion || '').replace(/^v/i, '');
+        if (currentVersionEl) currentVersionEl.textContent = 'v' + currentVersion;
+        if (latestVersionEl) latestVersionEl.textContent = latestVersion ? ('v' + latestVersion) : '未知';
+        if (publishedEl) publishedEl.textContent = formatPublishedAt(data.publishedAt);
+        if (releaseLink && data.releaseUrl) {
+          releaseLink.href = data.releaseUrl;
+          releaseLink.textContent = data.releaseUrl;
+        }
+        if (notesEl) notesEl.textContent = summarizeNotes(data.body);
+
+        if (data.hasUpdate) {
+          status.textContent = '发现新版本 v' + latestVersion;
+          toast('检测到新版本 v' + latestVersion + '，已更新发布页链接', 'success', { duration: 5200, fadeDuration: 240 });
+        } else {
+          status.textContent = '当前已是最新版本';
+          toast('当前已是最新版本 v' + currentVersion, 'success', { duration: 4200, fadeDuration: 240 });
+        }
+      } catch (err) {
+        status.textContent = '检查更新失败';
+        if (latestVersionEl) latestVersionEl.textContent = '检查失败';
+        if (publishedEl) publishedEl.textContent = '检查失败';
+        if (notesEl) notesEl.textContent = '检查 GitHub Releases 失败，请稍后重试。';
+        toast('检查更新失败：' + ((err && err.message) ? err.message : String(err)), 'error', { duration: 5600, fadeDuration: 240 });
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.textContent = originalText;
+      }
     });
 
-    releaseBtn.addEventListener('click', () => {
-      window.open('https://github.com/echohaoran/Qi_Baishi', '_blank', 'noopener,noreferrer');
+    releaseBtn.addEventListener('click', async () => {
+      if (releaseLink) releaseLink.click();
     });
   }
 

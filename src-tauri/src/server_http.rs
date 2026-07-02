@@ -279,7 +279,7 @@ fn resolve_repo_root() -> PathBuf {
 async fn api_health() -> Json<ApiResponse<serde_json::Value>> {
     ApiResponse::ok(json!({
         "status": "ok",
-        "version": "v0.0.1_test",
+        "version": "v0.1.4",
         "engine": "generic",
     }))
 }

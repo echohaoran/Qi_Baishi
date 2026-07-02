@@ -5,7 +5,7 @@
 ## 项目快照
 
 - 项目名：白石 `BaiShi`
-- 当前版本：`v0.0.1_test`
+- 当前版本：`v0.1.4`
 - 类型：本地优先的桌面生图原型
 - 前端：`front/` 下多页面 HTML/CSS/JS
 - 后端：`src-tauri/` 下 Rust + Axum + Rusqlite + Tauri
@@ -23,6 +23,10 @@
 - 页面切换过渡动画已经取消，`page-loader.js` 只负责初始化后隐藏加载层
 - 历史作品页支持图片和文案两类内容，且有“收藏”筛选
 - 文生文页面已经有“审阅视图 / 编辑视图”双模式
+- 设置页中的外链入口当前统一采用“显示原文链接 + 点击复制”交互，不再依赖直接拉起系统默认浏览器
+- “获取API”和“关于”中的仓库发布页入口都应保持同一套复制链接行为
+- “检查更新”当前应真实读取 GitHub Releases 最新版本信息，不能再保留只改前端文案的假检查逻辑
+- 图生图 / 多图融合上传当前使用持久隐藏 file input，不要再改回运行时临时创建 input 的做法
 
 ## 页面清单
 
@@ -79,6 +83,7 @@
 
 - `baishi-dev` 是联调用 HTTP 服务，不是测试脚本
 - `baishi-server` 是命令行后端能力测试入口
+- 打包态核心链路优先走 Tauri `invoke`，不要再把前端描述成“一律 HTTP”
 - 图像生成入口：
   - `POST /api/generate/text`
   - `POST /api/generate/image`
@@ -109,3 +114,22 @@
   - `docs/DEVELOPER/front.md`：前端页面、脚本分工与联调约定
   - `docs/DEVELOPER/server.md`：后端模块结构、运行方式、数据流与实现约束
 - 若接口有变更，应优先更新 `src-tauri/API.md`，再检查 README 中的高层摘要是否需要同步
+
+## 发版时要一起改的版本号位置
+
+- Rust 包版本：[src-tauri/Cargo.toml](../src-tauri/Cargo.toml)
+- Tauri 打包版本：[src-tauri/tauri.conf.json](../src-tauri/tauri.conf.json)
+- README 展示版本：[README.md](../README.md)
+- 接口文档版本：[src-tauri/API.md](../src-tauri/API.md)
+- 开发索引版本：[docs/Developer.md](./Developer.md)
+- vibecoding 基线版本：[docs/vibecoding_log.md](./vibecoding_log.md)
+- 设置页“关于”版本：[front/pages/settings.html](../front/pages/settings.html)
+- 健康检查接口版本：[src-tauri/src/server_http.rs](../src-tauri/src/server_http.rs)
+- 前端开发文档版本：[docs/DEVELOPER/front.md](./DEVELOPER/front.md)
+- 后端开发文档版本：[docs/DEVELOPER/server.md](./DEVELOPER/server.md)
+
+推荐发版顺序：
+
+1. 先统一以上文件中的版本号
+2. 再提交代码
+3. 最后打对应 tag，例如 `v0.1.4`

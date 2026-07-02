@@ -4,6 +4,7 @@
 /// 前端通过 invoke() 调用
 
 use tauri::{command, State};
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::time::{Duration, Instant};
 
@@ -16,6 +17,25 @@ use crate::types::*;
 pub struct AppState {
     pub storage: Storage,
     pub engine: Box<dyn InferenceEngine + Send + Sync>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppUpdateInfo {
+    pub current_version: String,
+    pub latest_version: String,
+    pub has_update: bool,
+    pub release_url: String,
+    pub published_at: Option<String>,
+    pub body: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct GithubRelease {
+    tag_name: String,
+    html_url: String,
+    published_at: Option<String>,
+    body: Option<String>,
 }
 
 impl AppState {
@@ -226,6 +246,56 @@ pub fn cleanup_history(
     state.storage
         .cleanup_history_older_than_days(days)
         .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn check_app_update() -> Result<AppUpdateInfo, String> {
+    let current_version = env!("CARGO_PKG_VERSION").to_string();
+    let endpoint = "https://api.github.com/repos/echohaoran/Qi_Baishi/releases/latest";
+
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(12))
+        .build()
+        .map_err(|e| format!("创建 HTTP 客户端失败: {}", e))?;
+
+    let response = client
+        .get(endpoint)
+        .header("Accept", "application/vnd.github+json")
+        .header("User-Agent", format!("baishi-desktop/{}", current_version))
+        .send()
+        .await
+        .map_err(|e| format!("请求 GitHub Releases 失败: {}", e))?;
+
+    let status = response.status();
+    let text = response
+        .text()
+        .await
+        .map_err(|e| format!("读取 GitHub 响应失败: {}", e))?;
+
+    if !status.is_success() {
+        return Err(format!(
+            "GitHub Releases 返回异常 ({}): {}",
+            status.as_u16(),
+            &text[..text.len().min(300)]
+        ));
+    }
+
+    let release: GithubRelease = serde_json::from_str(&text)
+        .map_err(|e| format!("解析 GitHub Releases 响应失败: {}", e))?;
+
+    let latest_version = normalize_semver_like(&release.tag_name);
+    let has_update = compare_versions(&latest_version, &current_version)
+        .map(|ord| ord.is_gt())
+        .unwrap_or_else(|| latest_version != current_version);
+
+    Ok(AppUpdateInfo {
+        current_version,
+        latest_version,
+        has_update,
+        release_url: release.html_url,
+        published_at: release.published_at,
+        body: release.body,
+    })
 }
 
 #[command]
@@ -564,4 +634,24 @@ fn parse_aspect(s: &str) -> Result<AspectRatio, String> {
         "21:9" => Ok(AspectRatio::Ultrawide),
         _ => Err(format!("不支持的画面比例: {}", s)),
     }
+}
+
+fn normalize_semver_like(raw: &str) -> String {
+    raw.trim().trim_start_matches('v').to_string()
+}
+
+fn compare_versions(a: &str, b: &str) -> Option<std::cmp::Ordering> {
+    let parse = |value: &str| -> Option<Vec<u64>> {
+        value
+            .split('.')
+            .map(|part| part.parse::<u64>().ok())
+            .collect::<Option<Vec<_>>>()
+    };
+
+    let mut left = parse(a)?;
+    let mut right = parse(b)?;
+    let max_len = left.len().max(right.len());
+    left.resize(max_len, 0);
+    right.resize(max_len, 0);
+    Some(left.cmp(&right))
 }

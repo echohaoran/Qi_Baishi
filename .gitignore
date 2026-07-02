@@ -7,5 +7,6 @@
 
 src-tauri/baishi.db
 mr*.png
+front/assets/drawings/
 
 docs/vibecoding_log.md

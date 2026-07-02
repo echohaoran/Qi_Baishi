@@ -5,7 +5,7 @@
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.1.0-b93a32" alt="version" />
+  <img src="https://img.shields.io/badge/version-v0.1.4-b93a32" alt="version" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-7b6a58" alt="license" />
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-e6dcc8" alt="platform" />
   <img src="https://img.shields.io/badge/runtime-Tauri%202-cb4b3f" alt="tauri" />
@@ -23,7 +23,7 @@
 
 白石是一个本地优先的桌面生图原型项目，面向自媒体创作者、营销和设计师。当前仓库包含一套可直接打开联调的前端页面，以及一套 Rust 后端，用于本地持久化、历史记录管理、预设管理和第三方图像/文本生成接口转发。
 
-当前版本：`v0.1.0`
+当前版本：`v0.1.4`
 开源许可证：Apache License 2.0
 
 ## 仓库概览
@@ -60,7 +60,7 @@
 
 ## 状态面板
 
-- 当前版本：`v0.1.0`
+- 当前版本：`v0.1.4`
 - 页面数量：`8` 个核心功能页
 - 本地缓存策略：默认 `2` 天，可配置 `1–5` 天
 - 当前发布产物：`arm64 dmg`、`intel dmg`、`x86_64 exe`、`deb`、`rpm`
@@ -71,6 +71,7 @@
 - 前端为多页面桌面应用原型，入口在 `front/index.html`
 - 功能页共 8 个：工作台、文生文、文生图、图生图、多图融合、灵感墙、历史作品、设置
 - 设置页已内置“关于”面板，包含开源说明、项目说明和检查更新入口
+- “检查更新”当前会真实读取 GitHub Releases 最新版本信息，并与本地版本比较
 - 后端以 `baishi-dev` HTTP 服务为主，默认端口 `3456`
 - 打包态核心功能优先走 Tauri `invoke`，开发态或注入缺失时回退本地 HTTP `http://localhost:3456`
 - 图像生成走“用户可配置供应商 + 请求体模板”模式，不内置本地模型
@@ -218,6 +219,8 @@ Qi_Baishi/
 ### `front/pages/settings.html`
 
 设置页，包含图像 API、生文 API、存储、偏好和“关于”面板。
+
+当前安装版中的外链入口为了兼容不同桌面环境，已统一调整为：直接显示原始链接，点击后复制到剪贴板，由用户自行粘贴到浏览器打开。这一策略目前覆盖“生图 API”中的“获取API”和“关于”面板中的仓库发布页入口。
 
 其中“关于”面板当前承担应用内说明页角色，主要包含：
 

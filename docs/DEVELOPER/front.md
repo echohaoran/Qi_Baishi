@@ -10,7 +10,7 @@
 - 组织方式：多页面桌面应用原型
 - 页面入口：`front/index.html`
 - 功能页数量：8
-- 版本：`v0.0.1_test`
+- 版本：`v0.1.4`
 - 主题：浅色/深色双模式，依赖 `data-theme`
 
 前端当前不使用框架，也不是 SPA。页面之间直接通过 `<a href="*.html">` 跳转。
@@ -169,21 +169,33 @@ front/
 
 ## 6. API 对接方式
 
-前端当前一律走 HTTP：
+前端当前不是“一律走 HTTP”，而是：
 
-- 基础地址：`http://localhost:3456`
-- 图像生成：
-  - `POST /api/generate/text`
-  - `POST /api/generate/image`
-- 文本生成：
-  - `POST /api/text/enhance`
-  - `POST /api/text/generate`
-- 设置：
-  - `GET/POST /api/settings/1`
-- 历史：
-  - `GET /api/history`
-  - `POST /api/history/favorite`
-  - `POST /api/history/delete`
+- 打包态：优先走 Tauri `invoke`
+- 开发浏览器联调：回退 `http://localhost:3456`
+
+统一入口：
+
+- `front/js/api-client.js`
+
+当前主链路已优先接入 Rust 命令层：
+
+- 文生图
+- 图生图
+- 多图融合
+- 文生文
+- 提示词润色
+
+开发 HTTP 回退接口仍包括：
+
+- `POST /api/generate/text`
+- `POST /api/generate/image`
+- `POST /api/text/enhance`
+- `POST /api/text/generate`
+- `GET/POST /api/settings/1`
+- `GET /api/history`
+- `POST /api/history/favorite`
+- `POST /api/history/delete`
 
 ## 7. 当前前端必须保持的行为
 
@@ -191,8 +203,11 @@ front/
 - 历史预览弹层必须跟随当前主题
 - 文生图结果卡片尺寸固定，原图在弹层中查看
 - 设置页供应商切换后显示真实官网链接
+- 设置页外链在安装版中必须优先走 Tauri shell/open
+- 若安装版外链打开不稳定，可改成“显示原始链接并点击复制”的退化交互
 - 设置页“关于”面板保留开源说明、项目说明和更新入口
 - 页面最外层使用统一圆角矩形外框
+- 图生图 / 多图融合上传使用持久隐藏 file input，避免偶发上传失效
 
 ## 8. 联调与检查
 

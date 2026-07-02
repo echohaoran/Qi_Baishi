@@ -9,7 +9,7 @@
 - 持久化：Rusqlite（SQLite）
 - 网络：Reqwest
 - 桌面壳：Tauri 2
-- 当前版本：`0.0.1-test`
+- 当前版本：`0.1.4`
 
 后端当前负责 4 件事：
 

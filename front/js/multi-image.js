@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const $$ = (sel) => document.querySelectorAll(sel);
 
   const refGrid       = $('#ref-grid');
+  const uploadInput   = $('#multi-upload-input');
   const addSlot       = $('#add-slot');
   const refCount      = $('#ref-count');
   const clearRefs     = $('#clear-refs');
@@ -270,14 +271,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function triggerUpload() {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    input.addEventListener('change', function () {
-      if (input.files) handleFiles(input.files);
+    if (!uploadInput) return;
+    uploadInput.value = '';
+    uploadInput.click();
+  }
+
+  if (uploadInput) {
+    uploadInput.addEventListener('change', function () {
+      if (uploadInput.files && uploadInput.files.length) handleFiles(uploadInput.files);
+      uploadInput.value = '';
     });
-    input.click();
   }
 
   function updateRefMem() {
@@ -289,6 +292,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   addSlot.addEventListener('click', triggerUpload);
+
+  window.addEventListener('pageshow', function () {
+    if (uploadInput) uploadInput.value = '';
+  });
 
   refGrid.addEventListener('dragover', function (e) { e.preventDefault(); refGrid.classList.add('drag-over'); });
   refGrid.addEventListener('dragleave', function () { refGrid.classList.remove('drag-over'); });

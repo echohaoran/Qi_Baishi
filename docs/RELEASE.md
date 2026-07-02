@@ -47,14 +47,15 @@ cargo tauri build
 使用语义化 tag，例如：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.4
+git push origin v0.1.4
 ```
 
 说明：
 
 - 当前 GitHub Releases 自动发布链路依赖 `v*` tag
 - 若 tag 名包含 `beta`、`alpha`、`rc`，Release 会被标记为预发布
+- 设置页“检查更新”读取的就是 GitHub Releases 最新版本；若应用内检测不到更新，优先检查 Release 是否已成功创建
 
 ### 3.4 等待 GitHub Actions 构建
 

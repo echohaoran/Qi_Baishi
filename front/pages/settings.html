@@ -31,7 +31,7 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.0.1_test</div></div></div>
+        <div class="brand"><span class="seal" style="background:url(../assets/logo.png) center/cover;color:transparent;">白</span><div><div class="name">白石</div><div class="en">BAISHI · v0.1.4</div></div></div>
         <div class="nav-scroll">
         <div class="nav-section">创作</div>
         <a href="workspace.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>工作台</a>
@@ -108,8 +108,8 @@
                     <select id="image-api-provider" class="select"></select>
                     <p class="field-hint" id="provider-endpoint-hint" style="font-size: 12px; color: var(--muted); margin-top: 6px; font-family: var(--font-mono); word-break: break-all;"></p>
                     <p class="field-hint" id="provider-api-link-row" hidden style="font-size: 12px; color: var(--muted); margin-top: 6px;">
-                      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);">
-                        <span style="color: var(--muted);">获取API：</span><a id="provider-api-link" href="#" target="_blank" rel="noreferrer noopener" style="color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px;">Agnes Images 2.1 Flash</a>
+                      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); max-width: 100%;">
+                        <span style="color: var(--muted); white-space: nowrap;">获取API：</span><a id="provider-api-link" href="#" rel="noreferrer noopener" style="color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; word-break: break-all;">https://wiki.agnes-ai.com/en/docs/quickstart</a>
                       </span>
                     </p>
                   </div>
@@ -354,7 +354,7 @@
                   </div>
                 </div>
                 <div class="about-meta">
-                  <span class="badge">版本 v0.0.1_test</span>
+                  <span class="badge">版本 v0.1.4</span>
                   <span class="badge">Apache-2.0</span>
                   <span class="badge">macOS / Windows</span>
                 </div>
@@ -391,8 +391,19 @@
                 </div>
                 <div class="about-actions">
                   <button type="button" class="btn btn-primary btn-sm" id="about-check-update">检查更新</button>
-                  <button type="button" class="btn btn-secondary btn-sm" id="about-open-release">打开发布页</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="about-open-release">复制发布页链接</button>
                 </div>
+                <div id="about-update-meta" class="field-hint" style="font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.7;">
+                  <div>当前版本：<span id="about-current-version">v0.1.4</span></div>
+                  <div>最新版本：<span id="about-latest-version">未检查</span></div>
+                  <div>发布时间：<span id="about-latest-published">未检查</span></div>
+                </div>
+                <p id="about-update-notes" class="field-hint" style="font-size: 12px; color: var(--muted); margin-top: 10px; white-space: pre-wrap; line-height: 1.7;">点击“检查更新”后将从 GitHub Releases 读取最新版本信息。</p>
+                <p class="field-hint" id="about-release-link-row" style="font-size: 12px; color: var(--muted); margin-top: 10px;">
+                  <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); max-width: 100%;">
+                    <span style="color: var(--muted); white-space: nowrap;">发布页：</span><a id="about-release-link" href="#" rel="noreferrer noopener" style="color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; word-break: break-all;">https://github.com/echohaoran/Qi_Baishi</a>
+                  </span>
+                </p>
               </div>
             </div>
 
